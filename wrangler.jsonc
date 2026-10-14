@@ -3,7 +3,7 @@
 // `bun run deploy:docs`. The name must match the Worker created in the dashboard.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "cellora-docs",
+  "name": "cellora",
   "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./apps/docs/dist",
