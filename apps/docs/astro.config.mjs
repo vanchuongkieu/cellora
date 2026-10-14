@@ -59,6 +59,13 @@ export default defineConfig({
         { tag: "meta", attrs: { name: "theme-color", content: "#151515" } },
         // Google AdSense: site verification + the ads loader (async, does not block rendering)
         { tag: "meta", attrs: { name: "google-adsense-account", content: "ca-pub-2241188479493423" } },
+        // Google Analytics 4: the queue and the page_view config run at once, the
+        // gtag.js file itself loads once the page has finished loading
+        {
+          tag: "script",
+          content:
+            'window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","G-PY8X3WPYCB");addEventListener("load",()=>{const s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-PY8X3WPYCB";document.head.appendChild(s)})',
+        },
         // Loaded after the page is interactive: the 200 KB ads script must not
         // delay the first paint or the demos (Core Web Vitals)
         {
