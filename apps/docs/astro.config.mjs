@@ -103,6 +103,7 @@ export default defineConfig({
           page("getting-started/columns", "Columns", "Định nghĩa cột"),
           page("getting-started/jsx-columns", "Columns as JSX", "Cột dạng JSX"),
           page("getting-started/styling", "Styling", "Tuỳ biến giao diện"),
+          page("getting-started/ai", "Use with AI (MCP)", "Dùng với AI (MCP)"),
         ]),
         group("Features", "Tính năng", [
           page("features/sorting", "Sorting", "Sắp xếp"),

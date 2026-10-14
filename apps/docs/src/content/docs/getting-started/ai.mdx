@@ -1,0 +1,83 @@
+---
+title: Use with AI (MCP)
+description: Connect Claude Code, Cursor, VS Code or ChatGPT to the Cellora documentation through its MCP server, llms.txt files and Copy Page button, so the assistant uses the real API.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components"
+
+An AI assistant that guesses a data grid API writes code that does not compile. Cellora publishes its documentation in three machine-readable ways so the assistant can read the real thing.
+
+## MCP server
+
+The docs site runs a [Model Context Protocol](https://modelcontextprotocol.io) server at:
+
+```
+https://cellora.vanchuongkieu.com/mcp
+```
+
+It is a remote server (Streamable HTTP), so there is nothing to install. It is read-only and needs no login.
+
+<Tabs>
+  <TabItem label="Claude Code">
+    ```sh
+    claude mcp add --transport http cellora https://cellora.vanchuongkieu.com/mcp
+    ```
+  </TabItem>
+  <TabItem label="Cursor">
+    `Settings` → `MCP` → `Add new global MCP server`, or add to `.cursor/mcp.json`:
+    ```json
+    { "mcpServers": { "cellora": { "url": "https://cellora.vanchuongkieu.com/mcp" } } }
+    ```
+  </TabItem>
+  <TabItem label="VS Code">
+    Add to `.vscode/mcp.json` (GitHub Copilot agent mode):
+    ```json
+    { "servers": { "cellora": { "type": "http", "url": "https://cellora.vanchuongkieu.com/mcp" } } }
+    ```
+  </TabItem>
+  <TabItem label="Windsurf">
+    Add to `~/.codeium/windsurf/mcp_config.json`:
+    ```json
+    { "mcpServers": { "cellora": { "serverUrl": "https://cellora.vanchuongkieu.com/mcp" } } }
+    ```
+  </TabItem>
+  <TabItem label="ChatGPT">
+    `Settings` → `Connectors` → `Add custom connector` with the URL above (needs Developer mode).
+  </TabItem>
+</Tabs>
+
+### Tools
+
+| Tool          | What it returns                                                                                       |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| `list_pages`  | Every page with its slug and one-line description.                                                    |
+| `get_page`    | One page as Markdown: guide, API table and the demo source. `slug` such as `features/server-side`.    |
+| `search_docs` | The best matching sections for a query, with excerpts and slugs.                                      |
+| `get_prop`    | The API table rows for one prop, column option, slot or label, e.g. `virtualized` or `onStateChange`. |
+
+Every page is also exposed as a resource (`cellora://docs/<slug>`).
+
+### Try it
+
+After connecting, ask things like:
+
+- "Using Cellora, build a grid that sorts and pages on the server with TanStack Query."
+- "Which Cellora column options change how search matches?"
+- "Show me how to pin a column and add a total row in Cellora."
+
+The assistant calls `search_docs` or `get_page`, reads the real API and writes code against it.
+
+## llms.txt
+
+For tools that read files instead of calling tools:
+
+- [`/llms.txt`](/llms.txt): the index, one line per page.
+- [`/llms-full.txt`](/llms-full.txt): every English page in one Markdown file, demos included as code. Paste it (or its URL) into a chat as context.
+
+## Copy Page
+
+Every page has a **Copy Page** button next to the title. It copies the page's Markdown, ready to paste into a conversation.
+
+## Running your own
+
+The server is about 200 lines in the docs repository (`apps/docs/worker`) and reads `llms-full.txt`, so it is always in step with the site. Fork it to serve your own documentation the same way.

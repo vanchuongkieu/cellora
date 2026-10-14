@@ -1,0 +1,83 @@
+---
+title: Dùng với AI (MCP)
+description: Kết nối Claude Code, Cursor, VS Code hoặc ChatGPT với tài liệu Cellora qua MCP server, file llms.txt và nút Copy Page, để trợ lý AI dùng đúng API thật.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components"
+
+Trợ lý AI đoán API của data grid thì viết ra code không chạy được. Cellora xuất bản tài liệu theo ba cách máy đọc được, để trợ lý đọc đúng nguồn.
+
+## MCP server
+
+Trang docs chạy một server [Model Context Protocol](https://modelcontextprotocol.io) tại:
+
+```
+https://cellora.vanchuongkieu.com/mcp
+```
+
+Đây là server remote (Streamable HTTP) nên không phải cài gì, chỉ đọc, không cần đăng nhập.
+
+<Tabs>
+  <TabItem label="Claude Code">
+    ```sh
+    claude mcp add --transport http cellora https://cellora.vanchuongkieu.com/mcp
+    ```
+  </TabItem>
+  <TabItem label="Cursor">
+    `Settings` → `MCP` → `Add new global MCP server`, hoặc thêm vào `.cursor/mcp.json`:
+    ```json
+    { "mcpServers": { "cellora": { "url": "https://cellora.vanchuongkieu.com/mcp" } } }
+    ```
+  </TabItem>
+  <TabItem label="VS Code">
+    Thêm vào `.vscode/mcp.json` (GitHub Copilot agent mode):
+    ```json
+    { "servers": { "cellora": { "type": "http", "url": "https://cellora.vanchuongkieu.com/mcp" } } }
+    ```
+  </TabItem>
+  <TabItem label="Windsurf">
+    Thêm vào `~/.codeium/windsurf/mcp_config.json`:
+    ```json
+    { "mcpServers": { "cellora": { "serverUrl": "https://cellora.vanchuongkieu.com/mcp" } } }
+    ```
+  </TabItem>
+  <TabItem label="ChatGPT">
+    `Settings` → `Connectors` → `Add custom connector` với URL ở trên (cần bật Developer mode).
+  </TabItem>
+</Tabs>
+
+### Các tool
+
+| Tool          | Trả về                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| `list_pages`  | Mọi trang kèm slug và một dòng mô tả.                                                                  |
+| `get_page`    | Một trang dạng Markdown: hướng dẫn, bảng API và mã demo. `slug` ví dụ `features/server-side`.          |
+| `search_docs` | Các đoạn khớp nhất với câu hỏi, kèm trích đoạn và slug.                                                |
+| `get_prop`    | Các dòng bảng API của một prop, tuỳ chọn cột, slot hoặc nhãn, ví dụ `virtualized` hay `onStateChange`. |
+
+Mỗi trang cũng là một resource (`cellora://docs/<slug>`).
+
+### Thử ngay
+
+Sau khi kết nối, hỏi kiểu:
+
+- "Dùng Cellora, làm grid sắp xếp và phân trang phía server với TanStack Query."
+- "Những tuỳ chọn cột nào của Cellora đổi cách tìm kiếm khớp?"
+- "Chỉ tôi cách ghim cột và thêm dòng tổng trong Cellora."
+
+Trợ lý sẽ gọi `search_docs` hoặc `get_page`, đọc API thật rồi viết code theo đó.
+
+## llms.txt
+
+Cho các công cụ đọc file thay vì gọi tool:
+
+- [`/llms.txt`](/llms.txt): mục lục, mỗi trang một dòng.
+- [`/llms-full.txt`](/llms-full.txt): mọi trang tiếng Anh trong một file Markdown, demo kèm code. Dán nội dung (hoặc URL) vào cuộc trò chuyện làm ngữ cảnh.
+
+## Copy Page
+
+Mỗi trang có nút **Copy Page** cạnh tiêu đề, sao chép Markdown của trang để dán thẳng vào chat.
+
+## Tự dựng cho dự án của bạn
+
+Server chỉ khoảng 200 dòng trong repo docs (`apps/docs/worker`) và đọc `llms-full.txt`, nên luôn khớp với site. Fork về để phục vụ tài liệu của bạn theo cùng cách.

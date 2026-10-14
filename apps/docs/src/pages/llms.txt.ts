@@ -22,6 +22,7 @@ export const GET: APIRoute = async () => {
     'Install: `npm install @cellora/react`, then `@import "@cellora/react/styles.css";` after Tailwind CSS v4 in your stylesheet. Needs React 18/19 and the shadcn/ui theme variables.',
     "",
     `The complete documentation as one Markdown file: ${SITE.url}/llms-full.txt`,
+    `MCP server (Streamable HTTP, read-only, tools list_pages / get_page / search_docs / get_prop): ${SITE.url}/mcp`,
     `Vietnamese version of every page: ${SITE.url}/vi/ (same paths, prefixed with /vi).`,
   ]
   let section = ""

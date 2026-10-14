@@ -1,6 +1,6 @@
 # Cellora — guide for AI assistants and coding agents
 
-Cellora is a React data grid built on shadcn/ui and Tailwind CSS v4. This file is the short, machine-friendly map of the project. The full documentation is published as Markdown for LLMs at <https://cellora.vanchuongkieu.com/llms.txt> (index) and <https://cellora.vanchuongkieu.com/llms-full.txt> (every page, demos included as code).
+Cellora is a React data grid built on shadcn/ui and Tailwind CSS v4. This file is the short, machine-friendly map of the project. The full documentation is published as Markdown for LLMs at <https://cellora.vanchuongkieu.com/llms.txt> (index) and <https://cellora.vanchuongkieu.com/llms-full.txt> (every page, demos included as code), and as an MCP server at <https://cellora.vanchuongkieu.com/mcp> (tools `list_pages`, `get_page`, `search_docs`, `get_prop`; source in `apps/docs/worker`).
 
 ## Using the package (for assistants helping Cellora users)
 
