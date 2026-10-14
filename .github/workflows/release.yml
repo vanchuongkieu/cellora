@@ -40,8 +40,9 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
-      - name: Verify
-        run: bun run typecheck && bun run lint && bun run build
+      # Build first: typecheck resolves the packages' types from their dist
+      - name: Build and verify
+        run: bun run build && bun run typecheck && bun run lint
 
       - name: Check that the tag matches @cellora/react
         run: |

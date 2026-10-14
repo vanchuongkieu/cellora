@@ -23,11 +23,15 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
+      # The apps and @cellora/react resolve types from the packages' dist, so build first
+      - name: Build packages
+        run: bun run build
+
       - name: Typecheck
         run: bun run typecheck
 
       - name: Lint
         run: bun run lint
 
-      - name: Build packages and docs
+      - name: Build docs
         run: bun run build:docs
