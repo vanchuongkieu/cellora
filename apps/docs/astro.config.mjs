@@ -53,6 +53,7 @@ export default defineConfig({
         { tag: "meta", attrs: { property: "og:image", content: `${SITE.url}/og.png` } },
         { tag: "meta", attrs: { property: "og:image:width", content: "1200" } },
         { tag: "meta", attrs: { property: "og:image:height", content: "630" } },
+        { tag: "meta", attrs: { property: "og:image:alt", content: "Cellora: the React data grid for shadcn/ui" } },
         { tag: "meta", attrs: { name: "twitter:card", content: "summary_large_image" } },
         { tag: "meta", attrs: { name: "twitter:image", content: `${SITE.url}/og.png` } },
         { tag: "meta", attrs: { name: "theme-color", content: "#151515" } },
