@@ -59,12 +59,20 @@ export default defineConfig({
         { tag: "meta", attrs: { name: "theme-color", content: "#151515" } },
         // Google AdSense: site verification + the ads loader (async, does not block rendering)
         { tag: "meta", attrs: { name: "google-adsense-account", content: "ca-pub-2241188479493423" } },
-        // Google Analytics 4: the queue and the page_view config run at once, the
-        // gtag.js file itself loads once the page has finished loading
+        // Google Analytics 4 with Consent Mode v2: storage is denied by default in
+        // the EEA, UK and Switzerland until the cookie banner (CookieConsent.astro)
+        // is answered, granted elsewhere. The queue and the page_view config run at
+        // once; the gtag.js file itself loads once the page has finished loading.
         {
           tag: "script",
-          content:
-            'window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","G-PY8X3WPYCB");addEventListener("load",()=>{const s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-PY8X3WPYCB";document.head.appendChild(s)})',
+          content: [
+            "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}",
+            'gtag("consent","default",{ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",analytics_storage:"denied",wait_for_update:500,region:["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH"]});',
+            'gtag("consent","default",{ad_storage:"granted",ad_user_data:"granted",ad_personalization:"granted",analytics_storage:"granted"});',
+            'try{const c=localStorage.getItem("cl-consent");if(c==="granted"||c==="denied")gtag("consent","update",{ad_storage:c,ad_user_data:c,ad_personalization:c,analytics_storage:c})}catch{}',
+            'gtag("js",new Date());gtag("config","G-PY8X3WPYCB");',
+            'addEventListener("load",()=>{const s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-PY8X3WPYCB";document.head.appendChild(s)})',
+          ].join(""),
         },
         // Loaded after the page is interactive: the 200 KB ads script must not
         // delay the first paint or the demos (Core Web Vitals)

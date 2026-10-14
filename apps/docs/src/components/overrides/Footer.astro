@@ -4,6 +4,7 @@ import Default from "@astrojs/starlight/components/Footer.astro"
 
 import { ui } from "../../i18n"
 import { SITE } from "../../site"
+import CookieConsent from "../CookieConsent.astro"
 
 const t = ui(Astro.locals.starlightRoute.locale)
 ---
@@ -12,3 +13,4 @@ const t = ui(Astro.locals.starlightRoute.locale)
 <p class="cl-credit">
   {t.builtBy} <a href="https://github.com/vanchuongkieu">vanchuongkieu</a>. {t.sourceOn} <a href={SITE.repo}>GitHub</a>.
 </p>
+<CookieConsent />

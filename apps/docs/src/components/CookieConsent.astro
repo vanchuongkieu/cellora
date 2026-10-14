@@ -1,0 +1,98 @@
+---
+/**
+ * Cookie banner for Google Consent Mode v2. The head script already denies
+ * storage by default in the EEA / UK / Switzerland; this banner records the
+ * visitor's choice and forwards it to gtag. It is only shown to visitors whose
+ * clock is in a European time zone and who have not chosen yet (the default
+ * stays "denied" for everyone else in those regions, so nothing leaks).
+ */
+import { ui } from "../i18n"
+
+const t = ui(Astro.locals.starlightRoute.locale)
+---
+
+<div class="cl-consent" data-consent hidden role="region" aria-label="Cookie consent">
+  <p>{t.consentText}</p>
+  <div class="cl-consent-actions">
+    <button type="button" class="cl-button-secondary" data-consent-choice="denied">{t.consentReject}</button>
+    <button type="button" class="cl-button-primary" data-consent-choice="granted">{t.consentAccept}</button>
+  </div>
+</div>
+
+<script>
+  const KEY = "cl-consent"
+  const banner = document.querySelector<HTMLElement>("[data-consent]")
+  const stored = (() => {
+    try {
+      return localStorage.getItem(KEY)
+    } catch {
+      return null
+    }
+  })()
+  const european = /^Europe\//.test(Intl.DateTimeFormat().resolvedOptions().timeZone ?? "")
+  if (banner && !stored && european) banner.hidden = false
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-consent-choice]")) {
+    button.addEventListener("click", () => {
+      const choice = button.dataset.consentChoice === "granted" ? "granted" : "denied"
+      try {
+        localStorage.setItem(KEY, choice)
+      } catch {
+        /* private mode: the choice lasts for this page only */
+      }
+      const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag
+      gtag?.("consent", "update", { ad_storage: choice, ad_user_data: choice, ad_personalization: choice, analytics_storage: choice })
+      if (banner) banner.hidden = true
+    })
+  }
+</script>
+
+<style>
+  .cl-consent {
+    position: fixed;
+    inset-inline: 1rem;
+    bottom: 1rem;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 26rem;
+    padding: 1rem;
+    border: 1px solid var(--cl-border);
+    border-radius: 0.75rem;
+    background: var(--cl-bg);
+    color: var(--cl-fg);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.14);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    animation: cl-consent-in 0.25s ease-out;
+  }
+  .cl-consent[hidden] {
+    display: none;
+  }
+  .cl-consent p {
+    margin: 0;
+  }
+  .cl-consent-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  @media (min-width: 40rem) {
+    .cl-consent {
+      inset-inline: auto 1.5rem;
+      bottom: 1.5rem;
+    }
+  }
+  @keyframes cl-consent-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cl-consent {
+      animation: none;
+    }
+  }
+</style>
