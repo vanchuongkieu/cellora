@@ -57,6 +57,8 @@ export default defineConfig({
         { tag: "meta", attrs: { name: "twitter:card", content: "summary_large_image" } },
         { tag: "meta", attrs: { name: "twitter:image", content: `${SITE.url}/og.png` } },
         { tag: "meta", attrs: { name: "theme-color", content: "#151515" } },
+        // Google AdSense site verification
+        { tag: "meta", attrs: { name: "google-adsense-account", content: "ca-pub-2241188479493423" } },
         {
           tag: "script",
           attrs: { type: "application/ld+json" },
