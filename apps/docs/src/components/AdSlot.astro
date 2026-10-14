@@ -9,8 +9,8 @@ import { ui } from "../i18n"
 interface Props {
   /** data-ad-slot of the unit created in AdSense */
   slot: string
-  /** "auto" (display, responsive) or "autorelaxed" (Multiplex) */
-  format?: "auto" | "autorelaxed"
+  /** "auto" (display, responsive), "autorelaxed" (Multiplex) or "fluid" (in-article) */
+  format?: "auto" | "autorelaxed" | "fluid"
   class?: string
 }
 
@@ -21,7 +21,14 @@ const t = ui(Astro.locals.starlightRoute.locale)
 
 <aside class:list={["cl-ad", className]} data-ad-slot-container>
   <span class="cl-ad-label">{t.advertisement}</span>
-  <ins class="adsbygoogle" style="display:block" data-ad-client={CLIENT} data-ad-slot={slot} data-ad-format={format} data-full-width-responsive={format === "auto" ? "true" : undefined}></ins>
+  <ins
+    class="adsbygoogle"
+    style={format === "fluid" ? "display:block;text-align:center" : "display:block"}
+    data-ad-client={CLIENT}
+    data-ad-slot={slot}
+    data-ad-format={format}
+    data-ad-layout={format === "fluid" ? "in-article" : undefined}
+    data-full-width-responsive={format === "auto" ? "true" : undefined}></ins>
   <script is:inline>
     ;(adsbygoogle = window.adsbygoogle || []).push({})
   </script>

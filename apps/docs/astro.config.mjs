@@ -48,6 +48,7 @@ export default defineConfig({
         Hero: "./src/components/overrides/Hero.astro",
         Pagination: "./src/components/overrides/Pagination.astro",
         PageSidebar: "./src/components/overrides/PageSidebar.astro",
+        MarkdownContent: "./src/components/overrides/MarkdownContent.astro",
         Footer: "./src/components/overrides/Footer.astro",
       },
       head: [

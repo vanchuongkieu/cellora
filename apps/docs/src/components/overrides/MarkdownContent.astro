@@ -1,0 +1,25 @@
+---
+/**
+ * Starlight's article body, plus the in-article ad unit. The unit is rendered
+ * after the content and moved to just before the first `##` heading (so it
+ * sits after the intro and the live demo, inside the article as AdSense wants).
+ */
+import Default from "@astrojs/starlight/components/MarkdownContent.astro"
+
+import AdSlot from "../AdSlot.astro"
+
+const { entry } = Astro.locals.starlightRoute
+const showAds = entry.data.template !== "splash" && !entry.id.endsWith("404")
+---
+
+<Default><slot /></Default>
+{showAds && <AdSlot slot="5823711231" format="fluid" class="cl-ad-in-article" />}
+
+<script>
+  const ad = document.querySelector(".cl-ad-in-article")
+  // Starlight wraps each heading in `.sl-heading-wrapper`; go before the first level-2 one
+  const firstHeading = document.querySelector(".sl-markdown-content .sl-heading-wrapper.level-h2, .sl-markdown-content h2")
+  const target = firstHeading?.closest(".sl-heading-wrapper") ?? firstHeading
+  // Runs before the ads script arrives (it loads after `load`), so the unit is in place when filled
+  if (ad && target) target.before(ad)
+</script>

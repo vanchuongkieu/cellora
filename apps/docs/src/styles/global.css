@@ -759,6 +759,9 @@ starlight-lang-select {
 .cl-ad-after-content:has(ins[data-ad-status="filled"]) {
   margin: 3rem 0 1rem;
 }
+.cl-ad-in-article:has(ins[data-ad-status="filled"]) {
+  margin: 2.5rem 0;
+}
 .cl-ad-sidebar {
   padding-inline-start: var(--sl-sidebar-pad-x, 1rem);
 }
