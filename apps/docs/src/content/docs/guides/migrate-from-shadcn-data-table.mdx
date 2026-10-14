@@ -1,0 +1,83 @@
+---
+title: Migrate from shadcn Data Table to Cellora
+description: Move a shadcn/ui Data Table built on TanStack Table to Cellora in minutes - columns, sorting, filtering, pagination, row selection and toolbar, side by side.
+---
+
+The shadcn/ui **Data Table** docs show how to assemble a table from TanStack Table and the `<Table>` primitives. It is a great starting point and a lot of code to maintain. Cellora keeps the look and replaces the assembly with props. This page maps one to the other.
+
+## Columns
+
+TanStack:
+
+```tsx
+const columns: ColumnDef<Payment>[] = [
+  { accessorKey: "status", header: "Status" },
+  {
+    accessorKey: "email",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Email
+      </Button>
+    ),
+  },
+  { accessorKey: "amount", header: () => <div className="text-right">Amount</div>, cell: ({ row }) => <div className="text-right">{format(row.getValue("amount"))}</div> },
+]
+```
+
+Cellora:
+
+```tsx
+const columns: DataGridColumnInput<Payment>[] = [
+  { id: "status", header: "Status", accessor: (row) => row.status },
+  { id: "email", header: "Email", accessor: (row) => row.email, sortable: true },
+  { id: "amount", header: "Amount", accessor: (row) => row.amount, align: "right", sortable: true, cell: (row) => format(row.amount) },
+]
+```
+
+| TanStack                                                          | Cellora                                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `accessorKey: "email"`                                            | `id: "email", accessor: (row) => row.email` (or `<DataGrid.Column field="email" />`) |
+| `header: ({ column }) => <Button onClick={column.toggleSorting}>` | `sortable: true` (whole header is the click target, icon included)                   |
+| `cell: ({ row }) => …`                                            | `cell: (row, { grid, index }) => …`                                                  |
+| `enableSorting: false`                                            | leave `sortable` off                                                                 |
+| `enableHiding: false`                                             | `hideable: false`                                                                    |
+| `size`                                                            | `width`                                                                              |
+| `meta.align` hacks                                                | `align: "right"`                                                                     |
+
+## The table component
+
+TanStack + shadcn/ui: `useReactTable` with `getCoreRowModel`, `getSortedRowModel`, `getFilteredRowModel`, `getPaginationRowModel`, then 60 lines of `<Table>` markup, a toolbar with an `<Input>` wired to `table.getColumn("email")?.setFilterValue`, a pagination footer with `table.previousPage()` …
+
+Cellora:
+
+```tsx
+<DataGrid rows={data} columns={columns} getRowId={(row) => row.id} enableSorting enableSearch enableRowSelection />
+```
+
+| TanStack feature                                       | Cellora prop                                                        |
+| ------------------------------------------------------ | ------------------------------------------------------------------- |
+| `getSortedRowModel()` + header buttons                 | `enableSorting`                                                     |
+| Filter input on one column                             | `enableSearch` (all columns) or the column menu's per-column filter |
+| `getPaginationRowModel()` + footer buttons             | on by default; `pageSize`, `pageSizeOptions`                        |
+| Row selection checkbox column                          | `enableRowSelection`, `onSelectionChange`                           |
+| Column visibility dropdown                             | column menu → Manage columns                                        |
+| `manualPagination`, `manualSorting`, `manualFiltering` | same names, plus `rowCount` and `onStateChange`                     |
+| `rowCount`                                             | `rowCount`                                                          |
+| Custom toolbar                                         | `<DataGrid.Toolbar>` slot or `slots.toolbar`                        |
+| "No results." row                                      | `emptyMessage` or the `empty` slot                                  |
+
+## State you were managing yourself
+
+`useState` for sorting, column filters, visibility and row selection goes away. Read it from the grid API in slots (`grid.state`, `grid.selection`) or control it with `sort` / `filter` / `columnFilters` / `pageIndex` / `selectedRowIds` and their `on…Change` callbacks when you need it in the URL.
+
+## What you gain
+
+Virtual scrolling for a million rows, pinned columns, column groups, row grouping with totals, inline editing, accent-insensitive search, labels for i18n, and a framework-free core, without adding libraries.
+
+## What to check after migrating
+
+- `getRowId` must return a stable id if rows can be reordered or reloaded (selection and editing key on it).
+- Custom `cell` renderers receive the row directly, not a TanStack `row` object.
+- Styling overrides move from `className` on `<TableCell>` to `classNames={{ cell: "…" }}` or per-column `cell`.
+
+Step by step: [Quick start](/getting-started/quick-start/). Full prop list: [DataGrid props](/api/data-grid/).

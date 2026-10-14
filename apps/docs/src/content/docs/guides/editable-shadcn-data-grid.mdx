@@ -1,0 +1,70 @@
+---
+title: Editable shadcn data grid with inline editing
+description: Add inline editing to a shadcn/ui data table. Text, number, date, select and checkbox editors, validation, async saves with error messages, Tab between cells.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/inline-editing-demo"
+import code from "~/demos/inline-editing-demo.tsx?raw"
+
+An editable table is where most hand-rolled data tables give up: focus management, Enter / Escape / Tab, validation, saving to an API without losing the user's typing. Cellora has it built in and never owns your data: it tells you what changed, you decide what to save.
+
+<ComponentPreview code={code} title="inline-editing-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+Double-click a cell, or press Enter / F2 on a focused cell. Tab moves to the next editable cell, Escape cancels.
+
+## Turn it on
+
+```tsx
+<DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} enableEditing onCellEdit={save} />
+```
+
+```tsx
+const columns = [
+  { id: "name", header: "Name", accessor: (row) => row.name, editable: true, validate: (value) => (String(value).trim() ? null : "Name is required") },
+  { id: "department", header: "Department", accessor: (row) => row.department, editable: true, editor: "select", editorOptions: options },
+  { id: "salary", header: "Salary", accessor: (row) => row.salary, editable: true, editor: "number" },
+  { id: "startDate", header: "Start", accessor: (row) => row.startDate, editable: true, editor: "date" },
+  { id: "remote", header: "Remote", accessor: (row) => row.remote, editable: true, editor: "checkbox" },
+]
+```
+
+## Save to an API
+
+`onCellEdit` receives `{ row, rowId, columnId, value, previousValue }`. Return nothing to accept, `false` or throw to reject; the editor stays open and shows the message.
+
+```tsx
+async function save({ rowId, columnId, value }: DataGridCellEdit<Employee>) {
+  const res = await fetch(`/api/employees/${rowId}`, { method: "PATCH", body: JSON.stringify({ [columnId]: value }) })
+  if (!res.ok) throw new Error((await res.json()).message) // shown in the cell
+  setRows((rows) => rows.map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)))
+}
+```
+
+While the promise is pending the editor is read-only and `grid.editing.pending` is true. Overlapping saves (checkbox cells save on every click) are counted, so `pending` only clears when the last one finishes.
+
+## Validation and parsing
+
+- `validate(value, row)` returns a message to reject.
+- `parseValue(input, row)` turns the typed text into the value you want to store (defaults per editor: number, local date, string).
+- `editable: (row) => boolean` decides per row (for example, not for inactive records).
+- `isCellEditable` on the grid adds a global gate (permissions).
+
+## Custom editors
+
+Give a column `editCell` (or `editComponent`) to render your own control. It receives `{ value, commit, cancel, pending }`: call `commit(newValue)` to save and close. Works for date pickers, comboboxes, rich inputs.
+
+More: [Inline editing](/features/inline-editing/), [Custom cells](/customization/custom-cells/).
+
+## FAQ
+
+**Does editing work with virtual scrolling and pinned columns?**
+Yes; the editor is positioned over the cell, so neither row height nor column width changes.
+
+**How is the edited row identified after I replace the row object?**
+By `getRowId`. Immutable updates replace the object; the id keeps the editor on the right row.
+
+**Can I edit on single click?**
+`editTrigger="click"`.

@@ -1,0 +1,2 @@
+# The sitemap Astro builds is sitemap-index.xml; tools and crawlers often ask for /sitemap.xml
+/sitemap.xml /sitemap-index.xml 301

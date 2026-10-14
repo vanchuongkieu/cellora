@@ -1,6 +1,6 @@
 ---
-title: The React data grid for shadcn/ui
-description: Fast, fully customizable React data grid built on shadcn/ui. Sorting, filtering, grouping, inline editing and virtual scrolling for a million rows.
+title: React data grid for shadcn/ui with virtual scroll
+description: Fast, fully customizable React data grid built on shadcn/ui, MIT licensed. Sorting, filtering, grouping, editing and virtual scrolling for a million rows.
 template: splash
 # The landing page is the site, not an article (Starlight's default og:type)
 head:
@@ -9,7 +9,7 @@ head:
       property: og:type
       content: website
 hero:
-  title: The data grid for your shadcn/ui app
+  title: The React data grid for your shadcn/ui app
   tagline: Sorting, filters, grouping, totals, inline editing, pinned columns and virtual scrolling. Built from shadcn/ui, styled with your theme, smooth with a million rows.
   actions:
     - text: Get Started
@@ -22,3 +22,28 @@ hero:
 import Showcase from "~/components/Showcase.astro"
 
 <Showcase />
+
+<div class="cl-landing-text">
+
+## A data grid that looks like your app
+
+Most React data grids bring their own design system. Cellora is built from [shadcn/ui](https://ui.shadcn.com) components and Tailwind CSS, and it draws with the theme variables your app already defines: colors, radius, dark mode. Drop it into a shadcn/ui project and it matches on the first render, with no theme file to maintain. Every part of the chrome (toolbar, header cells, rows, footer, menus, checkboxes, icons) is a slot you can replace, every string is a label you can translate, and every part accepts extra classes and inline styles.
+
+## Fast at any size
+
+The grid renders only the rows and columns in view. With `virtualized` on, 1,000,000 rows × 100 columns scroll at 60 fps with native scrolling and no blank flashes, because the browser does the scrolling and React only re-renders once per screen. Sorting a million rows reads each value once and takes well under a second; search runs in a background render and only re-filters the previous matches while you type. Rows do not need to be objects, so a huge dataset does not have to be a huge allocation.
+
+## Everything a real table needs
+
+- **Data**: sorting, accent-insensitive search (type `nguyen`, find `Nguyễn`), per-column filters, pagination, row grouping with aggregates and a total row, inline editing with text, number, date, select and checkbox editors, row selection that survives paging.
+- **Layout**: fixed column widths, drag, double-click and keyboard resizing, pinned columns on either side, sticky header, nested column groups, fill-the-screen height.
+- **Server-side**: let your API sort, search, filter and page; the grid keeps the state and reports every change through `onStateChange`, so a TanStack Query hook is all the glue you need.
+- **Custom rules**: per-column `sortValue`, `compare`, `searchValue`, `filterValue`, `filterMatch`, or a grid-wide `searchFilter` for multi-word and `field:value` search.
+
+## Made for teams and for AI assistants
+
+Cellora is TypeScript first, MIT licensed, and works with Vite, Next.js, Remix and Astro, including server rendering and static generation. The logic lives in a framework-free core package. The documentation is one page per feature with a live demo and an API table, in English and Vietnamese, and it is published for assistants too: an [MCP server](/getting-started/ai/), `llms.txt` files and a Copy Page button, so Claude Code, Cursor or ChatGPT write code against the real API instead of guessing.
+
+[Install in two minutes](/getting-started/installation/), read the [quick start](/getting-started/quick-start/), or compare it with [TanStack Table, AG Grid and MUI X](/guides/cellora-vs-tanstack-table-ag-grid-mui/).
+
+</div>

@@ -602,7 +602,7 @@ starlight-lang-select {
    the first column (the prop / option name) stays on one line */
 .sl-markdown-content :is(th, td) code:not(:where(.not-content *)) {
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .sl-markdown-content :is(th, td):first-child code:not(:where(.not-content *)) {
   white-space: nowrap;
@@ -765,6 +765,13 @@ starlight-lang-select {
 .cl-ad-sidebar {
   padding-inline-start: var(--sl-sidebar-pad-x, 1rem);
 }
+/* The right column only exists from Starlight's `lg` breakpoint; below it the
+   unit would land at the top of the page, full width */
+@media (max-width: 72rem) {
+  .cl-ad-sidebar {
+    display: none;
+  }
+}
 .cl-ad-sidebar:has(ins[data-ad-status="filled"]) {
   margin-top: 2rem;
 }
@@ -839,6 +846,28 @@ starlight-lang-select {
   box-shadow: none;
 }
 
+/* Landing page copy under the demo card: article width, centred */
+.cl-landing-text {
+  max-width: 44rem;
+  margin: 4rem auto 0;
+}
+.cl-landing-text h2 {
+  margin-top: 2.5rem;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--cl-fg);
+}
+.cl-landing-text p,
+.cl-landing-text li {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--cl-fg);
+}
+.cl-landing-text a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
 .cl-card {
   border: 1px solid var(--cl-border);
   border-radius: calc(var(--radius) * 0.8);

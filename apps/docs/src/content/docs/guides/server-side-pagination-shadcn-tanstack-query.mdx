@@ -1,0 +1,93 @@
+---
+title: Server-side shadcn data table with TanStack Query
+description: Build a shadcn/ui data table that pages, sorts and searches on the server with TanStack Query and Cellora. The grid keeps the state, your API returns one page.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/server-side-demo"
+import code from "~/demos/server-side-demo.tsx?raw"
+
+When the data lives behind an API, the browser should never download the whole table. The grid should ask the server for one page, sorted and filtered, and show what comes back. With Cellora that is three props and one callback.
+
+<ComponentPreview code={code} title="server-side-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+## With TanStack Query
+
+```tsx
+import { useState } from "react"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
+import { DataGrid, type DataGridState } from "@cellora/react"
+
+export function Employees() {
+  const [state, setState] = useState<DataGridState>({ sort: null, filter: "", columnFilters: {}, pageIndex: 0, pageSize: 20 })
+  const { data, isFetching } = useQuery({
+    queryKey: ["employees", state],
+    queryFn: () => fetchEmployees(state), // GET /api/employees?page=…&sort=…&q=…
+    placeholderData: keepPreviousData, // old page stays while the next loads
+  })
+
+  return (
+    <DataGrid
+      rows={data?.rows ?? []}
+      columns={columns}
+      getRowId={(row) => row.id}
+      manualSorting
+      manualFiltering
+      manualPagination
+      rowCount={data?.total}
+      onStateChange={setState}
+      pageSize={state.pageSize}
+      loading={isFetching}
+      loadingVariant="overlay"
+      enableSorting
+      enableSearch
+    />
+  )
+}
+```
+
+- `onStateChange` fires with `{ sort, filter, columnFilters, pageIndex, pageSize }` after every user action. Putting that object in the query key is all the caching logic you need.
+- `manualSorting`, `manualFiltering`, `manualPagination` tell the grid the rows are already processed, so it shows them as they are.
+- `rowCount` gives the total across pages for the page count and the "1-20 of 1,250" text.
+- `loadingVariant="overlay"` dims the old page instead of replacing it with a skeleton, so the table does not jump.
+
+## What to do on the server
+
+Translate the state into your query:
+
+| State field     | SQL / ORM equivalent                        |
+| --------------- | ------------------------------------------- |
+| `sort`          | `ORDER BY ${columnId} ${direction}`         |
+| `filter`        | `WHERE name ILIKE %q% OR email ILIKE %q% …` |
+| `columnFilters` | one `WHERE column ILIKE %text%` per entry   |
+| `pageIndex`     | `OFFSET pageIndex * pageSize`               |
+| `pageSize`      | `LIMIT pageSize`                            |
+
+Return `{ rows, total }`. Validate `sort.columnId` against an allow-list before interpolating it.
+
+## Debounce the search
+
+`onStateChange` fires on every keystroke in the search box. Either debounce before setting the query state, or let TanStack Query coalesce requests and keep `placeholderData`. For most APIs a 250 ms debounce on `filter` is enough:
+
+```tsx
+const [state, setState] = useState<DataGridState>(initial)
+const debounced = useDebounce(state, 250)
+useQuery({ queryKey: ["employees", debounced], queryFn: () => fetchEmployees(debounced) })
+```
+
+## Keep the state in the URL
+
+Pass the state back in as controlled props (`sort`, `filter`, `columnFilters`, `pageIndex`) and write it to the search params in `onStateChange`. Links become shareable and the back button works. Details: [Server-side data](/features/server-side/).
+
+## FAQ
+
+**Can only some steps be server-side?**
+Yes. Set only the `manual*` flags for what the API does; the grid still sorts or filters the rest client-side.
+
+**Does select-all cover the whole dataset?**
+It covers the rows the grid has (the current page). Server-wide selection needs your own id list.
+
+**Does it work with Next.js route handlers or tRPC?**
+Anything that returns `{ rows, total }` works; the grid does not care how it is fetched.

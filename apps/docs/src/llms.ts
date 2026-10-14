@@ -9,7 +9,7 @@ import { getCollection, type CollectionEntry } from "astro:content"
 import { SITE } from "./site"
 
 /** Sidebar order of the sections */
-const SECTIONS = ["getting-started", "features", "customization", "api"]
+const SECTIONS = ["getting-started", "features", "guides", "customization", "api"]
 
 /** Demo sources by path, as `~/demos/<name>.tsx?raw` imports resolve to */
 const demoSources = import.meta.glob<string>("./demos/*.tsx", { query: "?raw", import: "default", eager: true })

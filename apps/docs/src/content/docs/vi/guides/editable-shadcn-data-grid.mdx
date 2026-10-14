@@ -1,0 +1,70 @@
+---
+title: Data grid shadcn sửa trực tiếp trong ô
+description: Thêm sửa trực tiếp cho bảng dữ liệu shadcn/ui. Editor text, số, ngày, select và checkbox, kiểm tra hợp lệ, lưu bất đồng bộ kèm báo lỗi, Tab giữa các ô.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/inline-editing-demo"
+import code from "~/demos/inline-editing-demo.tsx?raw"
+
+Bảng sửa được là chỗ hầu hết bảng tự viết bỏ cuộc: quản lý focus, Enter / Escape / Tab, kiểm tra hợp lệ, lưu lên API mà không mất chữ người dùng đang gõ. Cellora có sẵn và không bao giờ sở hữu dữ liệu của bạn: nó báo cái gì đổi, bạn quyết định lưu gì.
+
+<ComponentPreview code={code} title="inline-editing-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+Nhấp đúp một ô, hoặc nhấn Enter / F2 ở ô đang focus. Tab sang ô sửa được tiếp theo, Escape huỷ.
+
+## Bật tính năng
+
+```tsx
+<DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} enableEditing onCellEdit={save} />
+```
+
+```tsx
+const columns = [
+  { id: "name", header: "Tên", accessor: (row) => row.name, editable: true, validate: (value) => (String(value).trim() ? null : "Tên không được trống") },
+  { id: "department", header: "Phòng ban", accessor: (row) => row.department, editable: true, editor: "select", editorOptions: options },
+  { id: "salary", header: "Lương", accessor: (row) => row.salary, editable: true, editor: "number" },
+  { id: "startDate", header: "Ngày vào", accessor: (row) => row.startDate, editable: true, editor: "date" },
+  { id: "remote", header: "Từ xa", accessor: (row) => row.remote, editable: true, editor: "checkbox" },
+]
+```
+
+## Lưu lên API
+
+`onCellEdit` nhận `{ row, rowId, columnId, value, previousValue }`. Không trả gì là chấp nhận; trả `false` hoặc ném lỗi là từ chối, editor giữ nguyên và hiện thông báo.
+
+```tsx
+async function save({ rowId, columnId, value }: DataGridCellEdit<Employee>) {
+  const res = await fetch(`/api/employees/${rowId}`, { method: "PATCH", body: JSON.stringify({ [columnId]: value }) })
+  if (!res.ok) throw new Error((await res.json()).message) // hiện ngay trong ô
+  setRows((rows) => rows.map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)))
+}
+```
+
+Trong lúc promise chạy, editor chỉ đọc và `grid.editing.pending` là true. Các lần lưu chồng nhau (ô checkbox lưu mỗi lần bấm) được đếm, nên `pending` chỉ tắt khi lần cuối xong.
+
+## Kiểm tra và phân tích giá trị
+
+- `validate(value, row)` trả thông báo để từ chối.
+- `parseValue(input, row)` đổi chữ gõ thành giá trị muốn lưu (mặc định theo editor: số, ngày local, chuỗi).
+- `editable: (row) => boolean` quyết định theo dòng (ví dụ không cho sửa bản ghi đã khoá).
+- `isCellEditable` ở cấp grid là cổng chung (phân quyền).
+
+## Editor tuỳ biến
+
+Cho cột `editCell` (hoặc `editComponent`) để render control riêng. Nó nhận `{ value, commit, cancel, pending }`: gọi `commit(giáTrịMới)` để lưu và đóng. Dùng được cho date picker, combobox, input phức tạp.
+
+Thêm: [Sửa trực tiếp](/vi/features/inline-editing/), [Ô tuỳ biến](/vi/customization/custom-cells/).
+
+## Hỏi đáp
+
+**Sửa ô có chạy cùng cuộn ảo và cột ghim không?**
+Có; editor nằm đè lên ô nên chiều cao dòng và độ rộng cột không đổi.
+
+**Thay object dòng rồi thì grid nhận ra dòng đang sửa thế nào?**
+Bằng `getRowId`. Cập nhật bất biến thay object; id giữ editor đúng dòng.
+
+**Sửa bằng một click được không?**
+`editTrigger="click"`.

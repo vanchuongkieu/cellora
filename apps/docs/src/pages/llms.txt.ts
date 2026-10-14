@@ -6,6 +6,7 @@ import { SITE } from "../site"
 const SECTION_TITLES: Record<string, string> = {
   "getting-started": "Getting started",
   features: "Features",
+  guides: "Guides",
   customization: "Customization",
   api: "API reference",
 }

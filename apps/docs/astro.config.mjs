@@ -157,6 +157,14 @@ export default defineConfig({
           page("features/server-side", "Server-side data", "Dữ liệu phía server"),
           page("features/display-columns", "Action columns", "Cột thao tác"),
         ]),
+        group("Guides", "Hướng dẫn", [
+          page("guides/shadcn-data-table-virtual-scroll", "1,000,000 rows in a shadcn table", "Bảng shadcn 1.000.000 dòng"),
+          page("guides/server-side-pagination-shadcn-tanstack-query", "Server-side with TanStack Query", "Phía server với TanStack Query"),
+          page("guides/editable-shadcn-data-grid", "Editable data grid", "Data grid sửa trực tiếp"),
+          page("guides/vietnamese-accent-insensitive-search", "Accent-insensitive search", "Tìm kiếm không dấu"),
+          page("guides/migrate-from-shadcn-data-table", "Migrate from shadcn Data Table", "Chuyển từ shadcn Data Table"),
+          page("guides/cellora-vs-tanstack-table-ag-grid-mui", "Cellora vs TanStack, AG Grid, MUI", "So sánh với TanStack, AG Grid, MUI"),
+        ]),
         group("Customization", "Tuỳ biến", [
           page("customization/custom-cells", "Custom cells", "Ô tuỳ biến"),
           page("customization/slots", "Slots", "Slot"),

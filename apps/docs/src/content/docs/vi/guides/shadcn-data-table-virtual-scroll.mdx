@@ -1,0 +1,70 @@
+---
+title: Bảng dữ liệu shadcn cuộn ảo 1.000.000 dòng
+description: Cách hiển thị một triệu dòng trong bảng dữ liệu shadcn/ui mà không lag. Cuộn ảo cả dòng lẫn cột, 60 fps native, có sẵn sắp xếp và tìm kiếm, chỉ một prop.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/virtual-scroll-demo"
+import code from "~/demos/virtual-scroll-demo.tsx?raw"
+
+Ví dụ **Data Table** của shadcn/ui vẽ mọi dòng nó nhận được. Vài trăm dòng thì ổn, vài nghìn dòng là bắt đầu hỏng: DOM phình to, sắp xếp vẽ lại tất cả, cuộn giật. Cellora là data grid dựng từ chính các primitive của shadcn/ui nhưng chỉ vẽ phần đang nhìn thấy, nên một triệu dòng cuộn mượt như một trăm dòng.
+
+<ComponentPreview code={code} title="virtual-scroll-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+## Một prop
+
+```tsx
+<DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} virtualized maxHeight={600} enableSorting enableSearch />
+```
+
+`virtualized` chuyển grid từ `<table>` sang lưới có cửa sổ: dòng **và** cột ngoài vùng nhìn không tồn tại trong DOM. Mọi thứ khác (sắp xếp, tìm kiếm, ghim cột, chọn dòng, sửa ô, nhóm dòng) vẫn hoạt động.
+
+## Vì sao vẫn mượt
+
+- **Cuộn native.** Dòng nằm đúng vị trí thật trong một vùng đệm cao, trình duyệt tự cuộn. Không có JavaScript nào chạy mỗi frame.
+- **Vẽ lại một lần mỗi màn hình.** React chỉ render dòng mới khi vùng nhìn vượt qua một khối, ở mức ưu tiên thấp. Cuộn thật nhanh không vẽ những cửa sổ đã bỏ lại.
+- **Không chớp trắng.** Hai màn hình dòng được chuẩn bị theo hướng cuộn; placeholder bằng CSS phủ phần cuộn vượt quá.
+- **Vượt giới hạn chiều cao của trình duyệt.** Trình duyệt giới hạn phần tử khoảng 33 triệu px (chừng 890.000 dòng ở 37 px). Quá mức đó Cellora quy đổi vị trí cuộn, nên một triệu dòng vẫn giữ nguyên chiều cao dòng.
+- **Sắp xếp một triệu dòng** đọc mỗi giá trị một lần, xếp hạng chuỗi một lần rồi chỉ sắp xếp số: chưa tới một giây. Tìm kiếm chạy ở lượt render nền và chỉ lọc tiếp kết quả cũ khi gõ thêm.
+
+Đo trên Chrome: 1.000.000 dòng × 100 cột ở 60 fps, không có long task, kể cả khi vuốt 12.000 px/s.
+
+## Dòng không cần là object
+
+Demo ở trên không giữ một triệu object trong bộ nhớ: mỗi dòng chỉ là chỉ số, mỗi cột tự suy giá trị từ đó. Cellora không bao giờ sao chép hay sửa `rows`, nên dữ liệu dạng nào cũng được.
+
+```tsx
+const rows = Array.from({ length: 1_000_000 }, (_, i) => i)
+const columns = [{ id: "n", header: "#", accessor: (row: number) => row + 1, sortable: true }]
+```
+
+## Giữ đúng giao diện shadcn/ui
+
+Grid vẽ bằng biến theme của shadcn/ui (`--background`, `--border`, `--muted`, …) nên khớp với app và dark mode mà không cần cấu hình. Cài một lần:
+
+```sh
+npm install @cellora/react
+```
+
+```css
+@import "tailwindcss";
+@import "@cellora/react/styles.css";
+```
+
+Hướng dẫn đầy đủ: [Cài đặt](/vi/getting-started/installation/). Mọi tuỳ chọn cuộn ảo: [Cuộn ảo](/vi/features/virtual-scroll/).
+
+## Hỏi đáp
+
+**Cuộn ảo có dùng được cùng ghim cột và nhóm dòng không?**
+Có. Cột ghim vẫn dính, tiêu đề nhóm được cửa sổ hoá như dòng, dòng tổng vẫn ở đáy.
+
+**Muốn giữ phân trang thì sao?**
+Không bật `virtualized`. Phân trang là mặc định cho dữ liệu nhỏ; cuộn ảo thay nó khi dữ liệu lớn.
+
+**Có chạy với Next.js và server rendering không?**
+Có. Package đã `"use client"`, hydrate an toàn, và render sẵn màn hình dòng đầu tiên trên server.
+
+**Khác gì TanStack Table + TanStack Virtual?**
+TanStack cho hook headless; bạn tự viết markup, layout sticky và windowing. Cellora giao sẵn grid shadcn/ui hoàn chỉnh có cuộn ảo. Xem [so sánh](/vi/guides/cellora-vs-tanstack-table-ag-grid-mui/).

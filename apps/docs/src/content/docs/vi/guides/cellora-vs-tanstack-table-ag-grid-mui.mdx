@@ -1,0 +1,48 @@
+---
+title: So sánh Cellora với TanStack, AG Grid, MUI X
+description: So sánh thẳng thắn data grid React cho app shadcn/ui - TanStack Table, AG Grid, MUI X Data Grid và Cellora - về giao diện, cuộn ảo, dữ liệu server, giấy phép.
+---
+
+Chọn data grid thực chất là chọn mình muốn tự làm bao nhiêu và muốn nó giống app của mình tới đâu. Trang này so sánh bốn lựa chọn hay gặp trong dự án React + shadcn/ui.
+
+## Nhìn nhanh
+
+|                                        | Cellora                                            | TanStack Table                    | AG Grid                                             | MUI X Data Grid                      |
+| -------------------------------------- | -------------------------------------------------- | --------------------------------- | --------------------------------------------------- | ------------------------------------ |
+| Bản chất                               | Data grid shadcn/ui hoàn chỉnh                     | Logic bảng headless (hook)        | Grid đầy đủ, UI riêng                               | Grid đầy đủ, Material UI             |
+| Giống shadcn/ui                        | Có, dùng token theme của bạn                       | Bạn tự viết toàn bộ markup        | Theme riêng, cần sửa CSS                            | Material design                      |
+| Cuộn ảo dòng + cột                     | Có sẵn, một prop                                   | Tự thêm TanStack Virtual          | Có sẵn                                              | Có sẵn                               |
+| Sắp xếp / lọc / phân trang phía server | prop `manual*` + `onStateChange`                   | tuỳ chọn `manual*`, tự nối fetch  | Server-side row model (đủ tính năng cần Enterprise) | Server-side (Pro)                    |
+| Ghim cột, nhóm dòng, dòng tổng, sửa ô  | Có sẵn                                             | Tự dựng                           | Có sẵn (một phần Enterprise)                        | Có sẵn (một phần Pro/Premium)        |
+| Slot / tuỳ biến                        | 30+ slot, `classNames` từng phần, mọi chữ là label | Tự do hoàn toàn, tự làm hoàn toàn | Cell renderer, theme                                | Slot, `sx`                           |
+| Giấy phép                              | MIT, miễn phí                                      | MIT, miễn phí                     | Community MIT; Enterprise trả phí                   | Community MIT; Pro / Premium trả phí |
+| Core không phụ thuộc framework         | `@cellora/core` (sắp có Vue)                       | Adapter cho nhiều framework       | Angular, Vue, React                                 | Chỉ React                            |
+
+## Khi nào chọn cái nào
+
+**TanStack Table** đúng khi bạn muốn tự kiểm soát từng pixel và bảng nhỏ hoặc vừa. Nó là động cơ sau ví dụ Data Table của shadcn/ui. Chi phí lộ ra khi cần cuộn ảo, cột dính, nhóm có tổng và sửa ô: mỗi thứ là một dự án riêng.
+
+**AG Grid** là "ngựa thồ" doanh nghiệp: pivot, xuất Excel, tree data, master-detail. Cần những thứ đó thì mua Enterprise và theme lại. UI của nó là của nó, không tự giống app shadcn/ui.
+
+**MUI X Data Grid** hợp khi app đã dùng Material UI. Trong app Tailwind + shadcn/ui, nó mang theo một hệ thiết kế thứ hai và runtime styling Emotion.
+
+**Cellora** dành cho app shadcn/ui cần grid thật, không phải demo: sắp xếp, tìm kiếm không dấu, lọc theo cột, phân trang hoặc cuộn ảo một triệu dòng, ghim cột, nhóm cột, nhóm dòng có tổng, sửa ô, chọn dòng giữ qua các trang, chế độ server-side. Vẽ bằng token theme của bạn, mọi phần là slot, mọi chữ là label, logic nằm trong core không phụ thuộc framework.
+
+## Về hiệu năng
+
+Cellora đo 1.000.000 dòng × 100 cột ở 60 fps trên Chrome với cuộn native, không long task ([cách làm](/vi/guides/shadcn-data-table-virtual-scroll/)). Sắp xếp một triệu dòng chưa tới một giây. AG Grid và MUI X cũng ảo hoá tốt; TanStack Table cần thêm TanStack Virtual và memo hoá cẩn thận.
+
+## Chuyển đổi
+
+Từ Data Table của shadcn/ui (TanStack): [hướng dẫn chuyển](/vi/guides/migrate-from-shadcn-data-table/). Định nghĩa cột gần như một-một (`accessorKey` → `accessor`, `header` → `header`, `cell` → `cell`).
+
+## Hỏi đáp
+
+**Cellora có headless không?**
+Cả hai: `useDataGrid` trả cùng grid API mà không render, `@cellora/core` có các hàm thuần, còn `DataGrid` là component hoàn chỉnh.
+
+**Có cần Tailwind không?**
+Cần Tailwind CSS v4 và biến theme của shadcn/ui; nhờ đó nó giống app của bạn mà không cấu hình.
+
+**Không dùng shadcn/ui có dùng được không?**
+Cần các biến CSS mà shadcn/ui định nghĩa (`--background`, `--border`, …). Dự án nào cũng khai báo được.

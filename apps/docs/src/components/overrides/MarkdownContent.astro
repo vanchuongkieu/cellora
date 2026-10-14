@@ -16,6 +16,20 @@ const showAds = entry.data.template !== "splash" && !entry.id.endsWith("404")
 {showAds && <AdSlot slot="5823711231" format="fluid" class="cl-ad-in-article" />}
 
 <script>
+  // Phones: every table row becomes a card (see responsive.css), each cell
+  // labelled with its column header through `data-label`
+  for (const table of document.querySelectorAll<HTMLTableElement>(".sl-markdown-content table")) {
+    const labels = [...table.querySelectorAll("thead th")].map((th) => th.textContent?.trim() ?? "")
+    if (labels.length === 0) continue
+    table.classList.add("cl-table-cards")
+    for (const row of table.querySelectorAll("tbody tr")) {
+      row.querySelectorAll("td").forEach((cell, index) => {
+        if (labels[index]) cell.dataset.label = labels[index]
+        if (!cell.textContent?.trim()) cell.dataset.empty = ""
+      })
+    }
+  }
+
   const ad = document.querySelector(".cl-ad-in-article")
   // Starlight wraps each heading in `.sl-heading-wrapper`; go before the first level-2 one
   const firstHeading = document.querySelector(".sl-markdown-content .sl-heading-wrapper.level-h2, .sl-markdown-content h2")

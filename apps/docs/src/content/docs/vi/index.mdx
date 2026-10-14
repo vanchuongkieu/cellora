@@ -1,6 +1,6 @@
 ---
-title: Data grid React cho shadcn/ui
-description: Data grid React nhanh, tuỳ biến hoàn toàn, xây trên shadcn/ui. Sắp xếp, lọc, nhóm, sửa trực tiếp, ghim cột và cuộn ảo cho một triệu dòng.
+title: Data grid React cho shadcn/ui, cuộn ảo triệu dòng
+description: Data grid React nhanh, tuỳ biến hoàn toàn, xây trên shadcn/ui, giấy phép MIT. Sắp xếp, lọc, nhóm, sửa trực tiếp, ghim cột và cuộn ảo cho một triệu dòng.
 template: splash
 head:
   - tag: meta
@@ -8,7 +8,7 @@ head:
       property: og:type
       content: website
 hero:
-  title: Data grid cho app shadcn/ui của bạn
+  title: Data grid React cho app shadcn/ui của bạn
   tagline: Sắp xếp, lọc, nhóm, tổng hợp, sửa trực tiếp, ghim cột và cuộn ảo. Dựng từ shadcn/ui, dùng theme của bạn, mượt với một triệu dòng.
   actions:
     - text: Bắt đầu
@@ -21,3 +21,28 @@ hero:
 import Showcase from "~/components/Showcase.astro"
 
 <Showcase />
+
+<div class="cl-landing-text">
+
+## Data grid trông giống hệt app của bạn
+
+Hầu hết data grid React mang theo hệ thiết kế riêng. Cellora dựng từ các component [shadcn/ui](https://ui.shadcn.com) và Tailwind CSS, vẽ bằng chính biến theme mà app của bạn đã khai báo: màu, bo góc, dark mode. Thả vào dự án shadcn/ui là khớp ngay từ lần render đầu, không phải nuôi file theme riêng. Mọi phần của khung (toolbar, ô tiêu đề, dòng, footer, menu, checkbox, icon) là slot có thể thay, mọi chuỗi là label có thể dịch, mọi phần nhận thêm class và style.
+
+## Nhanh ở mọi kích thước
+
+Grid chỉ vẽ các dòng và cột đang nhìn thấy. Bật `virtualized`, 1.000.000 dòng × 100 cột cuộn ở 60 fps bằng cuộn native, không chớp trắng, vì trình duyệt tự cuộn còn React chỉ render lại một lần mỗi màn hình. Sắp xếp một triệu dòng đọc mỗi giá trị một lần, chưa tới một giây; tìm kiếm chạy ở lượt render nền và chỉ lọc lại kết quả cũ khi bạn gõ tiếp. Dòng không cần là object, nên dữ liệu lớn không đồng nghĩa với cấp phát bộ nhớ lớn.
+
+## Đủ những gì một bảng thật cần
+
+- **Dữ liệu**: sắp xếp, tìm kiếm không dấu (gõ `nguyen` ra `Nguyễn`), lọc theo cột, phân trang, nhóm dòng có tổng hợp và dòng tổng, sửa trực tiếp với editor text, số, ngày, select và checkbox, chọn dòng giữ qua các trang.
+- **Bố cục**: độ rộng cột cố định, đổi độ rộng bằng kéo, nhấp đúp và bàn phím, ghim cột hai bên, tiêu đề dính, nhóm cột lồng nhau, lấp đầy chiều cao màn hình.
+- **Phía server**: để API sắp xếp, tìm kiếm, lọc và phân trang; grid giữ state và báo mọi thay đổi qua `onStateChange`, chỉ cần một hook TanStack Query là nối xong.
+- **Quy tắc riêng**: theo cột có `sortValue`, `compare`, `searchValue`, `filterValue`, `filterMatch`, hoặc `searchFilter` cho cả grid để tìm nhiều từ và cú pháp `trường:giá trị`.
+
+## Cho đội phát triển và cho trợ lý AI
+
+Cellora ưu tiên TypeScript, giấy phép MIT, chạy với Vite, Next.js, Remix và Astro, gồm cả server rendering và static generation. Logic nằm trong package core không phụ thuộc framework. Tài liệu mỗi tính năng một trang có demo chạy thật và bảng API, bằng tiếng Anh và tiếng Việt, và xuất bản cho trợ lý AI: [MCP server](/vi/getting-started/ai/), file `llms.txt` và nút Copy Page, để Claude Code, Cursor hay ChatGPT viết code theo API thật thay vì đoán.
+
+[Cài đặt trong hai phút](/vi/getting-started/installation/), đọc [bắt đầu nhanh](/vi/getting-started/quick-start/), hoặc xem [so sánh với TanStack Table, AG Grid và MUI X](/vi/guides/cellora-vs-tanstack-table-ag-grid-mui/).
+
+</div>

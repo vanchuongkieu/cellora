@@ -1,0 +1,48 @@
+---
+title: Cellora vs TanStack Table, AG Grid, MUI X
+description: Honest comparison of React data grids for shadcn/ui apps - TanStack Table, AG Grid, MUI X Data Grid, Cellora - on styling, virtual scroll, server data, license.
+---
+
+Choosing a data grid is mostly choosing how much you want to build yourself and how much you want it to look like your app. This page compares the four options people reach for in a React + shadcn/ui project.
+
+## At a glance
+
+|                                                  | Cellora                                                | TanStack Table                       | AG Grid                                     | MUI X Data Grid                   |
+| ------------------------------------------------ | ------------------------------------------------------ | ------------------------------------ | ------------------------------------------- | --------------------------------- |
+| What it is                                       | Finished shadcn/ui data grid                           | Headless table logic (hooks)         | Full-featured grid, own UI                  | Full-featured grid, Material UI   |
+| Looks like shadcn/ui                             | Yes, uses your theme tokens                            | You write all markup                 | Themed separately, needs CSS work           | Material design                   |
+| Virtual rows + columns                           | Built in, one prop                                     | Add TanStack Virtual yourself        | Built in                                    | Built in                          |
+| Server-side sort / filter / page                 | `manual*` props + `onStateChange`                      | `manual*` options, you wire fetching | Server-side row model (Enterprise for full) | Server-side (Pro)                 |
+| Pinned columns, grouping, totals, inline editing | Built in                                               | Build yourself                       | Built in (some Enterprise)                  | Built in (some Pro/Premium)       |
+| Slots / customization                            | 30+ slots, `classNames` per part, every string a label | Total freedom, total work            | Cell renderers, themes                      | Slots, `sx`                       |
+| License                                          | MIT, free                                              | MIT, free                            | Community MIT; Enterprise paid              | Community MIT; Pro / Premium paid |
+| Framework-free core                              | `@cellora/core` (Vue planned)                          | Framework adapters                   | Angular, Vue, React                         | React only                        |
+
+## When each one fits
+
+**TanStack Table** is the right pick when you want to own every pixel and your table is small or medium. It is the engine behind the shadcn/ui Data Table example. The cost shows up when you add virtual scrolling, sticky columns, grouping with totals and editing: each is a project of its own.
+
+**AG Grid** is the enterprise workhorse: pivoting, Excel export, tree data, master-detail. If you need those, pay for Enterprise and theme it. Its UI is its own, so it will not look like the rest of a shadcn/ui app without effort.
+
+**MUI X Data Grid** is the natural choice if the app is already on Material UI. In a Tailwind + shadcn/ui app it brings a second design system and Emotion runtime styling.
+
+**Cellora** is for shadcn/ui apps that need a real grid, not a demo: sorting, accent-insensitive search, per-column filters, pagination or virtual scrolling for a million rows, pinned columns, column groups, row grouping with aggregates, inline editing, selection that survives paging, server-side mode. It draws with your theme tokens, every part is a slot, every string is a label, and the logic lives in a framework-free core.
+
+## Performance notes
+
+Cellora measures 1,000,000 rows × 100 columns at 60 fps in Chrome with native scrolling and zero long tasks ([how](/guides/shadcn-data-table-virtual-scroll/)). Sorting a million rows takes well under a second. AG Grid and MUI X also virtualize well; TanStack Table needs TanStack Virtual plus careful memoization to get there.
+
+## Migration
+
+Coming from the shadcn/ui Data Table (TanStack): [migration guide](/guides/migrate-from-shadcn-data-table/). Column definitions map almost one to one (`accessorKey` → `accessor`, `header` → `header`, `cell` → `cell`).
+
+## FAQ
+
+**Is Cellora headless?**
+Both: `useDataGrid` returns the same grid API without rendering, and `@cellora/core` has the pure functions, but the shipped `DataGrid` is a finished component.
+
+**Does it need Tailwind?**
+Tailwind CSS v4 and the shadcn/ui theme variables, yes; that is what makes it look like your app with no configuration.
+
+**Can I use it without shadcn/ui?**
+You need the CSS variables shadcn/ui defines (`--background`, `--border`, …). Any project can declare them.

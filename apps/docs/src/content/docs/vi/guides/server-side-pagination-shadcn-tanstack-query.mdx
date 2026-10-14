@@ -1,0 +1,93 @@
+---
+title: Bảng shadcn phía server với TanStack Query
+description: Dựng bảng dữ liệu shadcn/ui phân trang, sắp xếp và tìm kiếm trên server với TanStack Query và Cellora. Grid giữ state, API trả về một trang.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/server-side-demo"
+import code from "~/demos/server-side-demo.tsx?raw"
+
+Khi dữ liệu nằm sau API, trình duyệt không nên tải cả bảng. Grid phải hỏi server một trang đã sắp xếp và lọc, rồi hiển thị kết quả. Với Cellora, đó là ba prop và một callback.
+
+<ComponentPreview code={code} title="server-side-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+## Với TanStack Query
+
+```tsx
+import { useState } from "react"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
+import { DataGrid, type DataGridState } from "@cellora/react"
+
+export function Employees() {
+  const [state, setState] = useState<DataGridState>({ sort: null, filter: "", columnFilters: {}, pageIndex: 0, pageSize: 20 })
+  const { data, isFetching } = useQuery({
+    queryKey: ["employees", state],
+    queryFn: () => fetchEmployees(state), // GET /api/employees?page=…&sort=…&q=…
+    placeholderData: keepPreviousData, // giữ trang cũ trong lúc tải trang mới
+  })
+
+  return (
+    <DataGrid
+      rows={data?.rows ?? []}
+      columns={columns}
+      getRowId={(row) => row.id}
+      manualSorting
+      manualFiltering
+      manualPagination
+      rowCount={data?.total}
+      onStateChange={setState}
+      pageSize={state.pageSize}
+      loading={isFetching}
+      loadingVariant="overlay"
+      enableSorting
+      enableSearch
+    />
+  )
+}
+```
+
+- `onStateChange` gọi với `{ sort, filter, columnFilters, pageIndex, pageSize }` sau mỗi thao tác. Đưa object đó vào query key là xong phần cache.
+- `manualSorting`, `manualFiltering`, `manualPagination` báo grid rằng dòng đã xử lý rồi, chỉ việc hiển thị.
+- `rowCount` là tổng số dòng trên mọi trang, để tính số trang và chữ "1-20 of 1.250".
+- `loadingVariant="overlay"` làm mờ trang cũ thay vì thay bằng skeleton, bảng không nhảy.
+
+## Phía server làm gì
+
+Dịch state thành câu truy vấn:
+
+| Trường state    | Tương đương SQL / ORM                       |
+| --------------- | ------------------------------------------- |
+| `sort`          | `ORDER BY ${columnId} ${direction}`         |
+| `filter`        | `WHERE name ILIKE %q% OR email ILIKE %q% …` |
+| `columnFilters` | mỗi mục một `WHERE column ILIKE %text%`     |
+| `pageIndex`     | `OFFSET pageIndex * pageSize`               |
+| `pageSize`      | `LIMIT pageSize`                            |
+
+Trả về `{ rows, total }`. Kiểm tra `sort.columnId` với danh sách cho phép trước khi ghép vào câu lệnh.
+
+## Debounce ô tìm kiếm
+
+`onStateChange` chạy mỗi lần gõ phím. Hoặc debounce trước khi đặt state cho query, hoặc để TanStack Query gộp request và giữ `placeholderData`. Thường 250 ms là đủ:
+
+```tsx
+const [state, setState] = useState<DataGridState>(initial)
+const debounced = useDebounce(state, 250)
+useQuery({ queryKey: ["employees", debounced], queryFn: () => fetchEmployees(debounced) })
+```
+
+## Giữ state trên URL
+
+Truyền ngược state vào các prop có kiểm soát (`sort`, `filter`, `columnFilters`, `pageIndex`) và ghi vào search params trong `onStateChange`. Link chia sẻ được, nút Back hoạt động. Chi tiết: [Dữ liệu phía server](/vi/features/server-side/).
+
+## Hỏi đáp
+
+**Chỉ một phần làm ở server được không?**
+Được. Chỉ bật cờ `manual*` cho phần API làm; phần còn lại grid vẫn xử lý ở client.
+
+**Chọn tất cả có bao hết dữ liệu trên server không?**
+Chỉ bao các dòng grid đang có (trang hiện tại). Chọn toàn bộ cần danh sách id của riêng bạn.
+
+**Dùng với Next.js route handler hay tRPC được không?**
+Bất cứ thứ gì trả `{ rows, total }` đều được; grid không quan tâm cách lấy dữ liệu.

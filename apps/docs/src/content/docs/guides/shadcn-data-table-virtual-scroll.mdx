@@ -1,0 +1,70 @@
+---
+title: 1,000,000 rows in a shadcn data table
+description: Render a million rows in a shadcn/ui data table without lag. Virtual scrolling for rows and columns, native 60 fps, sorting and search included, one prop.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/virtual-scroll-demo"
+import code from "~/demos/virtual-scroll-demo.tsx?raw"
+
+The shadcn/ui **Data Table** example renders every row it is given. That is fine for a few hundred rows and falls apart at a few thousand: the DOM grows, sorting re-renders everything, scrolling stutters. Cellora is a data grid built from the same shadcn/ui primitives that only renders what is on screen, so a million rows scroll like a hundred.
+
+<ComponentPreview code={code} title="virtual-scroll-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+## One prop
+
+```tsx
+<DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} virtualized maxHeight={600} enableSorting enableSearch />
+```
+
+`virtualized` switches the grid from a `<table>` to a windowed grid: rows **and** columns outside the viewport do not exist in the DOM. Everything else (sorting, search, pinned columns, selection, editing, grouping) keeps working.
+
+## Why it stays smooth
+
+- **Native scrolling.** Rows sit at their real position inside a tall spacer, so the browser scrolls them itself. No JavaScript runs per frame.
+- **Re-window once per screen.** React only renders new rows when the viewport crosses a block boundary, as a low-priority transition. A fast fling never renders windows it already left behind.
+- **No blank flashes.** Two screens of rows are prepared in the scroll direction; a CSS placeholder covers whatever a fling outruns.
+- **Beyond the browser's height limit.** Browsers cap element height around 33 million pixels (about 890,000 rows at 37 px). Past that, Cellora scales scroll positions, so a million rows still work with the same row height.
+- **Sorting a million rows** reads every value once, ranks strings once, then sorts plain numbers: well under a second. Search runs in a deferred render and only re-filters the previous matches while you keep typing.
+
+Measured in Chrome: 1,000,000 rows × 100 columns at 60 fps with zero long tasks, including at 12,000 px/s flings.
+
+## Rows do not have to be objects
+
+The demo above keeps no million objects in memory: a row is just its index, and every column derives its value from it. Cellora never copies or mutates `rows`, so any shape works.
+
+```tsx
+const rows = Array.from({ length: 1_000_000 }, (_, i) => i)
+const columns = [{ id: "n", header: "#", accessor: (row: number) => row + 1, sortable: true }]
+```
+
+## Keep the shadcn/ui look
+
+The grid draws with your shadcn/ui theme variables (`--background`, `--border`, `--muted`, …), so it matches the rest of the app and dark mode without configuration. Install once:
+
+```sh
+npm install @cellora/react
+```
+
+```css
+@import "tailwindcss";
+@import "@cellora/react/styles.css";
+```
+
+Full setup: [Installation](/getting-started/installation/). Every virtual-scroll option (row height, overscan, placeholders): [Virtual scroll](/features/virtual-scroll/).
+
+## FAQ
+
+**Does virtual scrolling work with pinned columns and grouping?**
+Yes. Pinned columns stay sticky, group headers are windowed like rows, and the total row stays at the bottom.
+
+**Can I keep pagination instead?**
+Yes: leave `virtualized` off. Pagination is the default for small data; virtual scrolling replaces it for large data.
+
+**Does it work with Next.js and server rendering?**
+Yes. The package is `"use client"`, hydration-safe, and renders the first screen of rows on the server.
+
+**How is this different from TanStack Table + TanStack Virtual?**
+TanStack gives you headless hooks; you write the markup, the sticky layout and the windowing yourself. Cellora ships the finished shadcn/ui grid with virtualization built in. See the [comparison](/guides/cellora-vs-tanstack-table-ag-grid-mui/).

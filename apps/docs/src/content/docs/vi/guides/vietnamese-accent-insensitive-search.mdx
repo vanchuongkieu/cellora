@@ -1,0 +1,60 @@
+---
+title: Tìm kiếm không dấu tiếng Việt trong bảng React
+description: Gõ "nguyen" tìm ra "Nguyễn" trong data grid React. Cách Cellora bỏ dấu tiếng Việt và ngôn ngữ có dấu, chi phí trên triệu dòng, cách tắt.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/search-demo"
+import code from "~/demos/search-demo.tsx?raw"
+
+Tên tiếng Việt đầy dấu (`Nguyễn`, `Trần`, `Đỗ`) mà chẳng ai gõ dấu vào ô tìm kiếm. `García`, `Müller`, `Crème` cũng vậy. Bảng mà so sánh chuỗi thô thì bỏ sót phần lớn thứ người ta tìm. Cellora khớp không dấu theo mặc định.
+
+<ComponentPreview code={code} title="search-demo.tsx">
+  <Demo client:visible />
+</ComponentPreview>
+
+Thử gõ `nguyen`, `tran` hoặc `lea` ở trên.
+
+## Cách hoạt động
+
+- Chữ tìm kiếm và giá trị mỗi ô đều được hạ chữ thường và **bỏ dấu**: tách Unicode NFD, bỏ dấu kết hợp, `đ`/`Đ` đổi thành `d`/`D` (đây là chữ cái, không phải dấu, nên NFD không xử lý được).
+- Gõ có dấu vẫn tìm được: `Nguyễn` cũng được bỏ dấu, nên khớp cả `nguyen` lẫn `Nguyễn`.
+- Bộ lọc theo cột trong menu cột dùng cùng quy tắc.
+- Mặc định bật. `ignoreAccents={false}` để khớp chính xác.
+
+```tsx
+<DataGrid rows={rows} columns={columns} enableSearch />            // "nguyen" tìm ra "Nguyễn"
+<DataGrid rows={rows} columns={columns} enableSearch ignoreAccents={false} />
+```
+
+## Chi phí với dữ liệu lớn
+
+Chỉ bỏ dấu khi so sánh thường không khớp và chuỗi có ký tự ngoài ASCII, nên dữ liệu tiếng Anh không tốn gì. Chuỗi đã bỏ dấu được ghi nhớ (tên, danh mục lặp nhiều). Đo trên 1.000.000 dòng × 3 cột có dấu: khoảng 0,7 giây cho lần gõ đầu; các lần gõ tiếp chỉ lọc lại kết quả trước. Gõ không bao giờ bị khựng vì lọc chạy ở lượt render nền.
+
+## Dùng cùng hàm bỏ dấu trong code của bạn
+
+Hàm được xuất từ `@cellora/core`:
+
+```ts
+import { foldAccents } from "@cellora/core"
+
+foldAccents("Trần Thị Đào") // "Tran Thi Dao"
+```
+
+Dùng cho `searchFilter` tuỳ biến, khoá sắp xếp, hay API nhận chữ tìm kiếm.
+
+## Kết hợp với quy tắc riêng
+
+- `searchValue(row)` theo cột: tìm trên chữ đã định dạng (ngày dạng `"5 Mar 2024"`) thay vì giá trị thô.
+- `searchable: false`: bỏ cột id khỏi tìm kiếm.
+- `searchFilter(row, term)`: cách khớp của riêng bạn (nhiều từ, `trường:giá trị`), vẫn bỏ dấu nếu bạn gọi `foldAccents`.
+
+Mọi tuỳ chọn: [Tìm kiếm](/vi/features/search/).
+
+## Hỏi đáp
+
+**Sắp xếp có bỏ dấu không?**
+Sắp xếp dùng collator theo locale với `sensitivity: "base"`, nên `Đào` và `Dao` coi như bằng nhau và chuỗi xếp theo thứ tự tự nhiên (`file2` trước `file10`).
+
+**Ngôn ngữ khác có dùng được không?**
+Có: ngôn ngữ nào dùng dấu kết hợp Unicode (Pháp, Đức, Tây Ban Nha, Bồ Đào Nha, Séc, …) đều bỏ dấu theo cùng cách.
