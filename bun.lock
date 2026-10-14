@@ -81,11 +81,11 @@
     },
     "packages/core": {
       "name": "@cellora/core",
-      "version": "0.0.0",
+      "version": "0.1.0",
     },
     "packages/react": {
       "name": "@cellora/react",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@cellora/core": "workspace:*",
         "class-variance-authority": "^0.7.1",

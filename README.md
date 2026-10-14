@@ -157,7 +157,7 @@ apps/
   docs/              documentation site (Astro + Starlight, EN + VI)
 ```
 
-Publishing: use `bun publish` (it rewrites the `workspace:*` dependency to a real version; plain `npm publish` does not).
+Releasing: `bun run bump 0.2.0` sets both package versions, then commit and push a tag `v0.2.0`. The `Release` GitHub Action publishes `@cellora/core` (when its version is new) and `@cellora/react` to npm with provenance through npm Trusted Publishing, so no token is involved. `bun run release` does the same from a machine (`bun publish` rewrites the `workspace:` dependency; plain `npm publish` does not). `bun run release:dry` packs without publishing.
 
 ## Browser support
 

@@ -1,0 +1,71 @@
+# Publishes @cellora/core and @cellora/react to npm when a version tag is pushed.
+#
+#   bun run bump 0.2.0        # sets the version in both packages
+#   git commit -am "release: 0.2.0" && git tag v0.2.0 && git push --tags
+#
+# Authentication is npm Trusted Publishing (OpenID Connect): each package on
+# npmjs.com lists this repository + workflow as its trusted publisher, so no
+# token and no one-time code are needed. The tag must equal the version of
+# @cellora/react; @cellora/core is only published when its version is new.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write # OIDC token for npm Trusted Publishing
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # Trusted Publishing needs a recent npm CLI
+      - name: Update npm
+        run: npm install -g npm@latest && npm --version
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Verify
+        run: bun run typecheck && bun run lint && bun run build
+
+      - name: Check that the tag matches @cellora/react
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VERSION="$(node -p "require('./packages/react/package.json').version")"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "Tag v$TAG does not match @cellora/react version $VERSION" >&2
+            exit 1
+          fi
+
+      - name: Publish @cellora/core (when its version is new)
+        working-directory: packages/core
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "@cellora/core@$VERSION" version >/dev/null 2>&1; then
+            echo "@cellora/core@$VERSION is already on npm, skipping"
+          else
+            npm publish --provenance --access public
+          fi
+
+      - name: Publish @cellora/react
+        working-directory: packages/react
+        run: |
+          # npm does not understand the workspace protocol: pin the real core version
+          CORE="$(node -p "require('../core/package.json').version")"
+          npm pkg set "dependencies.@cellora/core=^$CORE"
+          npm publish --provenance --access public

@@ -1,6 +1,6 @@
 {
   "name": "@cellora/react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cellora: a fast, fully slottable React data grid built on shadcn/ui",
   "license": "MIT",
   "publishConfig": {
