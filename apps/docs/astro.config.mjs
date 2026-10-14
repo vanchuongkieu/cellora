@@ -81,17 +81,47 @@ export default defineConfig({
           content:
             'addEventListener("load",()=>setTimeout(()=>{const s=document.createElement("script");s.async=true;s.crossOrigin="anonymous";s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241188479493423";document.head.appendChild(s)},1500))',
         },
+        // Icons at the sizes Google (48px multiples) and iOS want, next to the SVG
+        { tag: "link", attrs: { rel: "icon", type: "image/png", sizes: "96x96", href: "/favicon-96.png" } },
+        { tag: "link", attrs: { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" } },
+        // Structured data: who publishes the site, what the site is (its name
+        // for search results) and what the software is. Breadcrumbs per page
+        // are added by the Head override.
         {
           tag: "script",
           attrs: { type: "application/ld+json" },
           content: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "SoftwareSourceCode",
-            name: SITE.name,
-            description: SITE.description.en,
-            codeRepository: SITE.repo,
-            programmingLanguage: ["TypeScript", "React"],
-            url: SITE.url,
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": `${SITE.url}/#organization`,
+                name: SITE.name,
+                url: SITE.url,
+                logo: { "@type": "ImageObject", url: `${SITE.url}/icon-512.png`, width: 512, height: 512 },
+                sameAs: [SITE.repo, SITE.npm],
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${SITE.url}/#website`,
+                name: SITE.name,
+                alternateName: ["Cellora data grid", "Cellora docs"],
+                url: SITE.url,
+                description: SITE.description.en,
+                inLanguage: ["en", "vi"],
+                publisher: { "@id": `${SITE.url}/#organization` },
+              },
+              {
+                "@type": "SoftwareSourceCode",
+                name: SITE.name,
+                description: SITE.description.en,
+                codeRepository: SITE.repo,
+                programmingLanguage: ["TypeScript", "React"],
+                runtimePlatform: "React 18 / 19",
+                license: "https://opensource.org/licenses/MIT",
+                url: SITE.url,
+              },
+            ],
           }),
         },
       ],

@@ -14,7 +14,36 @@ import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal
 import geistVietnamese from "@fontsource-variable/geist/files/geist-vietnamese-wght-normal.woff2?url"
 import geistMonoLatin from "@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url"
 
-const fonts = Astro.locals.starlightRoute.locale === "vi" ? [geistLatin, geistVietnamese, geistMonoLatin] : [geistLatin, geistMonoLatin]
+import { localePath, ui } from "../../i18n"
+import { SITE } from "../../site"
+
+const { locale, entry, sidebar } = Astro.locals.starlightRoute
+const fonts = locale === "vi" ? [geistLatin, geistVietnamese, geistMonoLatin] : [geistLatin, geistMonoLatin]
+
+// Breadcrumb structured data: Home › section (the sidebar group) › page.
+// Helps Google show the site structure (and sitelinks) for the documentation.
+const t = ui(locale)
+const slug = entry.id.replace(/^vi\//, "")
+const section = sidebar.find((item) => item.type === "group" && item.entries.some((link) => link.type === "link" && link.href.replace(/\/$/, "").endsWith(slug)))
+// A section has no page of its own: its crumb points at the group's first page
+const sectionHref = section?.entries.find((link) => link.type === "link")?.href
+const isLanding = slug === "" || slug === "index" || entry.id === "vi"
+const crumbs = isLanding
+  ? []
+  : [
+      { name: SITE.name, item: `${SITE.url}${localePath(locale, "/")}` },
+      ...(section && sectionHref ? [{ name: section.label, item: `${SITE.url}${sectionHref}` }] : []),
+      { name: entry.data.title, item: `${SITE.url}${localePath(locale, `/${slug}/`)}` },
+    ]
+const breadcrumbs =
+  crumbs.length > 0
+    ? JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: crumbs.map((crumb, index) => ({ "@type": "ListItem", position: index + 1, name: crumb.name, item: crumb.item })),
+      })
+    : null
+void t
 ---
 
 <script is:inline>
@@ -30,3 +59,4 @@ const fonts = Astro.locals.starlightRoute.locale === "vi" ? [geistLatin, geistVi
 </script>
 {fonts.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 <Default />
+{breadcrumbs && <script type="application/ld+json" set:html={breadcrumbs} />}
