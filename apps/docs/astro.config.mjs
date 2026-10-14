@@ -59,7 +59,13 @@ export default defineConfig({
         { tag: "meta", attrs: { name: "theme-color", content: "#151515" } },
         // Google AdSense: site verification + the ads loader (async, does not block rendering)
         { tag: "meta", attrs: { name: "google-adsense-account", content: "ca-pub-2241188479493423" } },
-        { tag: "script", attrs: { async: true, src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241188479493423", crossorigin: "anonymous" } },
+        // Loaded after the page is interactive: the 200 KB ads script must not
+        // delay the first paint or the demos (Core Web Vitals)
+        {
+          tag: "script",
+          content:
+            'addEventListener("load",()=>setTimeout(()=>{const s=document.createElement("script");s.async=true;s.crossOrigin="anonymous";s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241188479493423";document.head.appendChild(s)},1500))',
+        },
         {
           tag: "script",
           attrs: { type: "application/ld+json" },

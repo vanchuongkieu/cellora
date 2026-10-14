@@ -1,6 +1,6 @@
 ---
 title: Slots
-description: Replace any part of the Cellora data grid chrome with slots, as plain functions, React components or JSX children. Toolbar, footer, icons, menus, checkboxes and more.
+description: Replace any part of the Cellora data grid chrome with slots, as functions, React components or JSX children. Toolbar, footer, icons, menus, checkboxes.
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -10,7 +10,7 @@ import code from "~/demos/slots-demo.tsx?raw"
 Every piece of the grid around your data (toolbar, icons, checkboxes, footer texts, menus…) is a **slot** you can replace.
 
 <ComponentPreview code={code} title="slots-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Three ways to fill a slot

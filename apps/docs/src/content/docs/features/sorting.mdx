@@ -12,7 +12,7 @@ import customCode from "~/demos/sorting-custom-demo.tsx?raw"
 Click a header to sort by that column. Each click moves to the next step: **ascending → descending → unsorted**.
 
 <ComponentPreview code={code} title="sorting-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Turn it on
@@ -61,7 +61,7 @@ Two column options change how a column sorts, without touching what it shows or 
 - `compare(a, b)`: your own comparison of two **rows** for ascending order (negative when `a` goes first). The grid flips it for descending and keeps equal rows in place. Wins over `sortValue`.
 
 <ComponentPreview code={customCode} title="sorting-custom-demo.tsx">
-  <CustomDemo client:only="react" />
+  <CustomDemo client:visible />
 </ComponentPreview>
 
 ```tsx

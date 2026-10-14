@@ -1,6 +1,6 @@
 ---
 title: Columns
-description: "Define Cellora data grid columns with an array: id, header, accessor, width, alignment and custom cells. The accessor is the raw value, the cell is how it looks."
+description: "Define Cellora data grid columns with an array: id, header, accessor, width, alignment and custom cells. The accessor is the raw value, the cell its look."
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -10,7 +10,7 @@ import code from "~/demos/columns-demo.tsx?raw"
 A column says **what** to read from a row (`accessor`) and **how** to show it (`cell`).
 
 <ComponentPreview code={code} title="columns-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## The minimum

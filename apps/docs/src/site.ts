@@ -10,7 +10,8 @@ export const SITE = {
   npm: "https://www.npmjs.com/package/@cellora/react",
   packageName: "@cellora/react",
   description: {
-    en: "Cellora is a fast, fully customizable React data grid built on shadcn/ui: sorting, filtering, grouping, inline editing and virtual scrolling for a million rows.",
-    vi: "Cellora là data grid React nhanh, tuỳ biến hoàn toàn, xây trên shadcn/ui: sắp xếp, lọc, nhóm, sửa trực tiếp và cuộn ảo cho một triệu dòng.",
+    // Under 155 characters: search engines cut longer descriptions
+    en: "Fast, fully customizable React data grid built on shadcn/ui: sorting, filtering, grouping, inline editing and virtual scrolling for a million rows.",
+    vi: "Data grid React nhanh, tuỳ biến hoàn toàn, xây trên shadcn/ui: sắp xếp, lọc, nhóm, sửa trực tiếp và cuộn ảo cho một triệu dòng.",
   },
 } as const

@@ -1,6 +1,6 @@
 ---
 title: Search
-description: Add a search box to the Cellora data grid. Accent-insensitive, matches every data column, customizable per column or with your own search function, responsive on large data.
+description: Add a search box to the Cellora data grid. Accent-insensitive, matches every data column, customizable per column or with your own function, fast on large data.
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -14,7 +14,7 @@ import customCode from "~/demos/search-custom-demo.tsx?raw"
 One box that filters rows by any column.
 
 <ComponentPreview code={code} title="search-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Turn it on
@@ -39,7 +39,7 @@ Two column options change what is matched, without touching sorting or filters:
 - `searchable: false`: leave the column out (internal ids, hashes).
 
 <ComponentPreview code={columnsCode} title="search-columns-demo.tsx">
-  <ColumnsDemo client:only="react" />
+  <ColumnsDemo client:visible />
 </ComponentPreview>
 
 ```tsx
@@ -52,7 +52,7 @@ Two column options change what is matched, without touching sorting or filters:
 `searchFilter(row, term)` replaces the built-in matching entirely: it is called for every row with the trimmed search text and returns whether the row matches. Column filters still apply on top. Use it for multi-word search, `field:value` syntax, fuzzy matching or a search index.
 
 <ComponentPreview code={customCode} title="search-custom-demo.tsx">
-  <CustomDemo client:only="react" />
+  <CustomDemo client:visible />
 </ComponentPreview>
 
 ```tsx

@@ -12,7 +12,7 @@ import customCode from "~/demos/sorting-custom-demo.tsx?raw"
 Bấm vào tiêu đề cột để sắp xếp theo cột đó. Mỗi lần bấm chuyển sang bước tiếp: **tăng dần → giảm dần → không sắp xếp**.
 
 <ComponentPreview code={code} title="sorting-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Bật tính năng
@@ -61,7 +61,7 @@ Hai tuỳ chọn của cột thay đổi cách sắp xếp, không ảnh hưởn
 - `compare(a, b)`: hàm so sánh hai **dòng** của riêng bạn cho chiều tăng dần (âm khi `a` đứng trước). Grid tự đảo cho chiều giảm dần và giữ nguyên vị trí các dòng bằng nhau. Ưu tiên hơn `sortValue`.
 
 <ComponentPreview code={customCode} title="sorting-custom-demo.tsx">
-  <CustomDemo client:only="react" />
+  <CustomDemo client:visible />
 </ComponentPreview>
 
 ```tsx

@@ -14,6 +14,6 @@ const vi = locale === "vi"
       {vi ? "Chỉ phần đang nhìn thấy được vẽ. Đổi số dòng, cuộn thật nhanh, sắp xếp, tìm kiếm." : "Only what is on screen is rendered. Switch sizes, fling it, sort it, search it."}{" "}
       <a href={localePath(locale, "/features/virtual-scroll/")}>{vi ? "Xem hướng dẫn" : "Read the guide"}</a>
     </p>
-    <VirtualScrollDemo client:only="react" />
+    <VirtualScrollDemo client:visible />
   </section>
 </div>

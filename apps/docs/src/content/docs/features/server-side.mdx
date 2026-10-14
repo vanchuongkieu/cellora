@@ -1,6 +1,6 @@
 ---
 title: Server-side data
-description: Let an API sort, search, filter and page the Cellora data grid - the grid keeps the state, reports every change with onStateChange, and shows the page the server returns.
+description: Let an API sort, search, filter and page the Cellora data grid. The grid keeps the state, reports every change with onStateChange and shows the page returned.
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -10,7 +10,7 @@ import code from "~/demos/server-side-demo.tsx?raw"
 By default the grid sorts, searches, filters and pages the rows you give it. When the data lives behind an API (too big to download, or already indexed on the server), the grid can hand that work over: it keeps the state, tells you every time it changes, and shows whatever page you give back.
 
 <ComponentPreview code={code} title="server-side-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Three steps

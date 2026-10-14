@@ -1,6 +1,6 @@
 ---
 title: Tìm kiếm
-description: Thêm ô tìm kiếm cho data grid Cellora. Không phân biệt dấu, khớp mọi cột dữ liệu, tuỳ biến theo từng cột hoặc bằng hàm tìm kiếm riêng, vẫn mượt trên dữ liệu lớn.
+description: Thêm ô tìm kiếm cho data grid Cellora. Không phân biệt dấu, khớp mọi cột dữ liệu, tuỳ biến theo cột hoặc bằng hàm riêng, vẫn mượt trên dữ liệu lớn.
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -14,7 +14,7 @@ import customCode from "~/demos/search-custom-demo.tsx?raw"
 Một ô duy nhất để lọc dòng theo bất kỳ cột nào.
 
 <ComponentPreview code={code} title="search-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Bật tính năng
@@ -39,7 +39,7 @@ Hai tuỳ chọn của cột thay đổi thứ được so khớp, không ảnh 
 - `searchable: false`: bỏ cột khỏi tìm kiếm (id nội bộ, mã băm).
 
 <ComponentPreview code={columnsCode} title="search-columns-demo.tsx">
-  <ColumnsDemo client:only="react" />
+  <ColumnsDemo client:visible />
 </ComponentPreview>
 
 ```tsx
@@ -52,7 +52,7 @@ Hai tuỳ chọn của cột thay đổi thứ được so khớp, không ảnh 
 `searchFilter(row, term)` thay toàn bộ cách khớp mặc định: được gọi cho từng dòng với chữ tìm kiếm (đã bỏ khoảng trắng hai đầu) và trả về dòng có khớp hay không. Lọc theo cột vẫn áp dụng thêm. Dùng cho tìm nhiều từ, cú pháp `trường:giá trị`, tìm mờ (fuzzy) hay một search index.
 
 <ComponentPreview code={customCode} title="search-custom-demo.tsx">
-  <CustomDemo client:only="react" />
+  <CustomDemo client:visible />
 </ComponentPreview>
 
 ```tsx

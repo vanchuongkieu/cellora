@@ -1,6 +1,6 @@
 ---
 title: Cuộn ảo
-description: Hiển thị một triệu dòng và một trăm cột trong data grid Cellora bằng cuộn ảo. Cuộn native 60 fps, không chớp trắng, chạy cùng nhóm dòng, ghim cột, chọn dòng và sửa ô.
+description: Hiển thị một triệu dòng và trăm cột trong data grid Cellora bằng cuộn ảo. Cuộn native 60 fps, không chớp trắng, dùng được cùng nhóm dòng, ghim cột, sửa ô.
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -10,7 +10,7 @@ import code from "~/demos/virtual-scroll-demo.tsx?raw"
 Chỉ những dòng và cột đang nhìn thấy mới có mặt trên trang. Thử một triệu dòng:
 
 <ComponentPreview code={code} title="virtual-scroll-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Bật tính năng

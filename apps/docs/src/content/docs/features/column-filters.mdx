@@ -12,7 +12,7 @@ import customCode from "~/demos/column-filters-custom-demo.tsx?raw"
 Each column can have its own text filter, typed in the column menu.
 
 <ComponentPreview code={code} title="column-filters-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## How to use
@@ -36,7 +36,7 @@ Column filters are on by default (they live in the [column menu](/features/colum
 - `filterMatch(row, text)`: your own rule, called with the row and the typed text. Exact matches, `>60000`, ranges, anything. Wins over `filterValue`.
 
 <ComponentPreview code={customCode} title="column-filters-custom-demo.tsx">
-  <CustomDemo client:only="react" />
+  <CustomDemo client:visible />
 </ComponentPreview>
 
 ```tsx

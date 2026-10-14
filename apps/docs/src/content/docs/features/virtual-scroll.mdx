@@ -1,6 +1,6 @@
 ---
 title: Virtual scroll
-description: Render a million rows and a hundred columns in the Cellora data grid with virtual scrolling. Native 60 fps scrolling, no blank flashes, works with grouping, pinning, selection and editing.
+description: Render a million rows and a hundred columns in the Cellora data grid with virtual scrolling. Native 60 fps, no blank flashes, works with grouping, pinning and editing.
 ---
 
 import ComponentPreview from "~/components/ComponentPreview.astro"
@@ -10,7 +10,7 @@ import code from "~/demos/virtual-scroll-demo.tsx?raw"
 Only the rows and columns in view exist in the page. Try a million rows:
 
 <ComponentPreview code={code} title="virtual-scroll-demo.tsx">
-  <Demo client:only="react" />
+  <Demo client:visible />
 </ComponentPreview>
 
 ## Turn it on
