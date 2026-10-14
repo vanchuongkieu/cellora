@@ -70,14 +70,15 @@ site-search dialog[open]::backdrop {
     font-weight: 500;
     color: var(--cl-fg);
   }
-  #starlight__search {
+  /* (site-search prefix: these must beat the desktop rules further down) */
+  site-search #starlight__search {
     /* room for the Cancel button at the end of the input row */
     --sl-search-cancel-space: 4.25rem;
   }
-  #starlight__search .pagefind-ui__search-input {
+  site-search #starlight__search .pagefind-ui__search-input {
     padding-inline-end: calc(2.75rem + var(--sl-search-cancel-space));
   }
-  #starlight__search .pagefind-ui__drawer {
+  site-search #starlight__search .pagefind-ui__drawer {
     max-height: calc(100vh - 3rem);
   }
   /* Header: the search trigger is a plain icon button like its neighbours */
