@@ -24,9 +24,12 @@ const fonts = locale === "vi" ? [geistLatin, geistVietnamese, geistMonoLatin] : 
 // Helps Google show the site structure (and sitelinks) for the documentation.
 const t = ui(locale)
 const slug = entry.id.replace(/^vi\//, "")
-const section = sidebar.find((item) => item.type === "group" && item.entries.some((link) => link.type === "link" && link.href.replace(/\/$/, "").endsWith(slug)))
+type SidebarGroup = Extract<(typeof sidebar)[number], { type: "group" }>
+const groups = sidebar.filter((item): item is SidebarGroup => item.type === "group")
+const section = groups.find((group) => group.entries.some((link) => link.type === "link" && link.href.replace(/\/$/, "").endsWith(slug)))
 // A section has no page of its own: its crumb points at the group's first page
-const sectionHref = section?.entries.find((link) => link.type === "link")?.href
+const firstLink = section?.entries.find((link) => link.type === "link")
+const sectionHref = firstLink && firstLink.type === "link" ? firstLink.href : undefined
 const isLanding = slug === "" || slug === "index" || entry.id === "vi"
 const crumbs = isLanding
   ? []
