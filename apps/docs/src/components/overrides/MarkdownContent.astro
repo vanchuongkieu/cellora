@@ -19,13 +19,23 @@ const showAds = entry.data.template !== "splash" && !entry.id.endsWith("404")
   // Phones: every table row becomes a card (see responsive.css), each cell
   // labelled with its column header through `data-label`
   for (const table of document.querySelectorAll<HTMLTableElement>(".sl-markdown-content table")) {
+    // Live demos (`.not-content`) render their own <table>; leave them alone
+    if (table.closest(".not-content")) continue
     const labels = [...table.querySelectorAll("thead th")].map((th) => th.textContent?.trim() ?? "")
     if (labels.length === 0) continue
     table.classList.add("cl-table-cards")
     for (const row of table.querySelectorAll("tbody tr")) {
       row.querySelectorAll("td").forEach((cell, index) => {
         if (labels[index]) cell.dataset.label = labels[index]
-        if (!cell.textContent?.trim()) cell.dataset.empty = ""
+        if (!cell.textContent?.trim()) {
+          cell.dataset.empty = ""
+          return
+        }
+        // The card cell is a two-column grid (label, value): keep the value as
+        // one grid item even when it mixes text, code and links
+        const value = document.createElement("span")
+        value.append(...cell.childNodes)
+        cell.append(value)
       })
     }
   }
