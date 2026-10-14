@@ -13,7 +13,7 @@
     "dev:docs": "bun run build && bun --filter docs dev",
     "build": "bun --filter './packages/*' build",
     "build:docs": "bun run build && bun --filter docs build",
-    "deploy:docs": "bun run build && bun --filter docs deploy",
+    "deploy:docs": "bun run build:docs && wrangler deploy",
     "typecheck": "bun --filter '*' typecheck",
     "lint": "bun --filter '*' lint",
     "format": "prettier --write \"packages/*/src/**/*.{ts,tsx,css}\" \"apps/docs/src/**/*.{ts,tsx,mdx,css}\" \"apps/docs/*.mjs\" \"*.{json,mjs,md}\" && bun --filter playground-react format"
@@ -28,6 +28,7 @@
     "prettier": "^3.9.9",
     "tsdown": "^0.23.1",
     "typescript": "~6.0.2",
-    "typescript-eslint": "^8"
+    "typescript-eslint": "^8",
+    "wrangler": "^4.151.0"
   }
 }

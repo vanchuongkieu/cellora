@@ -1,0 +1,15 @@
+// Cloudflare Workers config for the documentation site: a static-assets Worker
+// serving the Astro build. Used by Workers Builds (Git integration) and by
+// `bun run deploy:docs`. The name must match the Worker created in the dashboard.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cellora-docs",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./apps/docs/dist",
+    // Astro writes 404.html; serve it with a real 404 status
+    "not_found_handling": "404-page",
+    // /features/sorting and /features/sorting/ both resolve to index.html
+    "html_handling": "auto-trailing-slash"
+  }
+}

@@ -139,14 +139,14 @@ bun run dev          # packages in watch mode + playground (Vite)
 bun run dev:docs     # documentation site (Astro + Starlight)
 ```
 
-| Script                | What it does                                                            |
-| --------------------- | ----------------------------------------------------------------------- |
-| `bun run build`       | Build `@cellora/core` and `@cellora/react` (ESM + CJS + types).         |
-| `bun run build:docs`  | Build the packages, then the static docs site into `apps/docs/dist`.    |
-| `bun run deploy:docs` | Build and deploy the docs to Cloudflare Pages (needs `wrangler login`). |
-| `bun run typecheck`   | TypeScript in every workspace (`astro check` for the docs).             |
-| `bun run lint`        | ESLint (incl. React hooks rules).                                       |
-| `bun run format`      | Prettier.                                                               |
+| Script                | What it does                                                                                                                                                                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run build`       | Build `@cellora/core` and `@cellora/react` (ESM + CJS + types).                                                                                                               |
+| `bun run build:docs`  | Build the packages, then the static docs site into `apps/docs/dist`.                                                                                                          |
+| `bun run deploy:docs` | Build and deploy the docs as a Cloudflare Worker with static assets (`wrangler.jsonc`; needs `wrangler login`). Pushes to `main` deploy automatically through Workers Builds. |
+| `bun run typecheck`   | TypeScript in every workspace (`astro check` for the docs).                                                                                                                   |
+| `bun run lint`        | ESLint (incl. React hooks rules).                                                                                                                                             |
+| `bun run format`      | Prettier.                                                                                                                                                                     |
 
 ```
 packages/
