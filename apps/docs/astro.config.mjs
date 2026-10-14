@@ -76,12 +76,15 @@ export default defineConfig({
             'addEventListener("load",()=>{const s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-PY8X3WPYCB";document.head.appendChild(s)})',
           ].join(""),
         },
-        // Loaded after the page is interactive: the 200 KB ads script must not
-        // delay the first paint or the demos (Core Web Vitals)
+        // Loaded on the first user interaction (scroll, touch, pointer, key):
+        // the ads stack costs seconds of main-thread time on a slow phone, so
+        // it must never compete with the first paint, the demos or Core Web
+        // Vitals. A reader who never interacts gets no ads, and no ad value
+        // would have come from that visit anyway.
         {
           tag: "script",
           content:
-            'addEventListener("load",()=>setTimeout(()=>{const s=document.createElement("script");s.async=true;s.crossOrigin="anonymous";s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241188479493423";document.head.appendChild(s)},1500))',
+            '(()=>{let d=false;const l=()=>{if(d)return;d=true;const s=document.createElement("script");s.async=true;s.crossOrigin="anonymous";s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241188479493423";document.head.appendChild(s)};for(const e of["pointerdown","pointermove","touchstart","keydown","wheel","scroll"])addEventListener(e,l,{once:true,passive:true})})()',
         },
         // Icons at the sizes Google (48px multiples) and iOS want, next to the SVG
         { tag: "link", attrs: { rel: "icon", type: "image/png", sizes: "96x96", href: "/favicon-96.png" } },
