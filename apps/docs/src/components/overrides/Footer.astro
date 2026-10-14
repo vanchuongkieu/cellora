@@ -4,11 +4,16 @@ import Default from "@astrojs/starlight/components/Footer.astro"
 
 import { ui } from "../../i18n"
 import { SITE } from "../../site"
+import AdSlot from "../AdSlot.astro"
 import CookieConsent from "../CookieConsent.astro"
 
-const t = ui(Astro.locals.starlightRoute.locale)
+const { locale, entry } = Astro.locals.starlightRoute
+const t = ui(locale)
+// Ads sit after the article, above Previous / Next; not on the landing or 404 pages
+const showAds = entry.data.template !== "splash" && !entry.id.endsWith("404")
 ---
 
+{showAds && <AdSlot slot="5849877374" class="cl-ad-after-content" />}
 <Default><slot /></Default>
 <p class="cl-credit">
   {t.builtBy} <a href="https://github.com/vanchuongkieu">vanchuongkieu</a>. {t.sourceOn} <a href={SITE.repo}>GitHub</a>.

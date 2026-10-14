@@ -1,0 +1,28 @@
+---
+/**
+ * One AdSense unit. The ads script itself is loaded by the head (after the
+ * page has loaded); the push below queues until it arrives. An unfilled unit
+ * (site not approved yet, no ad available) collapses to nothing.
+ */
+import { ui } from "../i18n"
+
+interface Props {
+  /** data-ad-slot of the unit created in AdSense */
+  slot: string
+  /** "auto" (display, responsive) or "autorelaxed" (Multiplex) */
+  format?: "auto" | "autorelaxed"
+  class?: string
+}
+
+const CLIENT = "ca-pub-2241188479493423"
+const { slot, format = "auto", class: className } = Astro.props
+const t = ui(Astro.locals.starlightRoute.locale)
+---
+
+<aside class:list={["cl-ad", className]} data-ad-slot-container>
+  <span class="cl-ad-label">{t.advertisement}</span>
+  <ins class="adsbygoogle" style="display:block" data-ad-client={CLIENT} data-ad-slot={slot} data-ad-format={format} data-full-width-responsive={format === "auto" ? "true" : undefined}></ins>
+  <script is:inline>
+    ;(adsbygoogle = window.adsbygoogle || []).push({})
+  </script>
+</aside>

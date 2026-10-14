@@ -735,6 +735,36 @@ starlight-lang-select {
 .cl-pill:hover {
   background: var(--cl-border);
 }
+/* Ad units: collapsed to zero height until AdSense reports the unit as
+   filled (site not approved yet, nothing to show), so no empty box ever
+   shows. The unit keeps its width while collapsed: AdSense needs it to pick
+   an ad size, which display:none would break. */
+.cl-ad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 0;
+  overflow: hidden;
+}
+.cl-ad-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cl-muted-fg);
+}
+.cl-ad:has(ins[data-ad-status="filled"]) {
+  max-height: none;
+  overflow: visible;
+}
+.cl-ad-after-content:has(ins[data-ad-status="filled"]) {
+  margin: 3rem 0 1rem;
+}
+.cl-ad-sidebar {
+  padding-inline-start: var(--sl-sidebar-pad-x, 1rem);
+}
+.cl-ad-sidebar:has(ins[data-ad-status="filled"]) {
+  margin-top: 2rem;
+}
 .cl-credit {
   margin-top: 4rem;
   font-size: 0.8125rem;

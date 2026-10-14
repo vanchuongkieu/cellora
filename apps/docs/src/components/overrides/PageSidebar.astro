@@ -1,0 +1,12 @@
+---
+/** Starlight's "On this page" column, with an ad unit under the headings. */
+import Default from "@astrojs/starlight/components/PageSidebar.astro"
+
+import AdSlot from "../AdSlot.astro"
+
+const { entry } = Astro.locals.starlightRoute
+const showAds = entry.data.template !== "splash" && !entry.id.endsWith("404")
+---
+
+<Default><slot /></Default>
+{showAds && <AdSlot slot="1054600283" format="autorelaxed" class="cl-ad-sidebar" />}
