@@ -1,0 +1,86 @@
+---
+title: Chọn dòng
+description: Chọn dòng trong data grid Cellora bằng checkbox. Lựa chọn được giữ theo id qua các trang, khi sắp xếp và lọc; chọn tất cả, theo nhóm, hoặc chỉ một số dòng.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/row-selection-demo"
+import code from "~/demos/row-selection-demo.tsx?raw"
+
+Một cột checkbox với ô chọn tất cả trên tiêu đề. Footer cho biết đã chọn bao nhiêu dòng.
+
+<ComponentPreview code={code} title="row-selection-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Bật tính năng
+
+```tsx
+<DataGrid enableRowSelection getRowId={(row) => row.id} onSelectionChange={(change) => console.log(change)} />
+```
+
+**Hãy truyền `getRowId`.** Lựa chọn được lưu theo id, nên dòng đã chọn vẫn được chọn khi chuyển trang, sắp xếp, lọc hay tải lại dữ liệu. Không có nó, vị trí dòng được dùng làm id và sẽ sai ngay khi dòng đổi chỗ.
+
+## Bạn nhận được gì
+
+`onSelectionChange` được gọi mỗi lần thay đổi với:
+
+| Trường           | Kiểu       | Ý nghĩa                                   |
+| ---------------- | ---------- | ----------------------------------------- |
+| `selectedRowIds` | `string[]` | Mọi id đã chọn, trên tất cả các trang     |
+| `selectedRows`   | `TRow[]`   | Các dòng đã chọn có trong `rows` hiện tại |
+| `count`          | `number`   | Số dòng đã chọn                           |
+
+## Chọn tất cả: trang này hay toàn bộ
+
+| `selectAllScope`    | Ô chọn trên tiêu đề áp dụng cho                                                  |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `"page"` (mặc định) | Các dòng ở trang hiện tại (mọi dòng khi [cuộn ảo](/vi/features/virtual-scroll/)) |
+| `"all"`             | Mọi dòng khớp tìm kiếm và bộ lọc hiện tại                                        |
+
+Khi [nhóm dòng](/vi/features/row-grouping/), mỗi tiêu đề nhóm có checkbox cho các dòng bên trong.
+
+## Dòng không được chọn
+
+```tsx
+<DataGrid isRowSelectable={(row) => row.status !== "Inactive"} />
+```
+
+Checkbox của chúng bị vô hiệu, và chọn tất cả / chọn nhóm bỏ qua chúng.
+
+## Lựa chọn có kiểm soát
+
+```tsx
+const [ids, setIds] = useState<readonly string[]>([])
+<DataGrid enableRowSelection selectedRowIds={ids} onSelectionChange={(change) => setIds(change.selectedRowIds)} />
+```
+
+Hoặc chỉ đặt giá trị ban đầu bằng `defaultSelectedRowIds`.
+
+## Bằng code
+
+```tsx
+grid.selection.isSelected(row)
+grid.selection.toggle(row)
+grid.selection.setMany(rows, true)
+grid.selection.clear()
+grid.selection.count
+```
+
+## Quy mô
+
+Chọn một dòng tốn như nhau dù có 50 dòng hay một triệu: grid chỉ xét những dòng bạn đã chọn.
+
+## API
+
+| Prop                                                        | Kiểu                | Mặc định  | Mô tả                         |
+| ----------------------------------------------------------- | ------------------- | --------- | ----------------------------- |
+| `enableRowSelection`                                        | `boolean`           | `false`   | Thêm cột checkbox.            |
+| `selectAllScope`                                            | `"page" \| "all"`   | `"page"`  | Phạm vi của ô chọn tất cả.    |
+| `isRowSelectable`                                           | `(row) => boolean`  | tất cả    | Vô hiệu một số checkbox.      |
+| `pinSelectionColumn`                                        | `boolean`           | `true`    | Ghim cột checkbox bên trái.   |
+| `selectedRowIds`                                            | `readonly string[]` |           | Lựa chọn có kiểm soát.        |
+| `defaultSelectedRowIds`                                     | `readonly string[]` |           | Lựa chọn ban đầu.             |
+| `onSelectionChange`                                         | `(change) => void`  |           | Gọi mỗi lần thay đổi.         |
+| `selectAll`, `selectRow`, `selectionSummary`, `selectGroup` | slot                |           | Thay checkbox / dòng tóm tắt. |
+| `selectAll`, `selectRow`, `selected`, `selectGroup`         | `labels`            | tiếng Anh | Câu chữ.                      |

@@ -1,0 +1,96 @@
+---
+title: Inline editing
+description: Edit Cellora data grid cells in place with text, number, date, select and checkbox editors, validation, async saving and keyboard navigation.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/inline-editing-demo"
+import code from "~/demos/inline-editing-demo.tsx?raw"
+
+Double-click a cell to edit it. The grid never changes your data: it tells you what was typed, and you save it.
+
+<ComponentPreview code={code} title="inline-editing-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Three steps
+
+1. Switch it on: `enableEditing`.
+2. Mark columns: `editable: true` (or a function of the row).
+3. Save in `onCellEdit`:
+
+```tsx
+const [rows, setRows] = useState(initialRows)
+
+<DataGrid
+  rows={rows}
+  getRowId={(row) => row.id}
+  enableEditing
+  onCellEdit={({ rowId, columnId, value }) =>
+    setRows((current) => current.map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)))
+  }
+/>
+```
+
+`getRowId` matters here too: it keeps the editor on the right row after your update replaces the row object.
+
+## Editors
+
+| `editor`           | Input                       | Value you receive                        |
+| ------------------ | --------------------------- | ---------------------------------------- |
+| `"text"` (default) | text field                  | `string`                                 |
+| `"number"`         | number field                | `number`, or `null` when empty           |
+| `"date"`           | native date picker          | `Date` (local day), or `null`            |
+| `"select"`         | dropdown of `editorOptions` | the option's `value`                     |
+| `"checkbox"`       | always-live checkbox        | `boolean` (saved on click, no edit mode) |
+
+Invalid numbers and impossible dates (Feb 31) are rejected with a message. Use `parseValue(text, row)` to convert text yourself.
+
+## Validate and reject
+
+```tsx
+validate: (value, row) => (String(value).trim() ? null : "Name is required")
+```
+
+`validate` returns a message to keep the editor open. `onCellEdit` can also reject: return `false` or throw (the error message is shown). It may be `async`; the cell shows a busy state until it settles.
+
+## Keyboard
+
+| Key                                                | Action                                          |
+| -------------------------------------------------- | ----------------------------------------------- |
+| <kbd>Enter</kbd> / <kbd>F2</kbd> on a focused cell | Start editing                                   |
+| <kbd>Enter</kbd>                                   | Save                                            |
+| <kbd>Esc</kbd>                                     | Cancel                                          |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd>   | Save and edit the next / previous editable cell |
+| Click outside                                      | Save if valid, otherwise cancel                 |
+
+## Start editing on…
+
+`editTrigger`: `"doubleClick"` (default), `"click"`, or `"none"` (keyboard only).
+
+## Your own editor
+
+```tsx
+editCell: ({ value, commit, cancel }) => <MyColorPicker value={value} onPick={commit} onClose={cancel} />
+```
+
+Or `editComponent` (a component), or the `editCell` slot for every column. Return `null` from the slot to keep the built-in one.
+
+## API
+
+| Prop / option                                            | Where      | Type                                                     | Default         | Description                    |
+| -------------------------------------------------------- | ---------- | -------------------------------------------------------- | --------------- | ------------------------------ |
+| `enableEditing`                                          | `DataGrid` | `boolean`                                                | `false`         | Master switch.                 |
+| `editTrigger`                                            | `DataGrid` | `"doubleClick" \| "click" \| "none"`                     | `"doubleClick"` | What starts editing.           |
+| `onCellEdit`                                             | `DataGrid` | `(edit) => unknown`                                      |                 | Save; `false` / throw rejects. |
+| `isCellEditable`                                         | `DataGrid` | `({ row, column }) => boolean`                           |                 | Extra gate per cell.           |
+| `onEditingChange`                                        | `DataGrid` | `(cell \| null) => void`                                 |                 | The open editor changed.       |
+| `editable`                                               | column     | `boolean \| (row) => boolean`                            | `false`         | Allow editing.                 |
+| `editor`                                                 | column     | `"text" \| "number" \| "date" \| "select" \| "checkbox"` | `"text"`        | Built-in editor.               |
+| `editorOptions`                                          | column     | `{ value, label }[]`                                     |                 | Choices for `"select"`.        |
+| `parseValue`                                             | column     | `(text, row) => unknown`                                 | per editor      | Text → value.                  |
+| `validate`                                               | column     | `(value, row) => string \| null`                         |                 | Message rejects.               |
+| `editCell` / `editComponent`                             | column     |                                                          |                 | Custom editor.                 |
+| `invalidNumber`, `invalidDate`, `editFailed`, `editCell` | `labels`   |                                                          | English         | Messages.                      |
+
+The `edit` object passed to `onCellEdit`: `{ row, rowId, index, columnId, column, value, previousValue }`.

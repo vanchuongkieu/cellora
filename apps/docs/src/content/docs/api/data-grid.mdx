@@ -1,0 +1,176 @@
+---
+title: DataGrid props
+description: Complete reference of every Cellora DataGrid prop with its type, default value and a link to the feature it controls.
+---
+
+```tsx
+import { DataGrid } from "@cellora/react"
+```
+
+`TRow` is the type of one row; it is inferred from `rows`.
+
+## Data
+
+| Prop       | Type                                   | Default   | Description                                                                                                        |
+| ---------- | -------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------ |
+| `rows`     | `readonly TRow[]`                      | required  | The data. Never mutated; pass a new array to change it.                                                            |
+| `columns`  | `readonly DataGridColumnInput<TRow>[]` |           | Columns ([reference](/api/column/)). Optional when using JSX columns.                                              |
+| `children` | `ReactNode`                            |           | `<DataGrid.Column>` and slot parts ([JSX columns](/getting-started/jsx-columns/), [slots](/customization/slots/)). |
+| `getRowId` | `(row, index) => string`               | row index | Stable id per row: selection and editing are keyed by it.                                                          |
+
+## Look
+
+| Prop                | Type                                           | Default         | Description                                                    |
+| ------------------- | ---------------------------------------------- | --------------- | -------------------------------------------------------------- |
+| `className`         | `string`                                       |                 | Classes for the outer wrapper.                                 |
+| `classNames`        | `Partial<Record<DataGridPart, string>>`        |                 | Extra classes per part ([styling](/getting-started/styling/)). |
+| `styles`            | `Partial<Record<DataGridPart, CSSProperties>>` |                 | Inline styles per part.                                        |
+| `bordered`          | `boolean`                                      | `false`         | Lines between columns too.                                     |
+| `rowClassName`      | `(row, index) => string \| undefined`          |                 | Extra classes per body row.                                    |
+| `slots`             | `DataGridSlots<TRow>`                          |                 | Replace parts ([slots reference](/api/slots/)).                |
+| `components`        | `DataGridSlotComponents<TRow>`                 |                 | Same slots as components.                                      |
+| `labels`            | `Partial<DataGridLabels>`                      | English         | Every user-facing string ([labels](/customization/labels/)).   |
+| `searchPlaceholder` | `string`                                       | `"Search..."`   | Search box placeholder.                                        |
+| `emptyMessage`      | `string`                                       | `"No results."` | Text when nothing matches.                                     |
+
+## Size and layout
+
+| Prop                  | Type                                                    | Default | Description                                                                    |
+| --------------------- | ------------------------------------------------------- | ------- | ------------------------------------------------------------------------------ |
+| `maxHeight`           | `number \| string \| null`                              | `400`   | Height cap of the scroll area ([height](/features/height-and-sticky-header/)). |
+| `fillHeight`          | `boolean`                                               | `false` | Fill the remaining screen height.                                              |
+| `fillHeightOffset`    | `number`                                                | `0`     | px left free below when filling.                                               |
+| `fillHeightMin`       | `number`                                                | `200`   | Minimum height when filling.                                                   |
+| `fillHeightContainer` | `RefObject<HTMLElement \| null> \| HTMLElement \| null` | window  | Scrolling element to fill instead of the window.                               |
+| `stickyHeader`        | `boolean`                                               | `true`  | Keep the header visible while rows scroll.                                     |
+| `fixedColumnWidths`   | `boolean`                                               | `true`  | Fixed widths (needed for resizing and pinning).                                |
+| `stickyDivider`       | `boolean`                                               | `false` | Line beside pinned columns ([pinning](/features/pinned-columns/)).             |
+| `stickyShadow`        | `boolean`                                               | `true`  | Shadow beside pinned columns while scrolled under.                             |
+
+## Sorting, search, filters
+
+| Prop            | Type                     | Default  | Description                                                                               |
+| --------------- | ------------------------ | -------- | ----------------------------------------------------------------------------------------- |
+| `enableSorting` | `boolean`                | `false`  | Header sorting; columns opt in with `sortable` ([sorting](/features/sorting/)).           |
+| `enableSearch`  | `boolean`                | `false`  | Search box ([search](/features/search/)).                                                 |
+| `ignoreAccents` | `boolean`                | `true`   | Search and filters match without accents (`nguyen` finds `Nguyễn`).                       |
+| `searchFilter`  | `(row, term) => boolean` | built-in | Your own search, replacing "some column contains the text" ([search](/features/search/)). |
+
+Per-column filters live in the column menu ([column filters](/features/column-filters/)). Per-column matching and ordering are column options: `searchValue`, `searchable`, `sortValue`, `compare`, `filterValue`, `filterMatch` ([column](/api/column/#search-sort-and-filter-rules)).
+
+## State (controlled or initial)
+
+The sort, search, filters and page are kept by the grid. Each can be given a starting value or be controlled; `onStateChange` reports every change ([server-side data](/features/server-side/)).
+
+| Prop                   | Type                              | Default | Description                               |
+| ---------------------- | --------------------------------- | ------- | ----------------------------------------- |
+| `sort`                 | `{ columnId, direction } \| null` |         | Controlled sort.                          |
+| `defaultSort`          | `{ columnId, direction } \| null` | `null`  | Initial sort.                             |
+| `filter`               | `string`                          |         | Controlled search text.                   |
+| `defaultFilter`        | `string`                          | `""`    | Initial search text.                      |
+| `columnFilters`        | `Record<string, string>`          |         | Controlled column filters (by column id). |
+| `defaultColumnFilters` | `Record<string, string>`          | `{}`    | Initial column filters.                   |
+| `pageIndex`            | `number`                          |         | Controlled page (0-based).                |
+| `defaultPageIndex`     | `number`                          | `0`     | Initial page.                             |
+| `onStateChange`        | `(state: DataGridState) => void`  |         | The whole state after any user change.    |
+
+## Server-side processing
+
+| Prop               | Type      | Default       | Description                                                                           |
+| ------------------ | --------- | ------------- | ------------------------------------------------------------------------------------- |
+| `manualSorting`    | `boolean` | `false`       | `rows` are already sorted: shown as they are ([server-side](/features/server-side/)). |
+| `manualFiltering`  | `boolean` | `false`       | `rows` already match the search and filters.                                          |
+| `manualPagination` | `boolean` | `false`       | `rows` are one page; never sliced.                                                    |
+| `rowCount`         | `number`  | `rows.length` | Matching rows across all pages (with `manualPagination`).                             |
+
+## Pagination
+
+| Prop               | Type                | Default        | Description                                                         |
+| ------------------ | ------------------- | -------------- | ------------------------------------------------------------------- |
+| `enablePagination` | `boolean`           | `true`         | Paginate and show the footer ([pagination](/features/pagination/)). |
+| `pageSize`         | `number`            | `10`           | Rows per page.                                                      |
+| `pageSizeOptions`  | `readonly number[]` | `[10, 20, 50]` | Choices in "Rows per page".                                         |
+
+## Columns
+
+| Prop                         | Type                                                        | Default        | Description                                                        |
+| ---------------------------- | ----------------------------------------------------------- | -------------- | ------------------------------------------------------------------ |
+| `enableColumnResizing`       | `boolean`                                                   | `true`         | Drag / keyboard resizing ([resizing](/features/column-resizing/)). |
+| `resizeHandle`               | `"always" \| "hover"`                                       | `"always"`     | When the handle is visible.                                        |
+| `resizeHandleClassName`      | `string`                                                    |                | Extra classes for the handle bar.                                  |
+| `resizeHandleStyle`          | `CSSProperties`                                             |                | Inline style for the handle bar.                                   |
+| `autoFitOnDoubleClick`       | `boolean \| "cells" \| "header" \| "both"`                  | `true`         | Double-click fit.                                                  |
+| `enableColumnMenu`           | `boolean`                                                   | `true`         | ⋮ menu in each header ([column menu](/features/column-menu/)).     |
+| `columnMenuItems`            | `{ sort?, pin?, group?, filter?, hide?, manage?: boolean }` | all on         | Menu groups.                                                       |
+| `columnMenuWidth`            | `number \| string`                                          | `220`          | Menu width.                                                        |
+| `columnMenuClassName`        | `string`                                                    |                | Extra classes for the menu panel.                                  |
+| `columnMenuTriggerClassName` | `string`                                                    |                | Extra classes for the ⋮ button.                                    |
+| `columnMenuAlign`            | `"start" \| "center" \| "end"`                              | `"end"`        | Menu alignment.                                                    |
+| `enableHeaderGroups`         | `boolean`                                                   | `true`         | Column-group rows ([column groups](/features/column-groups/)).     |
+| `headerGroupHeight`          | `number`                                                    | `headerHeight` | Height of each group row.                                          |
+
+## Row grouping and totals
+
+| Prop                   | Type                | Default | Description                                                    |
+| ---------------------- | ------------------- | ------- | -------------------------------------------------------------- |
+| `groupBy`              | `readonly string[]` |         | Controlled grouping ([row grouping](/features/row-grouping/)). |
+| `defaultGroupBy`       | `readonly string[]` | `[]`    | Initial grouping.                                              |
+| `onGroupByChange`      | `(groupBy) => void` |         | Grouping changed.                                              |
+| `groupDefaultExpanded` | `boolean`           | `false` | Groups start open.                                             |
+| `groupIndent`          | `number`            | `16`    | Indent per level (px).                                         |
+| `hideGroupedCells`     | `boolean`           | `true`  | Hide grouped values on data rows.                              |
+| `enableGroupPanel`     | `boolean`           | `false` | Drag-to-group bar.                                             |
+| `enableFooterRow`      | `boolean`           | `false` | Total row ([aggregation](/features/aggregation/)).             |
+
+## Selection
+
+| Prop                    | Type                                                | Default  | Description                                              |
+| ----------------------- | --------------------------------------------------- | -------- | -------------------------------------------------------- |
+| `enableRowSelection`    | `boolean`                                           | `false`  | Checkbox column ([selection](/features/row-selection/)). |
+| `selectAllScope`        | `"page" \| "all"`                                   | `"page"` | What select-all covers.                                  |
+| `isRowSelectable`       | `(row) => boolean`                                  |          | Disable some rows.                                       |
+| `pinSelectionColumn`    | `boolean`                                           | `true`   | Pin the checkbox column left.                            |
+| `selectedRowIds`        | `readonly string[]`                                 |          | Controlled selection.                                    |
+| `defaultSelectedRowIds` | `readonly string[]`                                 |          | Initial selection.                                       |
+| `onSelectionChange`     | `({ selectedRowIds, selectedRows, count }) => void` |          | Selection changed.                                       |
+
+## Editing
+
+| Prop              | Type                                 | Default         | Description                                            |
+| ----------------- | ------------------------------------ | --------------- | ------------------------------------------------------ |
+| `enableEditing`   | `boolean`                            | `false`         | Inline editing ([editing](/features/inline-editing/)). |
+| `editTrigger`     | `"doubleClick" \| "click" \| "none"` | `"doubleClick"` | What starts editing.                                   |
+| `onCellEdit`      | `(edit) => unknown`                  |                 | Save an edit; `false` or throw rejects.                |
+| `isCellEditable`  | `({ row, column }) => boolean`       |                 | Extra gate per cell.                                   |
+| `onEditingChange` | `(cell \| null) => void`             |                 | Open editor changed.                                   |
+
+## Events
+
+| Prop          | Type                                                    | Description                                                 |
+| ------------- | ------------------------------------------------------- | ----------------------------------------------------------- |
+| `onRowClick`  | `({ row, index, rowId, event }) => void`                | Body row clicked ([clicks](/features/row-and-cell-click/)). |
+| `onCellClick` | `({ row, index, rowId, event, column, value }) => void` | Body cell clicked.                                          |
+
+## Loading
+
+| Prop             | Type                                | Default            | Description                                              |
+| ---------------- | ----------------------------------- | ------------------ | -------------------------------------------------------- |
+| `loading`        | `boolean`                           | `false`            | Loading state ([loading](/features/loading-and-empty/)). |
+| `loadingVariant` | `"auto" \| "skeleton" \| "overlay"` | `"auto"`           | How loading looks.                                       |
+| `loadingRows`    | `number`                            | page size (max 10) | Skeleton rows.                                           |
+
+## Virtual scroll
+
+| Prop                 | Type                              | Default                 | Description                                                                |
+| -------------------- | --------------------------------- | ----------------------- | -------------------------------------------------------------------------- |
+| `virtualized`        | `boolean`                         | `false`                 | Render only what is in view ([virtual scroll](/features/virtual-scroll/)). |
+| `rowHeight`          | `number`                          | `37`                    | Row height in px.                                                          |
+| `headerHeight`       | `number`                          | `40`                    | Header height in px.                                                       |
+| `overscanScreens`    | `number \| { rows?, columns? }`   | rows `2`, columns `0.5` | Lookahead in viewport sizes.                                               |
+| `overscanRows`       | `number`                          | `10`                    | Minimum extra rows each side.                                              |
+| `overscanColumns`    | `number`                          | `3`                     | Minimum extra columns each side.                                           |
+| `virtualPlaceholder` | `"skeleton" \| "lines" \| "none"` | `"skeleton"`            | Look of not-yet-rendered areas.                                            |
+
+## Static parts
+
+`DataGrid.Column` (with `.Cell`, `.Header`, `.Aggregate`, `.Edit`) and one part per slot: `DataGrid.Toolbar`, `DataGrid.Empty`, `DataGrid.SortIcon`, …

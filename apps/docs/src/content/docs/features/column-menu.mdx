@@ -1,0 +1,69 @@
+---
+title: Column menu
+description: The Cellora data grid header menu with sort, pin, group by, filter, hide and manage columns. Turn groups off, resize it, extend it or replace it.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-menu-demo"
+import code from "~/demos/column-menu-demo.tsx?raw"
+
+Every header has a **⋮** button with the actions for that column.
+
+<ComponentPreview code={code} title="column-menu-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## What is in it
+
+| Group    | Items                                 | Shown when                                |
+| -------- | ------------------------------------- | ----------------------------------------- |
+| `sort`   | Sort ascending, descending, unsorted  | the column [can sort](/features/sorting/) |
+| `pin`    | Pin left, pin right, unpin            | fixed widths and `pinnable !== false`     |
+| `group`  | Group by this column / Ungroup        | `groupable !== false`                     |
+| `filter` | A text field                          | `filterable !== false`                    |
+| `hide`   | Hide column                           | `hideable !== false`                      |
+| `manage` | Show / hide every column (checkboxes) | always                                    |
+
+## Turn groups off
+
+```tsx
+<DataGrid columnMenuItems={{ group: false, pin: false }} />
+```
+
+Per column: `menu: false` removes the button, `hideable: false` keeps a column always visible, etc. Turn the whole menu off with `enableColumnMenu={false}`.
+
+## Size and position
+
+```tsx
+<DataGrid columnMenuWidth={260} columnMenuAlign="start" columnMenuClassName="rounded-xl" />
+```
+
+The menu is non-modal: the page keeps scrolling and the menu follows its button, flipping above or below as needed.
+
+## Extend or replace
+
+| Slot                | Use                                                                                                                                                |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `columnMenuExtra`   | Append your own items after the built-in ones.                                                                                                     |
+| `columnMenuTrigger` | Replace just the ⋮ icon.                                                                                                                           |
+| `columnMenu`        | Replace the whole control (trigger and content). Receives everything: `sorted`, `pinned`, `setSort`, `setPin`, `setFilter`, `hide`, `setHidden`, … |
+
+## Hidden columns from code
+
+```tsx
+grid.setColumnHidden("email", true)
+grid.columnState.hidden // { email: true }
+```
+
+## API
+
+| Prop / option                                        | Where      | Type                                                        | Default    | Description                   |
+| ---------------------------------------------------- | ---------- | ----------------------------------------------------------- | ---------- | ----------------------------- |
+| `enableColumnMenu`                                   | `DataGrid` | `boolean`                                                   | `true`     | Show the ⋮ menu.              |
+| `columnMenuItems`                                    | `DataGrid` | `{ sort?, pin?, group?, filter?, hide?, manage?: boolean }` | all `true` | Groups to show.               |
+| `columnMenuWidth`                                    | `DataGrid` | `number \| string`                                          | `220`      | Menu width.                   |
+| `columnMenuAlign`                                    | `DataGrid` | `"start" \| "center" \| "end"`                              | `"end"`    | Alignment to the button.      |
+| `columnMenuClassName` / `columnMenuTriggerClassName` | `DataGrid` | `string`                                                    |            | Extra classes.                |
+| `menu`                                               | column     | `boolean`                                                   | `true`     | Show the menu on this column. |
+| `hideable`                                           | column     | `boolean`                                                   | `true`     | Allow hiding this column.     |
+| `columnMenu`, `hideColumn`, `manageColumns`          | `labels`   | `string`                                                    | English    | Texts.                        |

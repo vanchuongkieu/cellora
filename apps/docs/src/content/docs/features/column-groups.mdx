@@ -1,0 +1,50 @@
+---
+title: Column groups
+description: Group Cellora data grid columns under shared header labels, nested to any depth, with headerGroup on each column.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-groups-demo"
+import code from "~/demos/column-groups-demo.tsx?raw"
+
+Put a label above related columns. Labels can nest.
+
+<ComponentPreview code={code} title="column-groups-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## One level
+
+```tsx
+{ id: "department", header: "Department", accessor: (row) => row.department, headerGroup: "Work" }
+{ id: "role", header: "Role", accessor: (row) => row.role, headerGroup: "Work" }
+```
+
+Neighbouring columns with the same label share one spanning header cell.
+
+## Nested levels
+
+Pass an array, outermost first:
+
+```tsx
+{ id: "salary", headerGroup: ["Contract", "Pay"], ... }
+{ id: "remote", headerGroup: ["Contract", "Terms"], ... }
+```
+
+Cells merge only when the **whole path** matches, so `A › x` and `B › x` stay separate. Columns without a group get a blank cell on that level.
+
+## Rules
+
+- Pinned and scrolling columns are grouped separately (one cell cannot be both sticky and scrolling).
+- The group rows stick with the header.
+- Long group labels stay readable: they stick to the left edge while you scroll a wide group.
+
+## API
+
+| Prop / option        | Where                   | Type                                       | Default             | Description                      |
+| -------------------- | ----------------------- | ------------------------------------------ | ------------------- | -------------------------------- |
+| `headerGroup`        | column                  | `string \| string[]`                       | none                | Group label(s), outermost first. |
+| `enableHeaderGroups` | `DataGrid`              | `boolean`                                  | `true`              | Show the group rows.             |
+| `headerGroupHeight`  | `DataGrid`              | `number`                                   | `headerHeight` (40) | Height of each group row in px.  |
+| `headerGroup`        | slot                    | `({ label, level, columns }) => ReactNode` | label               | Custom group cell content.       |
+| `headerGroup`        | `classNames` / `styles` |                                            |                     | Style the group cells.           |

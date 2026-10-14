@@ -1,0 +1,101 @@
+---
+title: Tìm kiếm
+description: Thêm ô tìm kiếm cho data grid Cellora. Không phân biệt dấu, khớp mọi cột dữ liệu, tuỳ biến theo từng cột hoặc bằng hàm tìm kiếm riêng, vẫn mượt trên dữ liệu lớn.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/search-demo"
+import code from "~/demos/search-demo.tsx?raw"
+import ColumnsDemo from "~/demos/search-columns-demo"
+import columnsCode from "~/demos/search-columns-demo.tsx?raw"
+import CustomDemo from "~/demos/search-custom-demo"
+import customCode from "~/demos/search-custom-demo.tsx?raw"
+
+Một ô duy nhất để lọc dòng theo bất kỳ cột nào.
+
+<ComponentPreview code={code} title="search-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Bật tính năng
+
+```tsx
+<DataGrid rows={rows} columns={columns} enableSearch searchPlaceholder="Tìm nhân viên..." />
+```
+
+## Cách khớp
+
+- Một dòng khớp khi **bất kỳ cột dữ liệu đang hiển thị** nào chứa đoạn chữ. Cột bị ẩn và [cột thao tác](/vi/features/display-columns/) không được tìm.
+- Khớp kiểu "chứa", không phân biệt hoa thường, trên giá trị `accessor` của cột (nên `52000` khớp `"520"`, không khớp `"$52"`).
+- **Không phân biệt dấu**: gõ `nguyen` tìm được `Nguyễn`, `creme` tìm được `Crème`, và gõ `Nguyễn` vẫn tìm được `nguyen`. Tắt bằng `ignoreAccents={false}` nếu cần khớp chính xác.
+- Tìm kiếm và [lọc theo cột](/vi/features/column-filters/) kết hợp với nhau: dòng phải qua cả hai.
+- Khi gõ, bảng quay về trang đầu.
+
+## Chọn cột đưa gì cho ô tìm kiếm
+
+Hai tuỳ chọn của cột thay đổi thứ được so khớp, không ảnh hưởng sắp xếp hay lọc:
+
+- `searchValue(row)`: chữ để tìm thay cho giá trị `accessor`. Dùng cho ngày đã định dạng (`"5 Mar 2024"`), tiền (`"$52,000"`), nhãn của mã, hay nhiều trường ghép lại.
+- `searchable: false`: bỏ cột khỏi tìm kiếm (id nội bộ, mã băm).
+
+<ComponentPreview code={columnsCode} title="search-columns-demo.tsx">
+  <ColumnsDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+{ id: "startDate", header: "Ngày vào", accessor: (row) => row.startDate, searchValue: (row) => formatDay(row.startDate) }
+{ id: "id", header: "ID", accessor: (row) => row.id, searchable: false }
+```
+
+## Tìm kiếm theo cách của bạn
+
+`searchFilter(row, term)` thay toàn bộ cách khớp mặc định: được gọi cho từng dòng với chữ tìm kiếm (đã bỏ khoảng trắng hai đầu) và trả về dòng có khớp hay không. Lọc theo cột vẫn áp dụng thêm. Dùng cho tìm nhiều từ, cú pháp `trường:giá trị`, tìm mờ (fuzzy) hay một search index.
+
+<ComponentPreview code={customCode} title="search-custom-demo.tsx">
+  <CustomDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+<DataGrid enableSearch searchFilter={(row, term) => term.split(/\s+/).every((word) => row.name.toLowerCase().includes(word))} />
+```
+
+Khai báo hàm ngoài component (hoặc bọc `useCallback`): hàm mới ở mỗi lần render sẽ làm grid lọc lại.
+
+## Tìm kiếm trên server
+
+Khi API làm việc tìm kiếm, truyền dòng API trả về kèm `manualFiltering` và đọc chữ tìm từ `onStateChange`. Xem [Dữ liệu phía server](/vi/features/server-side/).
+
+## Dữ liệu lớn
+
+Gõ không bao giờ bị khựng: ô nhập hiện ký tự ngay và việc lọc chạy ở lượt render nền. Khi gõ tiếp (`"ali"` → `"alic"`), chỉ những dòng đã khớp trước đó được tìm lại. Bỏ dấu không tốn gì với dữ liệu ASCII; với một triệu dòng có dấu, lần gõ đầu mất chưa tới một giây.
+
+## Tìm từ code hoặc ô nhập của bạn
+
+Ẩn ô mặc định (`enableSearch={false}`) và điều khiển cùng bộ lọc từ bất kỳ đâu bằng [grid API](/vi/api/grid-api/):
+
+```tsx
+grid.setFilter("design")
+grid.state.filter // "design"
+```
+
+Muốn giữ toolbar nhưng đổi ô nhập, dùng slot `search`; thay cả toolbar, dùng slot `toolbar`. Xem [Slot](/vi/customization/slots/). Muốn có sẵn chữ tìm kiếm ban đầu, hoặc điều khiển từ URL, dùng `defaultFilter` / `filter` (xem [Props của DataGrid](/vi/api/data-grid/#state-điều-khiển-hoặc-ban-đầu)).
+
+## API
+
+| Prop / tuỳ chọn     | Ở đâu                   | Kiểu                       | Mặc định        | Mô tả                                                |
+| ------------------- | ----------------------- | -------------------------- | --------------- | ---------------------------------------------------- |
+| `enableSearch`      | `DataGrid`              | `boolean`                  | `false`         | Hiện ô tìm kiếm.                                     |
+| `searchPlaceholder` | `DataGrid`              | `string`                   | `"Search..."`   | Chữ gợi ý.                                           |
+| `ignoreAccents`     | `DataGrid`              | `boolean`                  | `true`          | Khớp không phân biệt dấu (tìm kiếm và lọc theo cột). |
+| `searchFilter`      | `DataGrid`              | `(row, term) => boolean`   | mặc định        | Hàm tìm kiếm riêng; thay toàn bộ cách khớp mặc định. |
+| `manualFiltering`   | `DataGrid`              | `boolean`                  | `false`         | Dòng đã được lọc sẵn (bởi API).                      |
+| `filter`            | `DataGrid`              | `string`                   |                 | Chữ tìm kiếm có kiểm soát.                           |
+| `defaultFilter`     | `DataGrid`              | `string`                   | `""`            | Chữ tìm kiếm ban đầu.                                |
+| `onStateChange`     | `DataGrid`              | `(state) => void`          |                 | Chữ tìm kiếm (và phần còn lại của state) thay đổi.   |
+| `searchable`        | cột                     | `boolean`                  | `true`          | Cho ô tìm kiếm nhìn vào cột này.                     |
+| `searchValue`       | cột                     | `(row) => unknown`         | accessor        | Thứ được so khớp cho cột này.                        |
+| `searchRows`        | `labels`                | `string`                   | `"Search rows"` | Tên cho trình đọc màn hình.                          |
+| `search`            | slot                    | `(grid) => ReactNode`      | ô nhập          | Chỉ thay ô nhập.                                     |
+| `toolbar`           | slot                    | `(grid) => ReactNode`      | toolbar         | Thay cả toolbar.                                     |
+| `search`            | `classNames` / `styles` | `string` / `CSSProperties` |                 | Đổi kiểu ô nhập.                                     |
+| `foldAccents(text)` | `@cellora/core`         | `(text: string) => string` |                 | Hàm bỏ dấu, dùng cho code so khớp của riêng bạn.     |

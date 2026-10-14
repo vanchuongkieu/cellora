@@ -1,0 +1,58 @@
+---
+title: Loading & empty state
+description: Show skeleton rows or a spinner overlay while the Cellora data grid loads, and a custom message when no row matches.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/loading-demo"
+import code from "~/demos/loading-demo.tsx?raw"
+
+Tell users data is on its way, and what to do when there is none.
+
+<ComponentPreview code={code} title="loading-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Loading
+
+```tsx
+const { data, isLoading } = useQuery(...)
+<DataGrid rows={data ?? []} loading={isLoading} />
+```
+
+| `loadingVariant`   | Looks like                                                                | Best for             |
+| ------------------ | ------------------------------------------------------------------------- | -------------------- |
+| `"auto"` (default) | Skeleton while there are no rows yet, overlay when rows are already shown | Most cases           |
+| `"skeleton"`       | Grey placeholder rows (the footer counts become placeholders too)         | First load           |
+| `"overlay"`        | Spinner over the current rows, which stay visible but are blocked         | Refetch, page change |
+
+- `loadingRows` sets the number of skeleton rows (default: the page size, at most 10).
+- The scroll area gets `aria-busy` and a screen-reader "Loading..." text.
+
+## Empty
+
+When no row matches (no data, or nothing passes the search / filters):
+
+```tsx
+<DataGrid emptyMessage="No employees yet." />
+```
+
+For more than text, use the `empty` slot (a button to clear filters, an illustration…):
+
+```tsx
+<DataGrid slots={{ empty: (grid) => <button onClick={() => grid.setFilter("")}>Clear search</button> }} />
+```
+
+The message stays centered in the visible area even when the grid is scrolled sideways.
+
+## API
+
+| Prop / option                             | Where                   | Type                                | Default            | Description                |
+| ----------------------------------------- | ----------------------- | ----------------------------------- | ------------------ | -------------------------- |
+| `loading`                                 | `DataGrid`              | `boolean`                           | `false`            | Show the loading state.    |
+| `loadingVariant`                          | `DataGrid`              | `"auto" \| "skeleton" \| "overlay"` | `"auto"`           | How it looks.              |
+| `loadingRows`                             | `DataGrid`              | `number`                            | page size (max 10) | Skeleton row count.        |
+| `emptyMessage`                            | `DataGrid`              | `string`                            | `"No results."`    | Text when nothing matches. |
+| `empty`, `loadingOverlay`, `skeletonCell` | slots                   |                                     |                    | Replace the parts.         |
+| `empty`                                   | `classNames` / `styles` |                                     |                    | Style the empty area.      |
+| `loading`                                 | `labels`                | `string`                            | `"Loading..."`     | Screen-reader text.        |

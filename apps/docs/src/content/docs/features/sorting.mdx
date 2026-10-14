@@ -1,0 +1,106 @@
+---
+title: Sorting
+description: Sort Cellora data grid rows by clicking a column header. Numbers and dates sort by value, text in natural order, empty values last.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/sorting-demo"
+import code from "~/demos/sorting-demo.tsx?raw"
+import CustomDemo from "~/demos/sorting-custom-demo"
+import customCode from "~/demos/sorting-custom-demo.tsx?raw"
+
+Click a header to sort by that column. Each click moves to the next step: **ascending → descending → unsorted**.
+
+<ComponentPreview code={code} title="sorting-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Turn it on
+
+Sorting needs two switches, so nothing sorts by accident:
+
+1. `enableSorting` on the grid (off by default).
+2. `sortable: true` on every column that may be sorted.
+
+```tsx
+<DataGrid rows={rows} columns={columns} enableSorting />
+```
+
+```tsx
+{ id: "salary", header: "Salary", accessor: (row) => row.salary, sortable: true }
+```
+
+## How values are compared
+
+Sorting reads the column's `accessor`, not what the `cell` shows. Keep the raw value in `accessor` and format it in `cell`:
+
+```tsx
+{
+  id: "salary",
+  header: "Salary",
+  accessor: (row) => row.salary, // 52000: sorts as a number
+  cell: (row) => formatMoney(row.salary), // "$52,000": only for display
+  sortable: true,
+}
+```
+
+| Value type           | Order                                               |
+| -------------------- | --------------------------------------------------- |
+| `number`             | Numeric (`2` before `10`)                           |
+| `Date`               | By time                                             |
+| `string`             | Natural, case-insensitive (`file2` before `file10`) |
+| `null` / `undefined` | Always last, in both directions                     |
+
+Rows with equal values keep their original order (the sort is stable).
+
+## Your own order
+
+Two column options change how a column sorts, without touching what it shows or searches:
+
+- `sortValue(row)`: sort by this value instead of the accessor's. A rank for a status (`Junior < Senior < Lead`), a last name, a parsed number. Same rules as above (numbers by value, strings in natural order).
+- `compare(a, b)`: your own comparison of two **rows** for ascending order (negative when `a` goes first). The grid flips it for descending and keeps equal rows in place. Wins over `sortValue`.
+
+<ComponentPreview code={customCode} title="sorting-custom-demo.tsx">
+  <CustomDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+{ id: "role", header: "Role", accessor: (row) => row.role, sortable: true, sortValue: (row) => RANK[row.role] }
+{ id: "status", header: "Status", accessor: (row) => row.status, sortable: true, compare: (a, b) => a.priority - b.priority }
+```
+
+## Sort on the server
+
+When the API sorts, pass its rows with `manualSorting`: the header still shows the sort state and `onStateChange` tells you what to ask for. See [Server-side data](/features/server-side/). To start sorted, or control the sort from a URL, use `defaultSort` / `sort`.
+
+## Sort from code
+
+The column menu offers _Sort ascending_, _Sort descending_ and _Unsorted_. From a slot or custom toolbar, use the [grid API](/api/grid-api/):
+
+```tsx
+grid.setSort("salary", "desc") // or "asc", or null to clear
+grid.toggleSort("salary") // same as a header click
+grid.state.sort // { columnId: "salary", direction: "desc" } | null
+```
+
+## Keyboard
+
+When a column has no menu button, its header is focusable: press <kbd>Enter</kbd> or <kbd>Space</kbd> to sort.
+
+## API
+
+| Prop / option   | Where      | Type                              | Default  | Description                                                     |
+| --------------- | ---------- | --------------------------------- | -------- | --------------------------------------------------------------- |
+| `enableSorting` | `DataGrid` | `boolean`                         | `false`  | Master switch for header sorting.                               |
+| `manualSorting` | `DataGrid` | `boolean`                         | `false`  | Rows are already sorted (by an API).                            |
+| `sort`          | `DataGrid` | `{ columnId, direction } \| null` |          | Controlled sort.                                                |
+| `defaultSort`   | `DataGrid` | `{ columnId, direction } \| null` | `null`   | Initial sort.                                                   |
+| `onStateChange` | `DataGrid` | `(state) => void`                 |          | Sort (and the rest of the state) changed.                       |
+| `sortable`      | column     | `boolean`                         | `false`  | Allow sorting this column.                                      |
+| `sortValue`     | column     | `(row) => unknown`                | accessor | Value to sort by.                                               |
+| `compare`       | column     | `(a, b) => number`                |          | Your own comparison of two rows (ascending).                    |
+| `sortIcon`      | slot       | `(direction) => ReactNode`        | arrows   | Replace the sort indicator. See [Slots](/customization/slots/). |
+
+## Performance
+
+A million rows sort in well under a second: every value is read once, strings are ranked once, then plain numbers are sorted.

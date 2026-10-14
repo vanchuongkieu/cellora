@@ -1,0 +1,81 @@
+---
+title: Column
+description: Every option of a Cellora data grid column, with type, default and the feature it belongs to.
+---
+
+```tsx
+import type { DataGridColumnInput } from "@cellora/react"
+
+const columns: DataGridColumnInput<Employee>[] = [{ id: "name", header: "Name", accessor: (row) => row.name }]
+```
+
+## Identity and data
+
+| Option     | Type               | Default     | Description                                                                             |
+| ---------- | ------------------ | ----------- | --------------------------------------------------------------------------------------- |
+| `id`       | `string`           | required    | Unique key.                                                                             |
+| `header`   | `string`           | required    | Header text (also in menus and labels).                                                 |
+| `accessor` | `(row) => unknown` |             | The raw value. Without it the column is a [display column](/features/display-columns/). |
+| `display`  | `boolean`          | `!accessor` | Not data: no sort, filter, group, total or edit.                                        |
+
+## Rendering
+
+| Option               | Type                                                 | Description                               |
+| -------------------- | ---------------------------------------------------- | ----------------------------------------- |
+| `cell`               | `(row, { grid, index }) => ReactNode`                | Cell content. Default: the value as text. |
+| `cellComponent`      | `ComponentType<{ row, value, index, column, grid }>` | Cell as a component.                      |
+| `headerCell`         | `({ column, sorted, grid }) => ReactNode`            | Header label.                             |
+| `headerComponent`    | `ComponentType<{ column, sorted, grid }>`            | Header label as a component.              |
+| `aggregateCell`      | `(value, { scope, column }) => ReactNode`            | Aggregate content.                        |
+| `aggregateComponent` | `ComponentType<{ value, scope, column }>`            | Aggregate as a component.                 |
+| `editCell`           | `(ctx) => ReactNode`                                 | Custom editor.                            |
+| `editComponent`      | `ComponentType<ctx>`                                 | Custom editor as a component.             |
+
+See [Custom cells](/customization/custom-cells/).
+
+## Size and position
+
+| Option        | Type                            | Default  | Description                                                        |
+| ------------- | ------------------------------- | -------- | ------------------------------------------------------------------ |
+| `width`       | `number`                        | `160`    | px.                                                                |
+| `minWidth`    | `number`                        | `60`     | Resize lower bound.                                                |
+| `maxWidth`    | `number`                        | none     | Resize upper bound.                                                |
+| `align`       | `"left" \| "center" \| "right"` | `"left"` | Text alignment.                                                    |
+| `resizable`   | `boolean`                       | `true`   | Allow resizing ([resizing](/features/column-resizing/)).           |
+| `sticky`      | `"left" \| "right"`             | none     | Pin to a side ([pinning](/features/pinned-columns/)).              |
+| `pinnable`    | `boolean`                       | `true`   | Pin items in the menu.                                             |
+| `headerGroup` | `string \| string[]`            | none     | Column-group label(s) ([column groups](/features/column-groups/)). |
+
+## Features
+
+| Option       | Type                                                                 | Default                              | Description                                                     |
+| ------------ | -------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------- |
+| `sortable`   | `boolean`                                                            | `false`                              | Allow sorting ([sorting](/features/sorting/)).                  |
+| `filterable` | `boolean`                                                            | `true`                               | Filter in the menu ([filters](/features/column-filters/)).      |
+| `hideable`   | `boolean`                                                            | `true`                               | Allow hiding.                                                   |
+| `menu`       | `boolean`                                                            | `true` (`false` for display columns) | Show the ⋮ menu.                                                |
+| `groupable`  | `boolean`                                                            | `true`                               | Allow grouping by it ([row grouping](/features/row-grouping/)). |
+| `aggregate`  | `"sum" \| "avg" \| "min" \| "max" \| "count" \| (values) => unknown` | none                                 | Group / total value ([aggregation](/features/aggregation/)).    |
+
+## Search, sort and filter rules
+
+Each column can change what the built-in search, sort and filter work with, or replace the rule entirely.
+
+| Option        | Type                     | Default  | Description                                                                           |
+| ------------- | ------------------------ | -------- | ------------------------------------------------------------------------------------- |
+| `searchable`  | `boolean`                | `true`   | Let the search box look at this column ([search](/features/search/)).                 |
+| `searchValue` | `(row) => unknown`       | accessor | What the search matches for this column (a formatted date, a label).                  |
+| `sortValue`   | `(row) => unknown`       | accessor | The value to sort by (a rank, a last name) ([sorting](/features/sorting/)).           |
+| `compare`     | `(a, b) => number`       |          | Your own comparison of two rows for ascending order; wins over `sortValue`.           |
+| `filterValue` | `(row) => unknown`       | accessor | What the column filter matches against ([column filters](/features/column-filters/)). |
+| `filterMatch` | `(row, text) => boolean` |          | Your own filter rule for the typed text; wins over `filterValue`.                     |
+
+## Editing
+
+| Option          | Type                                                     | Default    | Description                                           |
+| --------------- | -------------------------------------------------------- | ---------- | ----------------------------------------------------- |
+| `editable`      | `boolean \| (row) => boolean`                            | `false`    | Allow editing ([editing](/features/inline-editing/)). |
+| `editor`        | `"text" \| "number" \| "date" \| "select" \| "checkbox"` | `"text"`   | Built-in editor.                                      |
+| `editorOptions` | `{ value: string; label: string }[]`                     |            | Choices for `"select"`.                               |
+| `parseValue`    | `(input, row) => unknown`                                | per editor | Text → value.                                         |
+| `validate`      | `(value, row) => string \| null \| undefined`            |            | Return a message to reject.                           |

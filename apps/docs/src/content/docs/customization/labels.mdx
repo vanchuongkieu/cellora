@@ -1,0 +1,65 @@
+---
+title: Labels & i18n
+description: Translate every user-facing string of the Cellora data grid with the labels prop. Full list of labels with their English defaults.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/labels-demo"
+import code from "~/demos/labels-demo.tsx?raw"
+
+Every text the grid shows or announces to screen readers comes from `labels`. Override any of them; the rest keep their English default.
+
+<ComponentPreview code={code} title="labels-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Usage
+
+```tsx
+<DataGrid
+  labels={{
+    sortAsc: "Sắp xếp tăng dần",
+    selected: (count) => `Đã chọn ${count.toLocaleString("vi-VN")}`,
+  }}
+  searchPlaceholder="Tìm kiếm..."
+  emptyMessage="Không có kết quả."
+/>
+```
+
+Define the object once (outside the component) and reuse it for every grid. `DEFAULT_LABELS` is exported if you want to start from the full English set.
+
+Two texts are props of their own: `searchPlaceholder` and `emptyMessage`.
+
+## All labels
+
+| Key                                            | Default                                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| `columnMenu`                                   | `"Column options"`                                                                |
+| `sortAsc` / `sortDesc` / `sortClear`           | `"Sort ascending"` / `"Sort descending"` / `"Unsorted"`                           |
+| `pinLeft` / `pinRight` / `unpin`               | `"Pin left"` / `"Pin right"` / `"Unpin"`                                          |
+| `filter` / `filterPlaceholder`                 | `"Filter"` / `"Filter value..."`                                                  |
+| `hideColumn` / `manageColumns`                 | `"Hide column"` / `"Manage columns"`                                              |
+| `selectAll` / `selectRow` / `selectGroup`      | `"Select all rows"` / `"Select row"` / `"Select group"`                           |
+| `selected(count)`                              | `"1,234 selected"`                                                                |
+| `loading`                                      | `"Loading..."`                                                                    |
+| `rowCount(total)`                              | `"1,000,000 rows"`                                                                |
+| `groupBy` / `ungroup`                          | `"Group by this column"` / `"Ungroup"`                                            |
+| `total`                                        | `"Total"`                                                                         |
+| `expandGroup` / `collapseGroup`                | `"Expand group"` / `"Collapse group"`                                             |
+| `emptyGroup`                                   | `"(Empty)"`                                                                       |
+| `groupPanelHint`                               | `"Drag a column header here to group by it"`                                      |
+| `removeGroup(header)`                          | `"Stop grouping by Department"`                                                   |
+| `invalidNumber` / `invalidDate` / `editFailed` | `"Enter a valid number"` / `"Enter a valid date"` / `"Could not save the change"` |
+| `editCell(header)`                             | `"Edit Name"`                                                                     |
+| `searchRows`                                   | `"Search rows"`                                                                   |
+| `rowsPerPage`                                  | `"Rows per page"`                                                                 |
+| `previousPage` / `nextPage`                    | `"Previous page"` / `"Next page"`                                                 |
+| `pageIndicator(page, pageCount)`               | `"Page 2 / 10"`                                                                   |
+| `range(from, to, total)`                       | `"11-20 of 57"`                                                                   |
+| `resizeColumn(header)`                         | `"Resize Name column"`                                                            |
+
+Function labels receive numbers, so you control number formatting for your locale.
+
+## Docs site language
+
+These docs are available in English and Tiếng Việt: use the language picker in the header.

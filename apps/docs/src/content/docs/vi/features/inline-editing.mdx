@@ -1,0 +1,96 @@
+---
+title: Sửa trực tiếp
+description: Sửa ô ngay trong data grid Cellora với các editor chữ, số, ngày, danh sách và checkbox, có kiểm tra hợp lệ, lưu bất đồng bộ và điều hướng bằng bàn phím.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/inline-editing-demo"
+import code from "~/demos/inline-editing-demo.tsx?raw"
+
+Nhấp đúp vào ô để sửa. Grid không bao giờ tự đổi dữ liệu của bạn: nó báo bạn biết người dùng đã nhập gì, và bạn lưu lại.
+
+<ComponentPreview code={code} title="inline-editing-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ba bước
+
+1. Bật: `enableEditing`.
+2. Đánh dấu cột: `editable: true` (hoặc một hàm theo dòng).
+3. Lưu trong `onCellEdit`:
+
+```tsx
+const [rows, setRows] = useState(initialRows)
+
+<DataGrid
+  rows={rows}
+  getRowId={(row) => row.id}
+  enableEditing
+  onCellEdit={({ rowId, columnId, value }) =>
+    setRows((current) => current.map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)))
+  }
+/>
+```
+
+`getRowId` ở đây cũng quan trọng: nó giữ editor đúng dòng sau khi bạn cập nhật và object dòng bị thay mới.
+
+## Các loại editor
+
+| `editor`            | Ô nhập                       | Giá trị nhận được                                 |
+| ------------------- | ---------------------------- | ------------------------------------------------- |
+| `"text"` (mặc định) | ô chữ                        | `string`                                          |
+| `"number"`          | ô số                         | `number`, hoặc `null` khi trống                   |
+| `"date"`            | bộ chọn ngày của trình duyệt | `Date` (theo ngày địa phương), hoặc `null`        |
+| `"select"`          | danh sách từ `editorOptions` | `value` của lựa chọn                              |
+| `"checkbox"`        | checkbox luôn hoạt động      | `boolean` (lưu ngay khi bấm, không có chế độ sửa) |
+
+Số không hợp lệ và ngày không tồn tại (31/2) bị từ chối kèm thông báo. Dùng `parseValue(text, row)` để tự chuyển chữ thành giá trị.
+
+## Kiểm tra và từ chối
+
+```tsx
+validate: (value, row) => (String(value).trim() ? null : "Tên là bắt buộc")
+```
+
+`validate` trả về thông báo để giữ editor mở. `onCellEdit` cũng từ chối được: trả về `false` hoặc ném lỗi (thông báo lỗi được hiện). Nó có thể là `async`; ô hiện trạng thái đang lưu cho tới khi xong.
+
+## Bàn phím
+
+| Phím                                               | Tác dụng                        |
+| -------------------------------------------------- | ------------------------------- |
+| <kbd>Enter</kbd> / <kbd>F2</kbd> trên ô đang focus | Bắt đầu sửa                     |
+| <kbd>Enter</kbd>                                   | Lưu                             |
+| <kbd>Esc</kbd>                                     | Huỷ                             |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd>   | Lưu và sửa ô kế tiếp / trước đó |
+| Bấm ra ngoài                                       | Lưu nếu hợp lệ, không thì huỷ   |
+
+## Bắt đầu sửa khi…
+
+`editTrigger`: `"doubleClick"` (mặc định), `"click"`, hoặc `"none"` (chỉ bàn phím).
+
+## Editor của riêng bạn
+
+```tsx
+editCell: ({ value, commit, cancel }) => <MyColorPicker value={value} onPick={commit} onClose={cancel} />
+```
+
+Hoặc `editComponent` (dạng component), hoặc slot `editCell` cho mọi cột. Trả về `null` từ slot để giữ editor có sẵn.
+
+## API
+
+| Prop / tuỳ chọn                                          | Ở đâu      | Kiểu                                                     | Mặc định        | Mô tả                              |
+| -------------------------------------------------------- | ---------- | -------------------------------------------------------- | --------------- | ---------------------------------- |
+| `enableEditing`                                          | `DataGrid` | `boolean`                                                | `false`         | Công tắc chung.                    |
+| `editTrigger`                                            | `DataGrid` | `"doubleClick" \| "click" \| "none"`                     | `"doubleClick"` | Thao tác bắt đầu sửa.              |
+| `onCellEdit`                                             | `DataGrid` | `(edit) => unknown`                                      |                 | Lưu; `false` / ném lỗi là từ chối. |
+| `isCellEditable`                                         | `DataGrid` | `({ row, column }) => boolean`                           |                 | Điều kiện thêm cho từng ô.         |
+| `onEditingChange`                                        | `DataGrid` | `(cell \| null) => void`                                 |                 | Ô đang sửa thay đổi.               |
+| `editable`                                               | cột        | `boolean \| (row) => boolean`                            | `false`         | Cho phép sửa.                      |
+| `editor`                                                 | cột        | `"text" \| "number" \| "date" \| "select" \| "checkbox"` | `"text"`        | Editor có sẵn.                     |
+| `editorOptions`                                          | cột        | `{ value, label }[]`                                     |                 | Lựa chọn cho `"select"`.           |
+| `parseValue`                                             | cột        | `(text, row) => unknown`                                 | theo editor     | Chữ → giá trị.                     |
+| `validate`                                               | cột        | `(value, row) => string \| null`                         |                 | Có thông báo là từ chối.           |
+| `editCell` / `editComponent`                             | cột        |                                                          |                 | Editor tuỳ biến.                   |
+| `invalidNumber`, `invalidDate`, `editFailed`, `editCell` | `labels`   |                                                          | tiếng Anh       | Thông báo.                         |
+
+Object `edit` truyền vào `onCellEdit`: `{ row, rowId, index, columnId, column, value, previousValue }`.

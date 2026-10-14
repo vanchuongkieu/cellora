@@ -1,0 +1,84 @@
+---
+title: Lọc theo cột
+description: Lọc dòng của data grid Cellora theo từng cột ngay trong menu tiêu đề. Các bộ lọc kết hợp với nhau và với ô tìm kiếm.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-filters-demo"
+import code from "~/demos/column-filters-demo.tsx?raw"
+import CustomDemo from "~/demos/column-filters-custom-demo"
+import customCode from "~/demos/column-filters-custom-demo.tsx?raw"
+
+Mỗi cột có thể có một bộ lọc chữ riêng, nhập trong menu cột.
+
+<ComponentPreview code={code} title="column-filters-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Cách dùng
+
+1. Mở **⋮** trên tiêu đề cột.
+2. Chọn **Filter** rồi gõ. Dòng cập nhật ngay khi gõ.
+3. Biểu tượng lọc hiện trên tiêu đề khi cột đang được lọc. Xoá chữ để bỏ lọc.
+
+Lọc theo cột bật sẵn (nằm trong [menu cột](/vi/features/column-menu/)).
+
+## Quy tắc
+
+- Dòng phải khớp **mọi** bộ lọc cột, cộng với [ô tìm kiếm](/vi/features/search/) nếu có.
+- Khớp kiểu "chứa", không phân biệt hoa thường, trên giá trị `accessor` của cột, không phân biệt dấu (`ignoreAccents`, bật sẵn).
+- Ẩn một cột thì bộ lọc của cột đó cũng tạm ngưng cho tới khi hiện lại.
+- [Cột thao tác](/vi/features/display-columns/) không lọc được.
+
+## Cách khớp theo ý bạn
+
+- `filterValue(row)`: thứ được so khớp thay cho giá trị `accessor` (ngày đã định dạng, nhãn của một mã).
+- `filterMatch(row, text)`: quy tắc của riêng bạn, nhận dòng và chữ đã gõ. Khớp chính xác, `>60000`, khoảng giá trị, tuỳ ý. Ưu tiên hơn `filterValue`.
+
+<ComponentPreview code={customCode} title="column-filters-custom-demo.tsx">
+  <CustomDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+{ id: "startDate", header: "Ngày vào", accessor: (row) => row.startDate, filterValue: (row) => formatDay(row.startDate) }
+{ id: "salary", header: "Lương", accessor: (row) => row.salary, filterMatch: (row, text) => (text.startsWith(">") ? row.salary > Number(text.slice(1)) : String(row.salary).includes(text)) }
+```
+
+## Lọc trên server
+
+Khi API lọc, truyền dòng của nó kèm `manualFiltering` và đọc `columnFilters` từ `onStateChange`. Xem [Dữ liệu phía server](/vi/features/server-side/). Muốn lọc sẵn, hoặc điều khiển từ URL, dùng `defaultColumnFilters` / `columnFilters`.
+
+## Tắt tính năng
+
+```tsx
+// cho một cột
+{ id: "id", header: "ID", accessor: (row) => row.id, filterable: false }
+
+// cho cả grid (giữ phần còn lại của menu)
+<DataGrid columnMenuItems={{ filter: false }} />
+```
+
+## Lọc bằng code
+
+```tsx
+grid.setColumnFilter("department", "eng")
+grid.setColumnFilter("department", "") // bỏ lọc
+grid.state.columnFilters // { department: "eng" }
+```
+
+Đây là cách tự làm thanh lọc riêng: xem toolbar trong [demo Slot](/vi/customization/slots/).
+
+## API
+
+| Prop / tuỳ chọn                | Ở đâu      | Kiểu                     | Mặc định                         | Mô tả                                        |
+| ------------------------------ | ---------- | ------------------------ | -------------------------------- | -------------------------------------------- |
+| `filterable`                   | cột        | `boolean`                | `true`                           | Có mục "Filter" trong menu của cột này.      |
+| `filterValue`                  | cột        | `(row) => unknown`       | accessor                         | Thứ được so khớp.                            |
+| `filterMatch`                  | cột        | `(row, text) => boolean` |                                  | Quy tắc khớp của riêng bạn.                  |
+| `columnMenuItems.filter`       | `DataGrid` | `boolean`                | `true`                           | Có mục "Filter" ở mọi menu.                  |
+| `ignoreAccents`                | `DataGrid` | `boolean`                | `true`                           | Khớp không phân biệt dấu.                    |
+| `manualFiltering`              | `DataGrid` | `boolean`                | `false`                          | Dòng đã được lọc sẵn (bởi API).              |
+| `columnFilters`                | `DataGrid` | `Record<string, string>` |                                  | Bộ lọc có kiểm soát theo id cột.             |
+| `defaultColumnFilters`         | `DataGrid` | `Record<string, string>` | `{}`                             | Bộ lọc ban đầu.                              |
+| `onStateChange`                | `DataGrid` | `(state) => void`        |                                  | Bộ lọc (và phần còn lại của state) thay đổi. |
+| `filter` / `filterPlaceholder` | `labels`   | `string`                 | `"Filter"` / `"Filter value..."` | Chữ trong menu.                              |

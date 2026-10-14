@@ -1,0 +1,42 @@
+---
+/**
+ * A live demo with its source underneath, like ui.shadcn.com: the code starts
+ * collapsed (first lines, faded) behind a "View Code" button.
+ *
+ * Usage in MDX:
+ *   import Demo from "~/demos/sorting-demo"
+ *   import code from "~/demos/sorting-demo.tsx?raw"
+ *   <ComponentPreview code={code}><Demo client:only="react" /></ComponentPreview>
+ */
+import { Code } from "@astrojs/starlight/components"
+
+import { ui } from "../i18n"
+
+interface Props {
+  /** Source of the demo file (import it with `?raw`) */
+  code: string
+  /** File name, shown above the expanded code */
+  title?: string
+}
+
+const { code, title = "demo.tsx" } = Astro.props
+const t = ui(Astro.locals.starlightRoute.locale)
+---
+
+<div class="cl-preview not-content">
+  <div class="cl-preview-demo">
+    <slot />
+  </div>
+  <div class="cl-preview-code" data-collapsed>
+    <Code code={code} lang="tsx" title={title} />
+    <div class="cl-preview-code-overlay">
+      <button type="button" class="cl-button-secondary" data-view-code>{t.viewCode}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-view-code]")) {
+    button.addEventListener("click", () => button.closest("[data-collapsed]")?.removeAttribute("data-collapsed"))
+  }
+</script>

@@ -1,0 +1,58 @@
+---
+title: Virtual scroll
+description: Render a million rows and a hundred columns in the Cellora data grid with virtual scrolling. Native 60 fps scrolling, no blank flashes, works with grouping, pinning, selection and editing.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/virtual-scroll-demo"
+import code from "~/demos/virtual-scroll-demo.tsx?raw"
+
+Only the rows and columns in view exist in the page. Try a million rows:
+
+<ComponentPreview code={code} title="virtual-scroll-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Turn it on
+
+```tsx
+<DataGrid rows={bigRows} columns={columns} getRowId={(row) => row.id} virtualized maxHeight={600} />
+```
+
+That is all. Rows scroll instead of paginating, and the footer shows the row count.
+
+## How it stays smooth
+
+- **Native scrolling.** Rows sit at their real position in a tall spacer, so the browser scrolls them with no script running per frame.
+- **Rendering ahead.** Two screens of rows are prepared in the scroll direction, one kept behind; columns half a screen each side. Fast flings render the visible rows first.
+- **No white flashes.** Areas not rendered yet show row lines (or skeleton bars) drawn by CSS.
+- **Rows and columns.** With 100 columns only the visible ones (plus lookahead) are in the DOM. Pinned columns always render.
+
+## Row height
+
+Every row is 37 px high, like the normal table, whatever the row count: switching from 10,000 to 1,000,000 rows never changes the look. Up to the browser's maximum element height (about 890,000 rows at 37 px in Chrome) the browser scrolls natively; beyond it scroll positions are scaled, just as smooth. Change it with `rowHeight`.
+
+## Works with
+
+[Sorting](/features/sorting/), [search](/features/search/), [filters](/features/column-filters/), [pinned columns](/features/pinned-columns/), [column groups](/features/column-groups/), [row grouping](/features/row-grouping/), [totals](/features/aggregation/), [selection](/features/row-selection/), [editing](/features/inline-editing/). Fixed column widths are always on.
+
+## Tips for big data
+
+- Rows can be anything: in the demo a row is just its index. Lighter rows = less memory.
+- Give `getRowId`.
+- Keep `accessor`s cheap (they run for every row when sorting or searching).
+- Full-text search over millions of cells takes a moment; it runs off the typing path, but column filters are cheaper.
+
+## API
+
+| Prop                 | Type                              | Default                 | Description                                           |
+| -------------------- | --------------------------------- | ----------------------- | ----------------------------------------------------- |
+| `virtualized`        | `boolean`                         | `false`                 | Turn on virtual scrolling.                            |
+| `maxHeight`          | `number \| string`                | `400`                   | Required height cap (`null` falls back to 400).       |
+| `rowHeight`          | `number`                          | `37`                    | Fixed row height in px.                               |
+| `headerHeight`       | `number`                          | `40`                    | Header height in px.                                  |
+| `overscanScreens`    | `number \| { rows?, columns? }`   | rows `2`, columns `0.5` | Lookahead in viewport sizes.                          |
+| `overscanRows`       | `number`                          | `10`                    | Minimum extra rows each side.                         |
+| `overscanColumns`    | `number`                          | `3`                     | Minimum extra columns each side.                      |
+| `virtualPlaceholder` | `"skeleton" \| "lines" \| "none"` | `"skeleton"`            | What unrendered areas look like during a fast scroll. |
+| `rowCount`           | slot                              |                         | Replace the "N rows" text.                            |

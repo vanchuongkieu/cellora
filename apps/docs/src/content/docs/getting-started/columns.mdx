@@ -1,0 +1,78 @@
+---
+title: Columns
+description: "Define Cellora data grid columns with an array: id, header, accessor, width, alignment and custom cells. The accessor is the raw value, the cell is how it looks."
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/columns-demo"
+import code from "~/demos/columns-demo.tsx?raw"
+
+A column says **what** to read from a row (`accessor`) and **how** to show it (`cell`).
+
+<ComponentPreview code={code} title="columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## The minimum
+
+```tsx
+{ id: "name", header: "Name", accessor: (row) => row.name }
+```
+
+| Key        | What it does                                                                   |
+| ---------- | ------------------------------------------------------------------------------ |
+| `id`       | Unique key. Used for sorting state, filters, pinning, widths and in callbacks. |
+| `header`   | The header text (also used in menus and labels).                               |
+| `accessor` | Reads the raw value. Sorting, search, filters, grouping and totals all use it. |
+
+## Value vs. display
+
+`accessor` should return the **raw value** (a number, a `Date`, a string). Put formatting in `cell`, so sorting compares numbers instead of text like `"$9,000"` vs `"$10,000"`:
+
+```tsx
+{
+  id: "salary",
+  header: "Salary",
+  accessor: (row) => row.salary,
+  cell: (row) => formatMoney(row.salary),
+}
+```
+
+`cell` can return any React node: badges, links, buttons, progress bars. See [Custom cells](/customization/custom-cells/).
+
+## Width and alignment
+
+Columns have **fixed widths** by default: content never pushes a column wider, long text is cut with an ellipsis, and nothing jumps while you page or scroll.
+
+```tsx
+{ id: "email", header: "Email", accessor: (row) => row.email, width: 260, minWidth: 120, maxWidth: 480, align: "left" }
+```
+
+| Key        | Default  | Notes                                                       |
+| ---------- | -------- | ----------------------------------------------------------- |
+| `width`    | `160`    | px                                                          |
+| `minWidth` | `60`     | Lower bound while resizing                                  |
+| `maxWidth` | none     | Upper bound while resizing                                  |
+| `align`    | `"left"` | `"left"`, `"center"` or `"right"`; numbers usually go right |
+
+Set `fixedColumnWidths={false}` on the grid for the browser's automatic table layout (no resizing or pinning then).
+
+## Typing
+
+Give the row type once and every `accessor` / `cell` is typed:
+
+```tsx
+import type { DataGridColumnInput } from "@cellora/react"
+
+const columns: DataGridColumnInput<Employee>[] = [
+  { id: "name", header: "Name", accessor: (row) => row.name }, // row: Employee
+]
+```
+
+## Keep columns stable
+
+Define the array outside the component, or wrap it in `useMemo`. The grid re-reads your rows only when something that affects the data (an `accessor`, `aggregate`, …) changes, so inline cell renderers are fine, but a stable array is always cheapest.
+
+## All column options
+
+Sorting, filtering, pinning, grouping, editing and more are configured per column too. The full list is in the [Column reference](/api/column/).

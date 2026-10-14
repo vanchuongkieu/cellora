@@ -1,0 +1,43 @@
+---
+title: Row & cell click
+description: Handle clicks on Cellora data grid rows and cells with onRowClick and onCellClick. Buttons, links and fields inside cells keep their own clicks.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/row-click-demo"
+import code from "~/demos/row-click-demo.tsx?raw"
+
+Open a detail page, a drawer or a preview when a row or a cell is clicked.
+
+<ComponentPreview code={code} title="row-click-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Handlers
+
+```tsx
+<DataGrid onRowClick={({ row, rowId, index, event }) => navigate(`/employees/${rowId}`)} onCellClick={({ row, column, value, event }) => console.log(column.id, value)} />
+```
+
+- With both set, the cell handler runs first, then the row handler.
+- Rows (and cells) get the pointer cursor once a handler is set.
+- `index` is the position in the list being shown (the page, or all rows when virtualized). `rowId` comes from `getRowId`.
+
+## What does not count as a click
+
+Interactive things inside a cell keep their own behavior and do **not** fire the handlers: buttons, links, inputs, selects, text areas, labels, checkboxes, switches, menu items, combo boxes, and anything you mark with `data-no-row-click`. The selection checkbox column and group rows never fire them either.
+
+```tsx
+cell: (row) => <div data-no-row-click>Clicking here does nothing to the row</div>
+```
+
+## Performance
+
+There is one listener for the whole grid, not one per row: thousands of rows cost nothing extra.
+
+## API
+
+| Prop          | Type                                                    | Description                                                      |
+| ------------- | ------------------------------------------------------- | ---------------------------------------------------------------- |
+| `onRowClick`  | `({ row, index, rowId, event }) => void`                | A body row was clicked.                                          |
+| `onCellClick` | `({ row, index, rowId, event, column, value }) => void` | A body cell was clicked. `value` is the column's accessor value. |

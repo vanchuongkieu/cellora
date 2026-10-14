@@ -1,0 +1,69 @@
+---
+title: Đổi độ rộng cột
+description: Đổi độ rộng cột của data grid Cellora bằng cách kéo, nhấp đúp để vừa nội dung, hoặc bằng bàn phím. Giới hạn từng cột với minWidth và maxWidth.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-resizing-demo"
+import code from "~/demos/column-resizing-demo.tsx?raw"
+
+Mọi cột đều đổi được độ rộng, theo ba cách.
+
+<ComponentPreview code={code} title="column-resizing-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ba cách đổi độ rộng
+
+| Cách                                                                      | Điều gì xảy ra                                        |
+| ------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Kéo** tay nắm ở mép phải tiêu đề                                        | Độ rộng đi theo con trỏ (kể cả khi ra ngoài tiêu đề). |
+| **Nhấp đúp** vào tay nắm                                                  | Cột vừa khít nội dung (xem bên dưới).                 |
+| **Bàn phím**: <kbd>Tab</kbd> tới tay nắm, rồi <kbd>←</kbd> / <kbd>→</kbd> | 10 px mỗi lần nhấn.                                   |
+
+Đổi độ rộng không bao giờ làm cột bị sắp xếp, dù tay nắm nằm trong tiêu đề.
+
+## Nhấp đúp để vừa nội dung
+
+`autoFitOnDoubleClick` quyết định "nội dung" là gì:
+
+| Giá trị                       | Vừa theo                  |
+| ----------------------------- | ------------------------- |
+| `true` / `"cells"` (mặc định) | Ô rộng nhất đang hiển thị |
+| `"header"`                    | Chữ trên tiêu đề          |
+| `"both"`                      | Cái nào rộng hơn          |
+| `false`                       | Nhấp đúp không làm gì     |
+
+## Giới hạn theo cột
+
+```tsx
+{ id: "name", header: "Tên", accessor: (row) => row.name, width: 160, minWidth: 120, maxWidth: 320 }
+{ id: "id", header: "ID", accessor: (row) => row.id, resizable: false }
+```
+
+## Hình dạng tay nắm
+
+```tsx
+<DataGrid resizeHandle="hover" resizeHandleClassName="h-8 w-1 bg-primary" />
+```
+
+`"always"` (mặc định) hiện vạch mờ, sáng lên khi rê chuột; `"hover"` chỉ hiện khi rê chuột. Muốn toàn quyền thì dùng slot `resizeHandle`.
+
+## Ghi chú
+
+- Đổi độ rộng cần độ rộng cố định (`fixedColumnWidths`, bật sẵn).
+- Độ rộng được lưu trong state của grid; mất khi grid bị gỡ khỏi trang.
+
+## API
+
+| Prop / tuỳ chọn                               | Ở đâu      | Kiểu                                       | Mặc định             | Mô tả                                   |
+| --------------------------------------------- | ---------- | ------------------------------------------ | -------------------- | --------------------------------------- |
+| `enableColumnResizing`                        | `DataGrid` | `boolean`                                  | `true`               | Công tắc chung.                         |
+| `resizeHandle`                                | `DataGrid` | `"always" \| "hover"`                      | `"always"`           | Khi nào tay nắm hiện.                   |
+| `resizeHandleClassName` / `resizeHandleStyle` | `DataGrid` | `string` / `CSSProperties`                 |                      | Đổi kiểu vạch.                          |
+| `autoFitOnDoubleClick`                        | `DataGrid` | `boolean \| "cells" \| "header" \| "both"` | `true`               | Nhấp đúp để vừa.                        |
+| `fixedColumnWidths`                           | `DataGrid` | `boolean`                                  | `true`               | Độ rộng cố định (bắt buộc).             |
+| `resizable`                                   | cột        | `boolean`                                  | `true`               | Cho đổi độ rộng cột này.                |
+| `width` / `minWidth` / `maxWidth`             | cột        | `number`                                   | `160` / `60` / không | px.                                     |
+| `resizeColumn`                                | `labels`   | `(header) => string`                       | `"Resize X column"`  | Tên của tay nắm cho trình đọc màn hình. |
+| `resizeHandle`                                | slot       | `({ column, width }) => ReactNode`         | vạch                 | Tay nắm tuỳ biến.                       |

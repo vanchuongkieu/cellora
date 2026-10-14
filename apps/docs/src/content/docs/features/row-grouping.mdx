@@ -1,0 +1,73 @@
+---
+title: Row grouping
+description: Group Cellora data grid rows by one or more columns, expand and collapse groups, and let users group by dragging headers onto a group bar.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/row-grouping-demo"
+import code from "~/demos/row-grouping-demo.tsx?raw"
+
+Collect rows with the same value under a group header like **Engineering (12)**. Nest as many levels as you like.
+
+<ComponentPreview code={code} title="row-grouping-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Group rows
+
+Uncontrolled (the grid keeps the state):
+
+```tsx
+<DataGrid defaultGroupBy={["department"]} />
+```
+
+Controlled (you keep it, e.g. to save it in the URL):
+
+```tsx
+const [groupBy, setGroupBy] = useState<readonly string[]>(["department", "role"])
+<DataGrid groupBy={groupBy} onGroupByChange={setGroupBy} />
+```
+
+Column ids, outermost first. Unknown ids are ignored.
+
+## Three ways for users to group
+
+1. **Column menu**: ⋮ → _Group by this column_ / _Ungroup_.
+2. **Group bar**: `enableGroupPanel` adds a bar above the grid. Drag a header onto it to add a level, drag chips to reorder, click × to remove.
+3. **Your own UI**: call `grid.setGroupBy([...])`.
+
+## Expand and collapse
+
+Click a group row (or its chevron) to toggle it. Groups start closed; `groupDefaultExpanded` opens them all. From code: `grid.toggleGroup(group.key)`.
+
+## How groups are ordered
+
+Like a sort on that column: numbers and dates by value, text naturally, empty values last as **(Empty)**. Rows inside a group keep the current [sort](/features/sorting/).
+
+## Display
+
+| Prop               | Default | Effect                                                                       |
+| ------------------ | ------- | ---------------------------------------------------------------------------- |
+| `hideGroupedCells` | `true`  | Leave the grouped column empty on data rows (the group row already says it). |
+| `groupIndent`      | `16`    | px of indent per level.                                                      |
+
+Group rows can show [aggregates](/features/aggregation/) (sums, averages…) per column. With [row selection](/features/row-selection/), a group's checkbox selects every row inside it.
+
+## Paging and scale
+
+With pagination on, pages count lines (headers + rows). Grouping a million rows takes one pass per level; opening and closing groups never touches the data again. It works with [virtual scroll](/features/virtual-scroll/).
+
+## API
+
+| Prop / option                                                                                       | Where      | Type                | Default | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---------- | ------------------- | ------- | --------------------------------- |
+| `groupBy`                                                                                           | `DataGrid` | `readonly string[]` |         | Controlled grouping.              |
+| `defaultGroupBy`                                                                                    | `DataGrid` | `readonly string[]` | `[]`    | Initial grouping (uncontrolled).  |
+| `onGroupByChange`                                                                                   | `DataGrid` | `(groupBy) => void` |         | Called on every change.           |
+| `groupDefaultExpanded`                                                                              | `DataGrid` | `boolean`           | `false` | Groups start open.                |
+| `groupIndent`                                                                                       | `DataGrid` | `number`            | `16`    | Indent per level.                 |
+| `hideGroupedCells`                                                                                  | `DataGrid` | `boolean`           | `true`  | Hide grouped values on data rows. |
+| `enableGroupPanel`                                                                                  | `DataGrid` | `boolean`           | `false` | Drag-to-group bar.                |
+| `groupable`                                                                                         | column     | `boolean`           | `true`  | Allow grouping by this column.    |
+| `groupRow`, `groupLabel`, `groupIcon`, `groupPanel`, `groupChip`, `selectGroup`                     | slots      |                     |         | Replace group parts.              |
+| `groupBy`, `ungroup`, `expandGroup`, `collapseGroup`, `emptyGroup`, `groupPanelHint`, `removeGroup` | `labels`   |                     | English | Texts.                            |

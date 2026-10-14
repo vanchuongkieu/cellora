@@ -1,0 +1,65 @@
+---
+title: Custom cells
+description: "Render anything in Cellora data grid cells and headers: badges, avatars, links, components with hooks, custom header labels and aggregate formats."
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/custom-cells-demo"
+import code from "~/demos/custom-cells-demo.tsx?raw"
+
+Cells, headers, aggregates and editors can each be a render function or a component.
+
+<ComponentPreview code={code} title="custom-cells-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Cell: a render function
+
+```tsx
+{
+  id: "status",
+  header: "Status",
+  accessor: (row) => row.status, // still the value for sorting, search, filters
+  cell: (row, { grid, index }) => <StatusBadge status={row.status} />,
+}
+```
+
+## Cell: a component (hooks inside)
+
+```tsx
+function RevealEmail({ row, value, index, column, grid }: DataGridCellComponentProps<Employee>) {
+  const [shown, setShown] = useState(false)
+  return shown ? <span>{row.email}</span> : <button onClick={() => setShown(true)}>Show</button>
+}
+
+{ id: "email", header: "Email", accessor: (row) => row.email, cellComponent: RevealEmail }
+```
+
+## Header label
+
+Replaces only the label: sorting, the menu and the resize handle stay.
+
+```tsx
+headerCell: ({ column, sorted, grid }) => (
+  <span>
+    {column.header} {sorted === "asc" ? "↑" : ""}
+  </span>
+)
+// or headerComponent: MyHeader
+```
+
+## Aggregate and editor
+
+| Option                                    | Component version    | Receives                                                 |
+| ----------------------------------------- | -------------------- | -------------------------------------------------------- |
+| `aggregateCell(value, { scope, column })` | `aggregateComponent` | `{ value, scope, column }`                               |
+| `editCell(ctx)`                           | `editComponent`      | `{ row, column, index, value, pending, commit, cancel }` |
+
+See [Aggregation](/features/aggregation/) and [Inline editing](/features/inline-editing/).
+
+## Rules
+
+- A function (`cell`, `headerCell`, …) wins over its component (`cellComponent`, …) when both are given.
+- Plain text from `cell` gets the native tooltip and ellipsis; rich nodes are clipped to the cell.
+- Use `data-no-row-click` on parts that should not trigger [`onRowClick`](/features/row-and-cell-click/) (buttons and links already do not).
+- `index` is the position in the current page (or in all rows when virtualized).

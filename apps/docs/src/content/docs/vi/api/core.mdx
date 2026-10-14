@@ -1,0 +1,69 @@
+---
+title: Core (@cellora/core)
+description: Phần logic không phụ thuộc framework của Cellora - lọc, sắp xếp, phân trang, nhóm, tổng hợp, chọn dòng và tính toán cuộn ảo - dùng được từ mọi code JavaScript.
+---
+
+`@cellora/core` là TypeScript thuần, không phụ thuộc framework. `@cellora/react` được xây trên nó, và bản cho Vue sẽ dùng lại. Dùng trực tiếp để xử lý phía server, trong worker, trong test, hoặc với thư viện UI khác.
+
+```ts
+import { processRows, createInitialState, buildGroupTree } from "@cellora/core"
+```
+
+## Dòng
+
+| Hàm                                           | Mô tả                                                                                    |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `createInitialState(pageSize?)`               | `{ sort: null, filter: "", columnFilters: {}, pageIndex: 0, pageSize }`.                 |
+| `processRows(rows, columns, state, options?)` | Lọc + sắp xếp + phân trang. Trả về `{ rows, matchedRows, total, pageCount, pageIndex }`. |
+| `setSort(state, columnId, direction \| null)` | State mới với sắp xếp đó (về trang 1).                                                   |
+| `toggleSort(state, columnId)`                 | Xoay vòng tăng → giảm → không.                                                           |
+| `setColumnFilter(state, columnId, value)`     | Đặt hoặc bỏ bộ lọc một cột.                                                              |
+| `foldAccents(text)` / `hasAccents(text)`      | Bỏ dấu (`"Nguyễn"` → `"Nguyen"`, `đ` → `d`); chuỗi có dấu hay không.                     |
+
+`processRows` không bao giờ sửa dữ liệu đầu vào. Khi không lọc gì, nó trả về chính mảng đó; khi chữ tìm kiếm chỉ dài thêm, nó lọc tiếp trên kết quả trước. Nó tôn trọng các quy tắc của cột: `searchable`, `searchValue`, `sortValue`, `compare`, `filterValue` và `filterMatch`.
+
+`options` (`ProcessOptions`):
+
+| Tuỳ chọn           | Mặc định | Mô tả                                                              |
+| ------------------ | -------- | ------------------------------------------------------------------ |
+| `ignoreAccents`    | `true`   | Tìm kiếm và lọc không phân biệt dấu.                               |
+| `searchFilter`     |          | `(row, term) => boolean` thay cho tìm kiếm mặc định.               |
+| `manualFiltering`  | `false`  | Bỏ qua lọc (dòng đã khớp sẵn).                                     |
+| `manualSorting`    | `false`  | Bỏ qua sắp xếp (dòng đã đúng thứ tự).                              |
+| `manualPagination` | `false`  | Bỏ qua cắt trang (dòng là một trang); `rowCount` cho biết tổng số. |
+| `rowCount`         |          | Tổng số dòng khớp khi `manualPagination`.                          |
+
+## Nhóm và tổng hợp
+
+| Hàm                                                                | Mô tả                                                                              |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `buildGroupTree(rows, columns, groupBy)`                           | Chia dòng vào các nhóm lồng nhau kèm giá trị tổng hợp (bước tốn kém; làm một lần). |
+| `flattenGroupTree(tree, expanded, defaultExpanded?)`               | Các dòng hiển thị cho những nhóm đang mở (rẻ).                                     |
+| `groupRows(rows, columns, { groupBy, expanded, defaultExpanded })` | Cả hai bước một lần.                                                               |
+| `aggregateRows(rows, columns)`                                     | Giá trị tổng hợp cho mọi cột có `aggregate`.                                       |
+
+## Cột
+
+| Hàm                                                                                                          | Mô tả                                  |
+| ------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `getColumnWidth(column, sizes)` / `setColumnWidth(sizes, column, width)` / `clampColumnWidth(column, width)` | Tính độ rộng trong giới hạn min / max. |
+| `getStickyOffsets(columns, sizes)`                                                                           | Khoảng cách trái / phải của cột ghim.  |
+| `createColumnState()` / `setColumnPin` / `setColumnHidden` / `applyColumnState(columns, state)`              | Ghim và ẩn/hiện khi chạy.              |
+| `getHeaderGroupDepth(columns)` / `getHeaderGroupRow(columns, level)`                                         | Các dòng tiêu đề nhóm cột.             |
+
+## Chọn dòng và sửa ô
+
+| Hàm                                                                                     | Mô tả                                                 |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `toggleRowSelection(set, id)` / `setRowsSelected(set, ids, value)`                      | Cập nhật lựa chọn bất biến.                           |
+| `getSelectionStatus(selected, ids)`                                                     | `"none" \| "some" \| "all"` (nhanh khi ids là `Set`). |
+| `formatEditValue(type, value)` / `parseEditInput(type, text)` / `isSameEditValue(a, b)` | Chuyển đổi giá trị của editor.                        |
+
+## Toán cuộn ảo
+
+| Hàm                                                                                 | Mô tả                                                                     |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `getRowMetrics({ count, rowSize, headerSize, viewportSize, maxScrollSize? })`       | Tổng kích thước, phạm vi cuộn, nén.                                       |
+| `getRowRange({ virtualOffset, metrics, count, rowSize, overscan, … })`              | Các dòng cần vẽ.                                                          |
+| `createOffsets(sizes)` / `findIndexAtOffset(offsets, offset)` / `getOffsetRange(…)` | Cột có độ rộng khác nhau.                                                 |
+| `toVirtualOffset` / `toScrollOffset`                                                | Quy đổi vị trí cuộn khi nội dung vượt giới hạn chiều cao của trình duyệt. |

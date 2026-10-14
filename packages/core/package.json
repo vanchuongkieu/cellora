@@ -1,0 +1,45 @@
+{
+  "name": "@cellora/core",
+  "version": "0.0.0",
+  "description": "Cellora core: framework-agnostic data grid logic (sorting, filtering, grouping, virtual scrolling)",
+  "keywords": [
+    "data-grid",
+    "datagrid",
+    "table",
+    "sorting",
+    "filtering",
+    "grouping",
+    "virtual-scroll",
+    "headless"
+  ],
+  "homepage": "https://cellora.vanchuongkieu.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vanchuongkieu/cellora.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/vanchuongkieu/cellora/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch --no-clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  }
+}

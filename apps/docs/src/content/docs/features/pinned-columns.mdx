@@ -1,0 +1,59 @@
+---
+title: Pinned columns
+description: Pin Cellora data grid columns to the left or right so they stay in view while scrolling sideways, from code or from the column menu.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/pinned-columns-demo"
+import code from "~/demos/pinned-columns-demo.tsx?raw"
+
+Pinned (sticky) columns stay put while the rest scrolls horizontally.
+
+<ComponentPreview code={code} title="pinned-columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Pin in code
+
+```tsx
+{ id: "name", header: "Name", accessor: (row) => row.name, sticky: "left" }
+{ id: "total", header: "Total", accessor: (row) => row.total, sticky: "right" }
+```
+
+Several columns can be pinned per side; they stack in column order. Pinned columns are moved to their edge automatically.
+
+## Pin from the menu
+
+Users can pin and unpin any column from **⋮ → Pin left / Pin right / Unpin**. Turn that off per column with `pinnable: false`, or for all with `columnMenuItems={{ pin: false }}`.
+
+## Edge look
+
+| Prop            | Default | Effect                                                                                        |
+| --------------- | ------- | --------------------------------------------------------------------------------------------- |
+| `stickyShadow`  | `true`  | A soft shadow beside the innermost pinned column, shown **only while** content runs under it. |
+| `stickyDivider` | `false` | A permanent 1 px line beside the innermost pinned column.                                     |
+
+## Good to know
+
+- Pinning needs fixed widths (`fixedColumnWidths`, on by default).
+- The selection checkbox column is pinned left by default (`pinSelectionColumn`).
+- Pinned cells keep the row's hover and selected colors.
+- Works the same in [virtual scroll](/features/virtual-scroll/) mode.
+
+## From code at runtime
+
+```tsx
+grid.setColumnPin("email", "left") // "left" | "right" | false
+grid.columnState.pinned // { email: "left" }
+```
+
+## API
+
+| Prop / option                    | Where      | Type                | Default | Description                           |
+| -------------------------------- | ---------- | ------------------- | ------- | ------------------------------------- |
+| `sticky`                         | column     | `"left" \| "right"` | none    | Initial pin side.                     |
+| `pinnable`                       | column     | `boolean`           | `true`  | Offer pin items in the menu.          |
+| `stickyShadow`                   | `DataGrid` | `boolean`           | `true`  | Shadow while scrolled under.          |
+| `stickyDivider`                  | `DataGrid` | `boolean`           | `false` | Permanent divider line.               |
+| `pinSelectionColumn`             | `DataGrid` | `boolean`           | `true`  | Keep the checkbox column on the left. |
+| `pinLeft` / `pinRight` / `unpin` | `labels`   | `string`            | English | Menu texts.                           |

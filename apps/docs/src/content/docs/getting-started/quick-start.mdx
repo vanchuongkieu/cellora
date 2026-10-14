@@ -1,0 +1,67 @@
+---
+title: Quick start
+description: "Build your first Cellora data grid step by step: rows, columns, a stable row id, then switch features on with props."
+---
+
+import { Code, Steps } from "@astrojs/starlight/components"
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/quick-start-demo"
+import code from "~/demos/quick-start-demo.tsx?raw"
+import dataCode from "~/demos/data.ts?raw"
+
+<ComponentPreview code={code} title="quick-start-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Three things a grid needs
+
+<Steps>
+
+1. **`rows`**: an array of anything. Objects are usual; numbers or strings work too.
+
+2. **`columns`**: what to show. Each column has an `id`, a `header` and an `accessor` that reads the value from a row:
+
+   ```tsx
+   const columns = [
+     { id: "name", header: "Name", accessor: (row: Employee) => row.name },
+     { id: "salary", header: "Salary", accessor: (row: Employee) => row.salary },
+   ]
+   ```
+
+3. **`getRowId`** (strongly recommended): a stable id per row. Selection and editing are keyed by it, so they survive sorting, paging and reloads. Without it the row's position is used.
+
+</Steps>
+
+```tsx
+<DataGrid rows={employees} columns={columns} getRowId={(row) => row.id} />
+```
+
+## Switch features on
+
+Every feature is a prop. The defaults give a paginated, scrollable table with resizable columns and a column menu:
+
+```tsx
+<DataGrid
+  rows={employees}
+  columns={columns}
+  getRowId={(row) => row.id}
+  enableSorting // click headers to sort (columns opt in with sortable: true)
+  enableSearch // search box above the grid
+  enableRowSelection // checkbox column
+  pageSize={20}
+/>
+```
+
+Each feature has its own page with a demo: start with [Sorting](/features/sorting/) or browse **Features** in the sidebar.
+
+## Tips that keep it fast
+
+- Define `columns` **outside the component** (or in `useMemo`). Inline is fine too: the grid only re-reads your rows when an `accessor` really changes, but a stable array is the cheapest.
+- Keep raw values in `accessor` and formatting in `cell`, so sorting and filtering compare real numbers and dates.
+- Never mutate `rows`; pass a new array when data changes (`[...rows]`, `rows.map(...)`).
+
+## Sample data
+
+All demos import from this one file:
+
+<Code code={dataCode} lang="ts" title="data.ts" />

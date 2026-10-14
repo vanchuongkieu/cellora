@@ -1,0 +1,81 @@
+---
+title: Installation
+description: Install the Cellora React data grid with pnpm, npm, yarn or bun, and point Tailwind CSS v4 at it. Works with Vite, Next.js and Astro.
+---
+
+import { Steps } from "@astrojs/starlight/components"
+import InstallTabs from "~/components/InstallTabs.astro"
+
+## Requirements
+
+|                 | Version                                                                             |
+| --------------- | ----------------------------------------------------------------------------------- |
+| React           | 18 or 19                                                                            |
+| Tailwind CSS    | v4                                                                                  |
+| shadcn/ui theme | the CSS variables `npx shadcn init` adds (`--background`, `--border`, `--muted`, …) |
+
+Cellora draws with your shadcn/ui theme tokens, so it picks up your colors, radius and dark mode automatically.
+
+## Install
+
+<Steps>
+
+1. **Set up Tailwind CSS and shadcn/ui** (skip if your project already has them):
+
+   ```sh
+   npx shadcn@latest init
+   ```
+
+   This adds Tailwind CSS v4, the theme variables and `tw-animate-css` (used by the grid's menus).
+
+2. **Add the package**:
+
+   <InstallTabs packages="@cellora/react" />
+
+   `@cellora/core` is installed with it. `react` and `react-dom` are peer dependencies (you already have them).
+
+3. **Import the grid's styles** in the CSS file that imports Tailwind, after it:
+
+   ```css title="src/index.css"
+   @import "tailwindcss";
+   @import "tw-animate-css";
+   @import "@cellora/react/styles.css";
+   ```
+
+   No paths to maintain: the file tells Tailwind to scan the grid's code (Tailwind v4 only emits the utilities it finds, and skips `node_modules` on its own).
+
+4. **Render a grid**:
+
+   ```tsx title="src/app.tsx"
+   import { DataGrid } from "@cellora/react"
+
+   const rows = [
+     { id: "1", name: "Ava Nguyen", role: "Engineer" },
+     { id: "2", name: "Liam Smith", role: "Designer" },
+   ]
+
+   const columns = [
+     { id: "name", header: "Name", accessor: (row: (typeof rows)[number]) => row.name },
+     { id: "role", header: "Role", accessor: (row: (typeof rows)[number]) => row.role },
+   ]
+
+   export default function App() {
+     return <DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} />
+   }
+   ```
+
+</Steps>
+
+## Frameworks
+
+- **Vite / Create React App**: nothing else to do.
+- **Next.js (App Router)**: import `DataGrid` in any component. The package is already marked `"use client"`, so a Server Component can render it directly; pass rows as props.
+- **Astro**: render it as a React island, e.g. `<MyGrid client:load />`.
+
+## Troubleshooting
+
+| Symptom                                             | Fix                                                                                                                        |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Grid has no borders, no hover color, menus unstyled | `@import "@cellora/react/styles.css";` is missing from your CSS.                                                           |
+| Colors look wrong / transparent                     | The shadcn/ui theme variables are missing: run `npx shadcn init`, or copy the `:root` and `.dark` variables into your CSS. |
+| Menus open without animation                        | Add `@import "tw-animate-css";`.                                                                                           |

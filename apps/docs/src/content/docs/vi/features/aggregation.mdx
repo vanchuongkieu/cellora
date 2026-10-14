@@ -1,0 +1,74 @@
+---
+title: Tổng hợp & dòng tổng
+description: Hiển thị tổng, trung bình, nhỏ nhất, lớn nhất, đếm hoặc phép tổng hợp tuỳ ý trên dòng nhóm và dòng tổng cố định ở đáy của Cellora.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/aggregation-demo"
+import code from "~/demos/aggregation-demo.tsx?raw"
+
+Thêm `aggregate` cho một cột, giá trị tổng hợp sẽ hiện trên mọi dòng nhóm và dòng tổng.
+
+<ComponentPreview code={code} title="aggregation-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Phép tổng hợp có sẵn
+
+```tsx
+{ id: "salary", header: "Lương", accessor: (row) => row.salary, aggregate: "sum" }
+```
+
+| `aggregate`       | Kết quả                                        | Giá trị trống               |
+| ----------------- | ---------------------------------------------- | --------------------------- |
+| `"sum"`           | Tổng các số                                    | bỏ qua                      |
+| `"avg"`           | Trung bình                                     | bỏ qua; `null` nếu không có |
+| `"min"` / `"max"` | Nhỏ nhất / lớn nhất (ngày tính theo timestamp) | bỏ qua; `null` nếu không có |
+| `"count"`         | Số giá trị không trống                         | bỏ qua                      |
+
+Chữ trông như số (`"42"`) được tính là số; chữ khác bị sum / avg / min / max bỏ qua.
+
+## Tổng hợp tuỳ ý
+
+Một hàm nhận mọi giá trị của nhóm (hoặc của tất cả dòng, với dòng tổng):
+
+```tsx
+{
+  id: "remote",
+  header: "Làm từ xa",
+  accessor: (row) => row.remote,
+  aggregate: (values) => `${values.filter(Boolean).length} / ${values.length}`,
+}
+```
+
+## Định dạng kết quả
+
+Mặc định số được hiển thị theo ngôn ngữ của người dùng, tối đa 2 chữ số thập phân. Tự định dạng bằng `aggregateCell` (hoặc `aggregateComponent`):
+
+```tsx
+aggregateCell: (value, { scope }) => (scope === "total" ? <b>{formatMoney(value as number)}</b> : formatMoney(value as number))
+```
+
+`scope` là `"group"` trên dòng nhóm và `"total"` trên dòng tổng. **Slot** `aggregateCell` định dạng mọi cột cùng lúc.
+
+## Dòng tổng
+
+```tsx
+<DataGrid enableFooterRow />
+```
+
+- Cố định ở đáy vùng cuộn, luôn nhìn thấy.
+- Tổng tính trên **mọi dòng khớp** (sau tìm kiếm và lọc, trên tất cả các trang).
+- Chữ **Total** nằm ở cột đang nhóm, hoặc cột đầu tiên.
+- Dùng được cả khi không nhóm.
+
+## API
+
+| Prop / tuỳ chọn               | Ở đâu      | Kiểu                                                                 | Mặc định       | Mô tả                                            |
+| ----------------------------- | ---------- | -------------------------------------------------------------------- | -------------- | ------------------------------------------------ |
+| `aggregate`                   | cột        | `"sum" \| "avg" \| "min" \| "max" \| "count" \| (values) => unknown` | không          | Cách gộp giá trị.                                |
+| `aggregateCell`               | cột        | `(value, { scope, column }) => ReactNode`                            | số theo locale | Định dạng giá trị tổng hợp.                      |
+| `aggregateComponent`          | cột        | component                                                            |                | Như trên, dạng component.                        |
+| `enableFooterRow`             | `DataGrid` | `boolean`                                                            | `false`        | Hiện dòng tổng.                                  |
+| `aggregateCell` / `footerRow` | slot       |                                                                      |                | Định dạng mọi giá trị tổng hợp / thay dòng tổng. |
+| `total`                       | `labels`   | `string`                                                             | `"Total"`      | Nhãn dòng tổng.                                  |

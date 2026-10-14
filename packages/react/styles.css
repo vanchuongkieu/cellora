@@ -1,0 +1,11 @@
+/*
+ * Cellora styles entry. Import it once, after Tailwind:
+ *
+ *   @import "tailwindcss";
+ *   @import "@cellora/react/styles.css";
+ *
+ * The grid is styled with Tailwind utilities and your shadcn/ui theme tokens;
+ * this tells Tailwind to scan the grid's code for the classes it uses
+ * (Tailwind skips node_modules unless told otherwise).
+ */
+@source "./dist";

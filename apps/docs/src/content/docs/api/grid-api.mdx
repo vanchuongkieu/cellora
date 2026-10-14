@@ -1,0 +1,85 @@
+---
+title: Grid API
+description: The Cellora grid object handed to slots, cells and components - state, results, selection, editing and every method to drive the grid from your own UI.
+---
+
+The `grid` object is what slots, cell renderers and components receive. Use it to read the grid's state and to drive it from your own toolbar, footer or cells.
+
+```tsx
+import type { DataGridApi } from "@cellora/react"
+
+function Toolbar({ grid }: { grid: DataGridApi<Employee> }) {
+  return <button onClick={() => grid.setSort("salary", "desc")}>Highest paid first</button>
+}
+```
+
+## Where you get it
+
+- Slots called with the grid: `toolbar`, `search`, `empty`, `groupPanel`, `loadingOverlay`, `footer` (and as `{ grid }` in `components`).
+- Cell renderers: `cell(row, { grid, index })`, `cellComponent` props, `headerCell({ grid })`.
+- The column menu context: `ctx.grid`.
+
+## State
+
+| Field            | Type                                                   | Description                                           |
+| ---------------- | ------------------------------------------------------ | ----------------------------------------------------- |
+| `state`          | `{ sort, filter, columnFilters, pageIndex, pageSize }` | Current sort, search text, column filters and paging. |
+| `columnState`    | `{ pinned, hidden }`                                   | Runtime pin and visibility overrides by column id.    |
+| `groupBy`        | `readonly string[]`                                    | Current grouping.                                     |
+| `expandedGroups` | `Record<string, boolean>`                              | Open / closed groups by key.                          |
+| `columns`        | `DataGridColumnDef[]`                                  | All configured columns.                               |
+| `visibleColumns` | `DataGridColumnDef[]`                                  | After hiding and pin ordering.                        |
+
+## Results
+
+| Field                                   | Type                        | Description                                                      |
+| --------------------------------------- | --------------------------- | ---------------------------------------------------------------- |
+| `result.rows`                           | `TRow[]`                    | Rows of the current page (all matching rows when not paginated). |
+| `result.matchedRows`                    | `TRow[]`                    | Every row matching search and filters, sorted.                   |
+| `result.total`                          | `number`                    | Matching rows (lines when grouped).                              |
+| `result.pageIndex` / `result.pageCount` | `number`                    | Current page (0-based) and page count.                           |
+| `totals`                                | `Record<string, unknown>`   | Aggregates over all matching rows (with `enableFooterRow`).      |
+| `display`                               | `{ count, item(index) }`    | Every line (group headers and rows) for virtualized rendering.   |
+| `pageItems`                             | `DataGridRowItem[] \| null` | Lines of the current page when grouped.                          |
+
+## Methods
+
+| Method                                               | Description                               |
+| ---------------------------------------------------- | ----------------------------------------- |
+| `setFilter(text)`                                    | Set the search text.                      |
+| `setColumnFilter(columnId, text)`                    | Set one column's filter (`""` clears it). |
+| `toggleSort(columnId)`                               | Cycle asc → desc → none.                  |
+| `setSort(columnId, direction \| null)`               | Set or clear the sort.                    |
+| `setPageIndex(index)` / `setPageSize(size)`          | Paging.                                   |
+| `setColumnPin(columnId, "left" \| "right" \| false)` | Pin or unpin.                             |
+| `setColumnHidden(columnId, hidden)`                  | Hide or show.                             |
+| `setGroupBy(columnIds)`                              | Change grouping.                          |
+| `toggleGroup(key)`                                   | Open / close a group.                     |
+
+## `grid.selection`
+
+| Member                                      | Description                                     |
+| ------------------------------------------- | ----------------------------------------------- |
+| `selectedRowIds` / `selectedRows` / `count` | Current selection.                              |
+| `isSelected(row)`                           | Whether a row is checked.                       |
+| `toggle(row)`                               | Check / uncheck one row.                        |
+| `setMany(rows, checked)`                    | Check or uncheck many rows.                     |
+| `clear()`                                   | Uncheck everything.                             |
+| `getStatus(rows)`                           | `"none" \| "some" \| "all"` for a list of rows. |
+| `selectable(rows)`                          | The rows that may be checked.                   |
+| `getRowId(row)`                             | The id the selection uses for a row.            |
+
+## `grid.editing`
+
+| Member                                   | Description                                          |
+| ---------------------------------------- | ---------------------------------------------------- |
+| `cell`                                   | The cell being edited, or `null`.                    |
+| `pending`                                | `true` while `onCellEdit` runs.                      |
+| `isEditable(row, column)`                | Whether a cell can be edited.                        |
+| `start(row, column, index)` / `cancel()` | Open / close an editor.                              |
+| `commit(value)`                          | Save the open editor's value.                        |
+| `apply(row, column, index, value)`       | Save a value for any cell without opening an editor. |
+
+## Headless use
+
+`useDataGrid(options)` returns this same object without rendering anything, for building a completely custom table on top of Cellora's logic.

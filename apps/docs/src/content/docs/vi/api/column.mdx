@@ -1,0 +1,81 @@
+---
+title: Cột
+description: Mọi tuỳ chọn của một cột trong data grid Cellora, kèm kiểu, giá trị mặc định và tính năng liên quan.
+---
+
+```tsx
+import type { DataGridColumnInput } from "@cellora/react"
+
+const columns: DataGridColumnInput<Employee>[] = [{ id: "name", header: "Tên", accessor: (row) => row.name }]
+```
+
+## Định danh và dữ liệu
+
+| Tuỳ chọn   | Kiểu               | Mặc định    | Mô tả                                                                           |
+| ---------- | ------------------ | ----------- | ------------------------------------------------------------------------------- |
+| `id`       | `string`           | bắt buộc    | Khoá duy nhất.                                                                  |
+| `header`   | `string`           | bắt buộc    | Chữ tiêu đề (cũng dùng trong menu và nhãn).                                     |
+| `accessor` | `(row) => unknown` |             | Giá trị gốc. Không có thì cột là [cột thao tác](/vi/features/display-columns/). |
+| `display`  | `boolean`          | `!accessor` | Không phải dữ liệu: không sắp xếp, lọc, nhóm, tổng hay sửa.                     |
+
+## Hiển thị
+
+| Tuỳ chọn             | Kiểu                                                 | Mô tả                                   |
+| -------------------- | ---------------------------------------------------- | --------------------------------------- |
+| `cell`               | `(row, { grid, index }) => ReactNode`                | Nội dung ô. Mặc định: giá trị dạng chữ. |
+| `cellComponent`      | `ComponentType<{ row, value, index, column, grid }>` | Ô dạng component.                       |
+| `headerCell`         | `({ column, sorted, grid }) => ReactNode`            | Nhãn tiêu đề.                           |
+| `headerComponent`    | `ComponentType<{ column, sorted, grid }>`            | Nhãn tiêu đề dạng component.            |
+| `aggregateCell`      | `(value, { scope, column }) => ReactNode`            | Nội dung giá trị tổng hợp.              |
+| `aggregateComponent` | `ComponentType<{ value, scope, column }>`            | Giá trị tổng hợp dạng component.        |
+| `editCell`           | `(ctx) => ReactNode`                                 | Editor tuỳ biến.                        |
+| `editComponent`      | `ComponentType<ctx>`                                 | Editor tuỳ biến dạng component.         |
+
+Xem [Ô tuỳ biến](/vi/customization/custom-cells/).
+
+## Kích thước và vị trí
+
+| Tuỳ chọn      | Kiểu                            | Mặc định | Mô tả                                                           |
+| ------------- | ------------------------------- | -------- | --------------------------------------------------------------- |
+| `width`       | `number`                        | `160`    | px.                                                             |
+| `minWidth`    | `number`                        | `60`     | Giới hạn dưới khi đổi độ rộng.                                  |
+| `maxWidth`    | `number`                        | không    | Giới hạn trên khi đổi độ rộng.                                  |
+| `align`       | `"left" \| "center" \| "right"` | `"left"` | Căn chữ.                                                        |
+| `resizable`   | `boolean`                       | `true`   | Cho đổi độ rộng ([đổi độ rộng](/vi/features/column-resizing/)). |
+| `sticky`      | `"left" \| "right"`             | không    | Ghim sang một bên ([ghim cột](/vi/features/pinned-columns/)).   |
+| `pinnable`    | `boolean`                       | `true`   | Có mục ghim trong menu.                                         |
+| `headerGroup` | `string \| string[]`            | không    | Nhãn nhóm cột ([nhóm cột](/vi/features/column-groups/)).        |
+
+## Tính năng
+
+| Tuỳ chọn     | Kiểu                                                                 | Mặc định                          | Mô tả                                                        |
+| ------------ | -------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------ |
+| `sortable`   | `boolean`                                                            | `false`                           | Cho sắp xếp ([sắp xếp](/vi/features/sorting/)).              |
+| `filterable` | `boolean`                                                            | `true`                            | Lọc trong menu ([lọc](/vi/features/column-filters/)).        |
+| `hideable`   | `boolean`                                                            | `true`                            | Cho ẩn cột.                                                  |
+| `menu`       | `boolean`                                                            | `true` (`false` với cột thao tác) | Hiện menu ⋮.                                                 |
+| `groupable`  | `boolean`                                                            | `true`                            | Cho nhóm theo cột ([nhóm dòng](/vi/features/row-grouping/)). |
+| `aggregate`  | `"sum" \| "avg" \| "min" \| "max" \| "count" \| (values) => unknown` | không                             | Giá trị nhóm / tổng ([tổng hợp](/vi/features/aggregation/)). |
+
+## Quy tắc tìm kiếm, sắp xếp và lọc
+
+Mỗi cột có thể đổi thứ mà tìm kiếm, sắp xếp và lọc mặc định làm việc cùng, hoặc thay hẳn quy tắc.
+
+| Tuỳ chọn      | Kiểu                     | Mặc định | Mô tả                                                                             |
+| ------------- | ------------------------ | -------- | --------------------------------------------------------------------------------- |
+| `searchable`  | `boolean`                | `true`   | Cho ô tìm kiếm nhìn vào cột này ([tìm kiếm](/vi/features/search/)).               |
+| `searchValue` | `(row) => unknown`       | accessor | Thứ được so khớp khi tìm kiếm (ngày đã định dạng, một nhãn).                      |
+| `sortValue`   | `(row) => unknown`       | accessor | Giá trị dùng để sắp xếp (thứ hạng, họ) ([sắp xếp](/vi/features/sorting/)).        |
+| `compare`     | `(a, b) => number`       |          | Hàm so sánh hai dòng của riêng bạn cho chiều tăng dần; ưu tiên hơn `sortValue`.   |
+| `filterValue` | `(row) => unknown`       | accessor | Thứ được so khớp khi lọc theo cột ([lọc theo cột](/vi/features/column-filters/)). |
+| `filterMatch` | `(row, text) => boolean` |          | Quy tắc lọc của riêng bạn cho chữ đã gõ; ưu tiên hơn `filterValue`.               |
+
+## Sửa ô
+
+| Tuỳ chọn        | Kiểu                                                     | Mặc định    | Mô tả                                            |
+| --------------- | -------------------------------------------------------- | ----------- | ------------------------------------------------ |
+| `editable`      | `boolean \| (row) => boolean`                            | `false`     | Cho sửa ([sửa ô](/vi/features/inline-editing/)). |
+| `editor`        | `"text" \| "number" \| "date" \| "select" \| "checkbox"` | `"text"`    | Editor có sẵn.                                   |
+| `editorOptions` | `{ value: string; label: string }[]`                     |             | Lựa chọn cho `"select"`.                         |
+| `parseValue`    | `(input, row) => unknown`                                | theo editor | Chữ → giá trị.                                   |
+| `validate`      | `(value, row) => string \| null \| undefined`            |             | Trả về thông báo để từ chối.                     |

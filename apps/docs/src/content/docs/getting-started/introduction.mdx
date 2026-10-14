@@ -1,0 +1,42 @@
+---
+title: Introduction
+description: What Cellora is, what it can do and how this documentation is organized. A React data grid built on shadcn/ui and Tailwind CSS.
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components"
+
+**Cellora** is a data grid for React. It is built from [shadcn/ui](https://ui.shadcn.com) components and Tailwind CSS, so it looks like the rest of your app from the first render, and it stays fast with a million rows.
+
+## What you get
+
+- **Data features**: sorting, search, per-column filters, pagination, row grouping with totals, inline editing, row selection that survives paging.
+- **Layout features**: fixed column widths, drag / double-click / keyboard resizing, pinned columns on either side, sticky header, column groups, fill-the-screen height.
+- **Scale**: virtual scrolling for rows _and_ columns. 1,000,000 rows × 100 columns scroll at 60 fps.
+- **Customization**: every part of the chrome is a slot (30+), every string is a label (i18n), every part takes extra classes and styles.
+- **Your data stays yours**: the grid never copies or mutates your rows. Edits are reported to you; you decide what to save.
+
+## Two packages
+
+| Package          | What it is                                                                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@cellora/react` | The `DataGrid` component and its hooks. This is what you install.                                                                                  |
+| `@cellora/core`  | Framework-free logic: sorting, filtering, grouping, windowing math. Installed with `@cellora/react`; usable on its own (a Vue binding is planned). |
+
+## Browser support
+
+Current Chrome, Edge, Firefox and Safari (desktop and mobile). Server rendering works (Next.js App Router, Astro, Remix): the package is marked `"use client"`.
+
+## How these docs are organized
+
+<CardGrid>
+  <LinkCard title="Getting started" description="Install, render your first grid, define columns, style it." href="/getting-started/installation/" />
+  <LinkCard title="Features" description="One page per feature, each with a live demo and its own API table." href="/features/sorting/" />
+  <LinkCard title="Customization" description="Custom cells, slots and labels." href="/customization/custom-cells/" />
+  <LinkCard title="API reference" description="Every prop, column option, slot and grid method." href="/api/data-grid/" />
+</CardGrid>
+
+Every demo has a **View Code** button with the full source and a copy button. The demos share one small file of sample data, shown on the [Quick start](/getting-started/quick-start/#sample-data) page.
+
+## For AI assistants
+
+The documentation is also published as plain Markdown: [`/llms.txt`](/llms.txt) is the index, [`/llms-full.txt`](/llms-full.txt) is every English page in one file with the demos as code. Each page also has a **Copy Page** button that copies its Markdown, ready to paste into a chat.

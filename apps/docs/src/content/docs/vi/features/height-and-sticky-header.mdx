@@ -1,0 +1,60 @@
+---
+title: Chiều cao & header cố định
+description: Điều chỉnh chiều cao data grid Cellora bằng maxHeight hoặc fillHeight, giữ tiêu đề luôn ở trên khi cuộn, và lấp đầy màn hình không cần cuộn trang.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/height-demo"
+import code from "~/demos/height-demo.tsx?raw"
+
+Dòng cuộn bên trong grid, tiêu đề luôn nằm trên cùng.
+
+<ComponentPreview code={code} title="height-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Giới hạn chiều cao: `maxHeight`
+
+```tsx
+<DataGrid maxHeight={400} /> // mặc định
+<DataGrid maxHeight="60vh" /> // bất kỳ đơn vị CSS nào
+<DataGrid maxHeight={null} /> // không giới hạn: grid cao theo số dòng
+```
+
+Grid không bao giờ cao hơn giới hạn; nội dung ngắn hơn thì giữ chiều cao tự nhiên.
+
+## Tiêu đề luôn ở trên: `stickyHeader`
+
+Bật sẵn. Tắt đi nếu muốn tiêu đề cuộn đi cùng các dòng:
+
+```tsx
+<DataGrid stickyHeader={false} />
+```
+
+Các dòng nhóm cột và [dòng tổng](/vi/features/aggregation/) cũng cố định (dòng tổng nằm dưới đáy).
+
+## Lấp đầy màn hình: `fillHeight`
+
+Cho grid chiếm đúng phần chiều cao còn lại của trang, để trang không phải cuộn (dashboard, màn hình quản trị):
+
+```tsx
+<DataGrid fillHeight fillHeightOffset={16} fillHeightMin={240} />
+```
+
+- Khoảng trống được **đo từ bố cục thật**: header, toolbar, margin, footer quanh grid đều được tính, và cập nhật khi đổi kích thước.
+- `fillHeightOffset` chừa thêm vài pixel bên dưới (ví dụ thanh cố định ở đáy).
+- `fillHeightMin` giữ chiều cao tối thiểu trên màn hình nhỏ.
+- Nếu grid nằm trong một panel tự cuộn thay vì cửa sổ, truyền vào: `fillHeightContainer={panelRef}`.
+
+`fillHeight` thay cho `maxHeight`.
+
+## API
+
+| Prop                  | Kiểu                                    | Mặc định | Mô tả                                    |
+| --------------------- | --------------------------------------- | -------- | ---------------------------------------- |
+| `maxHeight`           | `number \| string \| null`              | `400`    | Giới hạn chiều cao vùng cuộn.            |
+| `stickyHeader`        | `boolean`                               | `true`   | Giữ tiêu đề khi cuộn dòng.               |
+| `fillHeight`          | `boolean`                               | `false`  | Lấp đầy chiều cao còn lại của màn hình.  |
+| `fillHeightOffset`    | `number`                                | `0`      | Số px chừa lại bên dưới.                 |
+| `fillHeightMin`       | `number`                                | `200`    | Chiều cao tối thiểu (px).                |
+| `fillHeightContainer` | `RefObject<HTMLElement> \| HTMLElement` | cửa sổ   | Lấp đầy phần tử cuộn này thay vì cửa sổ. |

@@ -1,0 +1,74 @@
+---
+title: Aggregation & total row
+description: Show sums, averages, minimums, maximums, counts or custom aggregates on Cellora group rows and a total row pinned to the bottom.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/aggregation-demo"
+import code from "~/demos/aggregation-demo.tsx?raw"
+
+Give a column an `aggregate` and its value appears on every group row and on the total row.
+
+<ComponentPreview code={code} title="aggregation-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Built-in aggregates
+
+```tsx
+{ id: "salary", header: "Salary", accessor: (row) => row.salary, aggregate: "sum" }
+```
+
+| `aggregate`       | Result                                   | Empty values            |
+| ----------------- | ---------------------------------------- | ----------------------- |
+| `"sum"`           | Sum of the numbers                       | skipped                 |
+| `"avg"`           | Average                                  | skipped; `null` if none |
+| `"min"` / `"max"` | Smallest / largest (dates as timestamps) | skipped; `null` if none |
+| `"count"`         | Number of non-empty values               | skipped                 |
+
+Text that looks like a number (`"42"`) is counted as a number; other text is ignored by sum / avg / min / max.
+
+## Custom aggregate
+
+A function receives every value of the group (or of all rows, for the total):
+
+```tsx
+{
+  id: "remote",
+  header: "Remote",
+  accessor: (row) => row.remote,
+  aggregate: (values) => `${values.filter(Boolean).length} / ${values.length}`,
+}
+```
+
+## Formatting the result
+
+By default numbers are shown in the user's locale with up to 2 decimals. Format it yourself with `aggregateCell` (or `aggregateComponent`):
+
+```tsx
+aggregateCell: (value, { scope }) => (scope === "total" ? <b>{formatMoney(value as number)}</b> : formatMoney(value as number))
+```
+
+`scope` is `"group"` on group rows and `"total"` on the total row. The `aggregateCell` **slot** formats every column at once.
+
+## Total row
+
+```tsx
+<DataGrid enableFooterRow />
+```
+
+- Pinned to the bottom of the scroll area, always visible.
+- Totals cover **all matching rows** (after search and filters, across every page).
+- The label **Total** goes in the grouped column, or the first column.
+- Works without grouping too.
+
+## API
+
+| Prop / option                 | Where      | Type                                                                 | Default       | Description                                    |
+| ----------------------------- | ---------- | -------------------------------------------------------------------- | ------------- | ---------------------------------------------- |
+| `aggregate`                   | column     | `"sum" \| "avg" \| "min" \| "max" \| "count" \| (values) => unknown` | none          | How to combine values.                         |
+| `aggregateCell`               | column     | `(value, { scope, column }) => ReactNode`                            | locale number | Format the aggregate.                          |
+| `aggregateComponent`          | column     | component                                                            |               | Same, as a component.                          |
+| `enableFooterRow`             | `DataGrid` | `boolean`                                                            | `false`       | Show the total row.                            |
+| `aggregateCell` / `footerRow` | slots      |                                                                      |               | Format all aggregates / replace the total row. |
+| `total`                       | `labels`   | `string`                                                             | `"Total"`     | Total row label.                               |

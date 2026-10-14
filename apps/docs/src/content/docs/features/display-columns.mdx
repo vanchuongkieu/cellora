@@ -1,0 +1,47 @@
+---
+title: Action columns
+description: Add action buttons, icons or drag handles to the Cellora data grid with display columns that hold no data and never take part in sorting, filtering or totals.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/display-columns-demo"
+import code from "~/demos/display-columns-demo.tsx?raw"
+
+A column that is not data: edit / delete buttons, a menu, an icon, a drag handle.
+
+<ComponentPreview code={code} title="display-columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Make one
+
+Leave out the `accessor` and render with `cell`:
+
+```tsx
+{
+  id: "actions",
+  header: "Actions",
+  sticky: "right",
+  cell: (row) => <button onClick={() => remove(row.id)}>Delete</button>,
+}
+```
+
+Or keep an accessor and say `display: true`.
+
+## What changes
+
+A display column never takes part in **search, filters, sorting, grouping, totals or editing**, and gets no column menu (unless you set `menu: true`). Clicks on its buttons do not trigger [`onRowClick`](/features/row-and-cell-click/).
+
+## Tips
+
+- Pin it right (`sticky: "right"`) so actions stay reachable on wide grids.
+- Use the same row id you pass to `getRowId` in your handlers.
+
+## API
+
+| Option     | Type                      | Default                     | Description                                  |
+| ---------- | ------------------------- | --------------------------- | -------------------------------------------- |
+| `accessor` | `(row) => unknown`        | none                        | Without one, the column is a display column. |
+| `display`  | `boolean`                 | `!accessor`                 | Force display mode.                          |
+| `cell`     | `(row, ctx) => ReactNode` |                             | What to render.                              |
+| `menu`     | `boolean`                 | `false` for display columns | Show the column menu anyway.                 |

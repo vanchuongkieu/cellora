@@ -1,0 +1,57 @@
+---
+title: Pagination
+description: Paginate Cellora data grid rows with a page size select and previous / next buttons. Short last pages keep the table height.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/pagination-demo"
+import code from "~/demos/pagination-demo.tsx?raw"
+
+Pagination is on by default: 10 rows per page with a footer to change pages and page size.
+
+<ComponentPreview code={code} title="pagination-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Configure
+
+```tsx
+<DataGrid pageSize={25} pageSizeOptions={[25, 50, 100]} />
+```
+
+- `pageSize` is the starting size; users change it with **Rows per page**. Changing the prop later applies the new size too.
+- Sorting, searching, filtering and changing the size go back to the first page.
+- A short last page keeps the height of a full one, so the content below does not jump.
+- With [row grouping](/features/row-grouping/), pages count lines (group headers + rows).
+
+## Turn it off
+
+```tsx
+<DataGrid enablePagination={false} maxHeight={400} />
+```
+
+All rows then scroll inside the `maxHeight`. For thousands of rows use [virtual scroll](/features/virtual-scroll/) instead (it replaces pagination).
+
+## Control from code
+
+```tsx
+grid.setPageIndex(2) // third page
+grid.setPageSize(50)
+grid.result.pageIndex // current page (0-based)
+grid.result.pageCount
+grid.result.total // matching rows (or lines when grouped)
+```
+
+## Replace parts of the footer
+
+Every footer piece is a slot: `range` ("1-10 of 57"), `pageSize`, `pageIndicator` ("Page 1 / 6"), `pageNavigation` (the buttons), or `footer` for all of it. The texts are also [labels](/customization/labels/).
+
+## API
+
+| Prop / option                                                       | Where      | Type       | Default        | Description                   |
+| ------------------------------------------------------------------- | ---------- | ---------- | -------------- | ----------------------------- |
+| `enablePagination`                                                  | `DataGrid` | `boolean`  | `true`         | Paginate and show the footer. |
+| `pageSize`                                                          | `DataGrid` | `number`   | `10`           | Rows per page.                |
+| `pageSizeOptions`                                                   | `DataGrid` | `number[]` | `[10, 20, 50]` | Choices in "Rows per page".   |
+| `range`, `pageIndicator`, `rowsPerPage`, `previousPage`, `nextPage` | `labels`   |            | English        | Footer texts.                 |
+| `range`, `pageSize`, `pageIndicator`, `pageNavigation`, `footer`    | slots      |            |                | Replace footer parts.         |

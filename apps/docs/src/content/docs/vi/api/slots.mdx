@@ -1,0 +1,63 @@
+---
+title: Danh sách slot
+description: Mọi slot của data grid Cellora kèm tham số nhận được - toolbar, dòng, nhóm, dòng tổng, editor, menu, checkbox và các phần của footer.
+---
+
+Cách dùng slot (hàm, component, JSX con) được giải thích ở trang [Slot](/vi/customization/slots/). Trang này liệt kê tất cả.
+
+## Toolbar và thân bảng
+
+| Slot             | Nhận                              | Thay                            |
+| ---------------- | --------------------------------- | ------------------------------- |
+| `toolbar`        | `grid`                            | Cả toolbar (gồm ô tìm kiếm).    |
+| `search`         | `grid`                            | Chỉ ô tìm kiếm.                 |
+| `row`            | `{ row, index, selected, cells }` | Một dòng dữ liệu (bọc `cells`). |
+| `empty`          | `grid`                            | Nội dung khi không có kết quả.  |
+| `skeletonCell`   | `{ column, rowIndex }`            | Một ô giữ chỗ khi đang tải.     |
+| `loadingOverlay` | `grid`                            | Spinner phủ lên dòng hiện có.   |
+
+## Tiêu đề và cột
+
+| Slot                | Nhận                                    | Thay                               |
+| ------------------- | --------------------------------------- | ---------------------------------- |
+| `headerGroup`       | `{ label, level, columns }`             | Nội dung ô nhóm cột.               |
+| `sortIcon`          | `direction` (`"asc" \| "desc" \| null`) | Biểu tượng sắp xếp.                |
+| `resizeHandle`      | `{ column, width }`                     | Hình tay nắm đổi độ rộng.          |
+| `columnMenu`        | ngữ cảnh menu                           | Toàn bộ menu cột (nút + nội dung). |
+| `columnMenuTrigger` | ngữ cảnh menu                           | Icon ⋮.                            |
+| `columnMenuExtra`   | ngữ cảnh menu                           | Mục thêm ở cuối menu.              |
+
+Ngữ cảnh menu: `{ column, grid, columns, sorted, pinned, filterValue, canSort, canPin, grouped, canGroup, setGrouped, setSort, setPin, setFilter, hide, isHidden, setHidden }`.
+
+## Nhóm và tổng
+
+| Slot            | Nhận                          | Thay                                 |
+| --------------- | ----------------------------- | ------------------------------------ |
+| `groupRow`      | `{ group, cells, toggle }`    | Tiêu đề một nhóm dòng (bọc `cells`). |
+| `groupLabel`    | `{ group, column, label }`    | Chữ của nhóm ("Corn (8)").           |
+| `groupIcon`     | `{ expanded }`                | Mũi tên mở / đóng.                   |
+| `selectGroup`   | `{ group, status, onChange }` | Checkbox của nhóm.                   |
+| `groupPanel`    | `grid`                        | Cả thanh nhóm.                       |
+| `groupChip`     | `{ column, remove }`          | Một chip trên thanh.                 |
+| `footerRow`     | `{ totals, cells }`           | Dòng tổng (bọc `cells`).             |
+| `aggregateCell` | `{ column, value, scope }`    | Mọi giá trị tổng hợp.                |
+
+## Sửa ô
+
+| Slot       | Nhận                                                     | Thay                                             |
+| ---------- | -------------------------------------------------------- | ------------------------------------------------ |
+| `editCell` | `{ row, column, index, value, pending, commit, cancel }` | Mọi editor (trả về `null` để giữ editor có sẵn). |
+
+## Chọn dòng và footer
+
+| Slot               | Nhận                                             | Thay                        |
+| ------------------ | ------------------------------------------------ | --------------------------- |
+| `selectAll`        | `{ status, disabled, onChange }`                 | Checkbox trên tiêu đề.      |
+| `selectRow`        | `{ row, checked, disabled, onChange }`           | Checkbox của một dòng.      |
+| `selectionSummary` | `{ selectedRowIds, selectedRows, count, total }` | "3 selected".               |
+| `footer`           | `grid`                                           | Cả footer.                  |
+| `rowCount`         | `{ total }`                                      | "1,000,000 rows" (cuộn ảo). |
+| `range`            | `{ from, to, total }`                            | "1-10 of 57".               |
+| `pageSize`         | `{ pageSize, options, onChange }`                | "Rows per page" + ô chọn.   |
+| `pageIndicator`    | `{ pageIndex, pageCount }`                       | "Page 1 / 6".               |
+| `pageNavigation`   | `{ pageIndex, pageCount, onPageChange }`         | Nút trang trước / sau.      |

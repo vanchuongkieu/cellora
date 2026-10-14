@@ -1,0 +1,89 @@
+---
+title: Dữ liệu phía server
+description: Để API sắp xếp, tìm kiếm, lọc và phân trang cho data grid Cellora - grid giữ state, báo mọi thay đổi qua onStateChange và hiển thị trang mà server trả về.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/server-side-demo"
+import code from "~/demos/server-side-demo.tsx?raw"
+
+Mặc định grid tự sắp xếp, tìm kiếm, lọc và phân trang các dòng bạn truyền vào. Khi dữ liệu nằm sau một API (quá lớn để tải hết, hoặc đã được đánh chỉ mục trên server), grid có thể giao việc đó đi: nó giữ state, báo cho bạn mỗi khi state đổi, và hiển thị trang bạn trả về.
+
+<ComponentPreview code={code} title="server-side-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ba bước
+
+1. **Lắng nghe**: `onStateChange` được gọi với toàn bộ state `{ sort, filter, columnFilters, pageIndex, pageSize }` sau mỗi thao tác của người dùng. Gọi API theo state đó (debounce chữ tìm kiếm nếu API chậm).
+2. **Giao dòng cho grid**: truyền kết quả API vào `rows`, kèm `manualSorting`, `manualFiltering` và `manualPagination` để grid không xử lý lại. Có thể giữ một vài bước ở client (ví dụ server phân trang nhưng không sắp xếp).
+3. **Cho biết tổng số**: với `manualPagination`, `rowCount` là số dòng khớp trên mọi trang. Nó quyết định số trang và chữ "1-10 of 250".
+
+```tsx
+const [state, setState] = useState<DataGridState>({ sort: null, filter: "", columnFilters: {}, pageIndex: 0, pageSize: 20 })
+const { data, isLoading } = useQuery(["employees", state], () => fetchEmployees(state))
+
+<DataGrid
+  rows={data?.rows ?? []}
+  columns={columns}
+  manualSorting
+  manualFiltering
+  manualPagination
+  rowCount={data?.total}
+  onStateChange={setState}
+  pageSize={state.pageSize}
+  loading={isLoading}
+  loadingVariant="overlay"
+  enableSorting
+  enableSearch
+/>
+```
+
+## Server nhận được gì
+
+| Trường          | Kiểu                              | Ý nghĩa                                            |
+| --------------- | --------------------------------- | -------------------------------------------------- |
+| `sort`          | `{ columnId, direction } \| null` | Id cột và `"asc"` / `"desc"`, hoặc không sắp xếp.  |
+| `filter`        | `string`                          | Chữ trong ô tìm kiếm (tự bỏ khoảng trắng hai đầu). |
+| `columnFilters` | `Record<string, string>`          | Chữ đã gõ theo id cột (bộ lọc rỗng bị bỏ).         |
+| `pageIndex`     | `number`                          | Trang, đếm từ 0.                                   |
+| `pageSize`      | `number`                          | Số dòng mỗi trang.                                 |
+
+Đổi sắp xếp, tìm kiếm, bộ lọc hay số dòng mỗi trang đều quay về trang 0 trước khi `onStateChange` chạy, nên chỉ cần một request.
+
+## State có kiểm soát (URL, view đã lưu)
+
+Mỗi phần của state cũng có thể truyền vào grid: `sort`, `filter`, `columnFilters`, `pageIndex` (và `pageSize`, luôn lấy từ prop). Grid sẽ hiển thị giá trị đó và vẫn báo thay đổi qua `onStateChange`; bạn lưu ở đâu tuỳ ý (search params, local storage). Muốn có giá trị ban đầu mà không kiểm soát về sau, dùng `defaultSort`, `defaultFilter`, `defaultColumnFilters`, `defaultPageIndex`.
+
+```tsx
+<DataGrid sort={sortFromUrl} pageIndex={pageFromUrl} onStateChange={(state) => router.replace(toUrl(state))} />
+```
+
+## Phần vẫn ở client
+
+- **Nhóm dòng** nhóm các dòng bạn truyền (trang hiện tại). Chỉ nhóm khi API trả về đủ những dòng thuộc cùng nhóm.
+- **Dòng tổng** (`enableFooterRow`) cộng các dòng bạn truyền. Hỏi API tổng toàn cục rồi hiển thị bằng slot `footerRow`.
+- **Chọn tất cả = "all"** chỉ gồm các dòng bạn truyền. Chọn toàn server cần danh sách id của riêng bạn.
+- **Cuộn ảo** thay cho phân trang; với `manualSorting` / `manualFiltering` nó hiển thị dòng đúng như nhận được.
+
+## Đang tải
+
+Khi request đang chạy, `loading` cùng `loadingVariant="overlay"` làm mờ các dòng cũ thay vì thay bằng skeleton, nên bảng không nhảy. Xem [Đang tải & không có dữ liệu](/vi/features/loading-and-empty/).
+
+## API
+
+| Prop                                                                          | Kiểu                              | Mặc định      | Mô tả                                                        |
+| ----------------------------------------------------------------------------- | --------------------------------- | ------------- | ------------------------------------------------------------ |
+| `manualSorting`                                                               | `boolean`                         | `false`       | `rows` đã được sắp xếp sẵn.                                  |
+| `manualFiltering`                                                             | `boolean`                         | `false`       | `rows` đã khớp tìm kiếm và bộ lọc cột.                       |
+| `manualPagination`                                                            | `boolean`                         | `false`       | `rows` là một trang; grid không bao giờ cắt nó.              |
+| `rowCount`                                                                    | `number`                          | `rows.length` | Số dòng khớp trên mọi trang (với `manualPagination`).        |
+| `onStateChange`                                                               | `(state: DataGridState) => void`  |               | Sắp xếp, tìm kiếm, bộ lọc, trang hoặc số dòng mỗi trang đổi. |
+| `sort`                                                                        | `{ columnId, direction } \| null` |               | Sắp xếp có kiểm soát.                                        |
+| `filter`                                                                      | `string`                          |               | Chữ tìm kiếm có kiểm soát.                                   |
+| `columnFilters`                                                               | `Record<string, string>`          |               | Bộ lọc cột có kiểm soát.                                     |
+| `pageIndex`                                                                   | `number`                          |               | Trang có kiểm soát.                                          |
+| `pageSize`                                                                    | `number`                          | `10`          | Số dòng mỗi trang (đổi prop cũng áp dụng).                   |
+| `defaultSort` / `defaultFilter` / `defaultColumnFilters` / `defaultPageIndex` |                                   |               | Giá trị ban đầu, không kiểm soát.                            |
+
+Trong `@cellora/core`, các công tắc này là tham số thứ tư của `processRows(rows, columns, state, { manualSorting, manualFiltering, manualPagination, rowCount })`.

@@ -1,0 +1,31 @@
+---
+/** Landing hero like ui.shadcn.com: badge, big centered title, tagline, two pill buttons. */
+import { localePath, ui } from "../../i18n"
+
+const { entry, locale } = Astro.locals.starlightRoute
+const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {}
+const t = ui(locale)
+---
+
+<div class="cl-hero">
+  <a class="cl-hero-badge" href={localePath(locale, "/features/virtual-scroll/")}>
+    {t.badge}
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  </a>
+  <h1 id="_top" set:html={title} />
+  {tagline && <p class="cl-hero-tagline" set:html={tagline} />}
+  {
+    actions.length > 0 && (
+      <div class="cl-hero-actions">
+        {actions.map(({ link, text, variant }) => (
+          <a href={link} class={variant === "minimal" ? "cl-button-secondary cl-button-lg" : "cl-button-primary cl-button-lg"}>
+            {text}
+          </a>
+        ))}
+      </div>
+    )
+  }
+</div>

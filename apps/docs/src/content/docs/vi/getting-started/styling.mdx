@@ -1,0 +1,70 @@
+---
+title: Tuỳ biến giao diện
+description: Đổi giao diện data grid Cellora bằng theme shadcn/ui, classNames và styles theo từng phần, chế độ có viền và chế độ tối.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/styling-demo"
+import code from "~/demos/styling-demo.tsx?raw"
+
+Cellora dùng biến theme shadcn/ui của bạn, nên đã hợp với app sẵn. Ngoài ra, mọi phần đều nhận thêm class và style.
+
+<ComponentPreview code={code} title="styling-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## 1. Theme (toàn cục)
+
+Đổi biến CSS là mọi bảng đổi theo: `--background`, `--foreground`, `--muted`, `--border`, `--primary`, `--ring`, `--radius`. Chế độ tối dùng các biến trong `.dark` của bạn.
+
+## 2. `classNames` (từng phần)
+
+```tsx
+<DataGrid
+  classNames={{
+    headerCell: "bg-primary/5 text-primary",
+    row: "odd:bg-muted/40",
+  }}
+/>
+```
+
+Class của bạn được gộp **sau** class mặc định bằng tailwind-merge, nên `bg-primary/5` thay hẳn màu nền mặc định chứ không tranh chấp với nó.
+
+## 3. `styles` (từng phần)
+
+Cho những giá trị class không diễn tả được:
+
+```tsx
+<DataGrid styles={{ cell: { fontVariantNumeric: "tabular-nums" } }} />
+```
+
+## Các phần
+
+| Phần                                  | Là gì                                         |
+| ------------------------------------- | --------------------------------------------- |
+| `root`                                | Khung ngoài cùng (giống `className`)          |
+| `toolbar`                             | Thanh công cụ phía trên                       |
+| `search`                              | Ô tìm kiếm mặc định                           |
+| `groupPanel` / `groupChip`            | Thanh "nhóm theo" và các chip                 |
+| `scroll`                              | Vùng cuộn có viền                             |
+| `table`                               | Thẻ `<table>` (hoặc phần tử grid khi cuộn ảo) |
+| `header` / `headerRow` / `headerCell` | Khối tiêu đề, dòng, ô tiêu đề                 |
+| `headerGroup`                         | Ô của các dòng nhóm cột                       |
+| `row` / `cell`                        | Dòng dữ liệu và mọi ô                         |
+| `groupRow` / `footerRow`              | Tiêu đề nhóm dòng và dòng tổng                |
+| `empty`                               | Vùng "Không có kết quả"                       |
+| `footer`                              | Phân trang, số dòng đã chọn, tổng số dòng     |
+| `columnMenu`                          | Bảng menu cột                                 |
+
+## 4. Công tắc giao diện
+
+| Prop            | Mặc định   | Tác dụng                                                     |
+| --------------- | ---------- | ------------------------------------------------------------ |
+| `bordered`      | `false`    | Có cả đường kẻ giữa các cột                                  |
+| `stickyDivider` | `false`    | Đường kẻ cạnh cột được ghim                                  |
+| `stickyShadow`  | `true`     | Bóng cạnh cột ghim khi nội dung cuộn bên dưới                |
+| `resizeHandle`  | `"always"` | Tay nắm đổi độ rộng luôn hiện mờ, hoặc chỉ hiện khi rê chuột |
+
+## 5. Thay hẳn một phần
+
+Khi class chưa đủ, thay markup của phần đó bằng [slot](/vi/customization/slots/).

@@ -1,0 +1,47 @@
+---
+title: Cột thao tác
+description: Thêm nút thao tác, icon hay tay nắm kéo vào data grid Cellora bằng cột hiển thị, không chứa dữ liệu và không tham gia sắp xếp, lọc hay tính tổng.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/display-columns-demo"
+import code from "~/demos/display-columns-demo.tsx?raw"
+
+Một cột không phải dữ liệu: nút sửa / xoá, menu, icon, tay nắm để kéo.
+
+<ComponentPreview code={code} title="display-columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Tạo cột thao tác
+
+Bỏ `accessor` và render bằng `cell`:
+
+```tsx
+{
+  id: "actions",
+  header: "Thao tác",
+  sticky: "right",
+  cell: (row) => <button onClick={() => remove(row.id)}>Xoá</button>,
+}
+```
+
+Hoặc giữ accessor và đặt `display: true`.
+
+## Điều gì thay đổi
+
+Cột thao tác không bao giờ tham gia **tìm kiếm, lọc, sắp xếp, nhóm, tính tổng hay sửa ô**, và không có menu cột (trừ khi bạn đặt `menu: true`). Bấm vào nút trong cột không kích hoạt [`onRowClick`](/vi/features/row-and-cell-click/).
+
+## Mẹo
+
+- Ghim sang phải (`sticky: "right"`) để luôn bấm được trên grid rộng.
+- Trong hàm xử lý, dùng cùng id bạn truyền cho `getRowId`.
+
+## API
+
+| Tuỳ chọn   | Kiểu                      | Mặc định                 | Mô tả                                  |
+| ---------- | ------------------------- | ------------------------ | -------------------------------------- |
+| `accessor` | `(row) => unknown`        | không                    | Không có accessor thì là cột thao tác. |
+| `display`  | `boolean`                 | `!accessor`              | Ép thành cột thao tác.                 |
+| `cell`     | `(row, ctx) => ReactNode` |                          | Nội dung hiển thị.                     |
+| `menu`     | `boolean`                 | `false` với cột thao tác | Vẫn hiện menu cột.                     |

@@ -1,0 +1,85 @@
+---
+title: Grid API
+description: Object grid của Cellora được truyền cho slot, ô và component - trạng thái, kết quả, chọn dòng, sửa ô và mọi hàm để điều khiển grid từ giao diện của bạn.
+---
+
+Object `grid` là thứ slot, hàm render ô và component nhận được. Dùng nó để đọc trạng thái của grid và điều khiển grid từ toolbar, footer hay ô của bạn.
+
+```tsx
+import type { DataGridApi } from "@cellora/react"
+
+function Toolbar({ grid }: { grid: DataGridApi<Employee> }) {
+  return <button onClick={() => grid.setSort("salary", "desc")}>Lương cao nhất trước</button>
+}
+```
+
+## Lấy ở đâu
+
+- Các slot nhận grid: `toolbar`, `search`, `empty`, `groupPanel`, `loadingOverlay`, `footer` (và là `{ grid }` trong `components`).
+- Hàm render ô: `cell(row, { grid, index })`, props của `cellComponent`, `headerCell({ grid })`.
+- Ngữ cảnh menu cột: `ctx.grid`.
+
+## Trạng thái
+
+| Trường           | Kiểu                                                   | Mô tả                                                     |
+| ---------------- | ------------------------------------------------------ | --------------------------------------------------------- |
+| `state`          | `{ sort, filter, columnFilters, pageIndex, pageSize }` | Sắp xếp, chữ tìm kiếm, bộ lọc cột và phân trang hiện tại. |
+| `columnState`    | `{ pinned, hidden }`                                   | Ghim và ẩn/hiện khi đang chạy, theo id cột.               |
+| `groupBy`        | `readonly string[]`                                    | Nhóm hiện tại.                                            |
+| `expandedGroups` | `Record<string, boolean>`                              | Nhóm đang mở / đóng theo key.                             |
+| `columns`        | `DataGridColumnDef[]`                                  | Mọi cột đã cấu hình.                                      |
+| `visibleColumns` | `DataGridColumnDef[]`                                  | Sau khi ẩn và sắp xếp cột ghim.                           |
+
+## Kết quả
+
+| Trường                                  | Kiểu                        | Mô tả                                                         |
+| --------------------------------------- | --------------------------- | ------------------------------------------------------------- |
+| `result.rows`                           | `TRow[]`                    | Dòng của trang hiện tại (mọi dòng khớp khi không phân trang). |
+| `result.matchedRows`                    | `TRow[]`                    | Mọi dòng khớp tìm kiếm và bộ lọc, đã sắp xếp.                 |
+| `result.total`                          | `number`                    | Số dòng khớp (số dòng hiển thị khi nhóm).                     |
+| `result.pageIndex` / `result.pageCount` | `number`                    | Trang hiện tại (đếm từ 0) và số trang.                        |
+| `totals`                                | `Record<string, unknown>`   | Giá trị tổng hợp trên mọi dòng khớp (khi `enableFooterRow`).  |
+| `display`                               | `{ count, item(index) }`    | Mọi dòng hiển thị (tiêu đề nhóm và dòng) cho cuộn ảo.         |
+| `pageItems`                             | `DataGridRowItem[] \| null` | Các dòng hiển thị của trang hiện tại khi nhóm.                |
+
+## Hàm
+
+| Hàm                                                  | Mô tả                                |
+| ---------------------------------------------------- | ------------------------------------ |
+| `setFilter(text)`                                    | Đặt chữ tìm kiếm.                    |
+| `setColumnFilter(columnId, text)`                    | Đặt bộ lọc cho một cột (`""` để bỏ). |
+| `toggleSort(columnId)`                               | Xoay vòng tăng → giảm → không.       |
+| `setSort(columnId, direction \| null)`               | Đặt hoặc bỏ sắp xếp.                 |
+| `setPageIndex(index)` / `setPageSize(size)`          | Phân trang.                          |
+| `setColumnPin(columnId, "left" \| "right" \| false)` | Ghim hoặc bỏ ghim.                   |
+| `setColumnHidden(columnId, hidden)`                  | Ẩn hoặc hiện.                        |
+| `setGroupBy(columnIds)`                              | Đổi nhóm.                            |
+| `toggleGroup(key)`                                   | Mở / đóng một nhóm.                  |
+
+## `grid.selection`
+
+| Thành phần                                  | Mô tả                                               |
+| ------------------------------------------- | --------------------------------------------------- |
+| `selectedRowIds` / `selectedRows` / `count` | Lựa chọn hiện tại.                                  |
+| `isSelected(row)`                           | Dòng có đang được chọn.                             |
+| `toggle(row)`                               | Chọn / bỏ chọn một dòng.                            |
+| `setMany(rows, checked)`                    | Chọn hoặc bỏ chọn nhiều dòng.                       |
+| `clear()`                                   | Bỏ chọn tất cả.                                     |
+| `getStatus(rows)`                           | `"none" \| "some" \| "all"` cho một danh sách dòng. |
+| `selectable(rows)`                          | Những dòng được phép chọn.                          |
+| `getRowId(row)`                             | Id mà lựa chọn dùng cho một dòng.                   |
+
+## `grid.editing`
+
+| Thành phần                               | Mô tả                                            |
+| ---------------------------------------- | ------------------------------------------------ |
+| `cell`                                   | Ô đang sửa, hoặc `null`.                         |
+| `pending`                                | `true` trong lúc `onCellEdit` chạy.              |
+| `isEditable(row, column)`                | Ô có sửa được không.                             |
+| `start(row, column, index)` / `cancel()` | Mở / đóng editor.                                |
+| `commit(value)`                          | Lưu giá trị của editor đang mở.                  |
+| `apply(row, column, index, value)`       | Lưu giá trị cho một ô bất kỳ mà không mở editor. |
+
+## Dùng không giao diện (headless)
+
+`useDataGrid(options)` trả về đúng object này mà không render gì, để bạn tự dựng một bảng hoàn toàn riêng trên logic của Cellora.

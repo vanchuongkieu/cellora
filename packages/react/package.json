@@ -1,0 +1,60 @@
+{
+  "name": "@cellora/react",
+  "version": "0.0.0",
+  "description": "Cellora: a fast, fully slottable React data grid built on shadcn/ui",
+  "keywords": [
+    "react",
+    "data-grid",
+    "datagrid",
+    "table",
+    "shadcn",
+    "shadcn-ui",
+    "tailwindcss",
+    "virtual-scroll",
+    "grid",
+    "spreadsheet"
+  ],
+  "homepage": "https://cellora.vanchuongkieu.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vanchuongkieu/cellora.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/vanchuongkieu/cellora/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "styles.css"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch --no-clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@cellora/core": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "cn": "^0.4.0",
+    "lucide-react": "^1.56.0",
+    "radix-ui": "^1.8.1"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json",
+    "./styles.css": "./styles.css"
+  }
+}

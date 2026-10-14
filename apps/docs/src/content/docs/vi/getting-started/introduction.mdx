@@ -1,0 +1,42 @@
+---
+title: Giới thiệu
+description: Cellora là gì, làm được gì và tài liệu này được sắp xếp ra sao. Data grid React xây trên shadcn/ui và Tailwind CSS.
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components"
+
+**Cellora** là data grid (bảng dữ liệu) cho React. Nó được dựng từ các component của [shadcn/ui](https://ui.shadcn.com) và Tailwind CSS, nên ngay lần hiển thị đầu đã hợp với giao diện app của bạn, và vẫn nhanh khi có một triệu dòng.
+
+## Bạn có gì
+
+- **Xử lý dữ liệu**: sắp xếp, tìm kiếm, lọc theo từng cột, phân trang, nhóm dòng kèm tổng, sửa trực tiếp trong ô, chọn dòng giữ nguyên khi chuyển trang.
+- **Bố cục**: độ rộng cột cố định, kéo / nhấp đúp / bàn phím để đổi độ rộng, ghim cột hai bên, header cố định, nhóm cột, chiều cao vừa màn hình.
+- **Quy mô**: cuộn ảo cho cả dòng _và_ cột. 1.000.000 dòng × 100 cột vẫn cuộn 60 fps.
+- **Tuỳ biến**: mọi phần giao diện là một slot (hơn 30), mọi câu chữ là một label (đa ngôn ngữ), mọi phần nhận thêm class và style.
+- **Dữ liệu là của bạn**: grid không bao giờ sao chép hay sửa dòng của bạn. Mỗi lần sửa được báo lại; bạn quyết định lưu gì.
+
+## Hai package
+
+| Package          | Là gì                                                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@cellora/react` | Component `DataGrid` và các hook. Đây là package bạn cài.                                                                                                    |
+| `@cellora/core`  | Logic không phụ thuộc framework: sắp xếp, lọc, nhóm, tính toán cuộn ảo. Được cài kèm `@cellora/react`; dùng riêng được (bản cho Vue đang được lên kế hoạch). |
+
+## Trình duyệt hỗ trợ
+
+Chrome, Edge, Firefox và Safari bản hiện hành (máy tính và điện thoại). Render phía server hoạt động (Next.js App Router, Astro, Remix): package đã được đánh dấu `"use client"`.
+
+## Tài liệu được sắp xếp thế nào
+
+<CardGrid>
+  <LinkCard title="Bắt đầu" description="Cài đặt, hiển thị bảng đầu tiên, định nghĩa cột, đổi giao diện." href="/vi/getting-started/installation/" />
+  <LinkCard title="Tính năng" description="Mỗi tính năng một trang, có demo chạy thật và bảng API riêng." href="/vi/features/sorting/" />
+  <LinkCard title="Tuỳ biến" description="Ô tuỳ biến, slot và nhãn." href="/vi/customization/custom-cells/" />
+  <LinkCard title="Tham chiếu API" description="Mọi prop, tuỳ chọn cột, slot và hàm của grid." href="/vi/api/data-grid/" />
+</CardGrid>
+
+Mỗi demo có nút **View Code** hiện toàn bộ code kèm nút sao chép. Các demo dùng chung một file dữ liệu mẫu nhỏ, có ở trang [Bắt đầu nhanh](/vi/getting-started/quick-start/#dữ-liệu-mẫu).
+
+## Dành cho trợ lý AI
+
+Tài liệu cũng được xuất bản dạng Markdown thuần: [`/llms.txt`](/llms.txt) là mục lục, [`/llms-full.txt`](/llms-full.txt) gom mọi trang tiếng Anh vào một file, demo kèm code. Mỗi trang còn có nút **Copy Page** sao chép Markdown của trang, dán thẳng vào cuộc trò chuyện.

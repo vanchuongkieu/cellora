@@ -1,0 +1,50 @@
+---
+title: Nhóm cột
+description: Gom các cột của data grid Cellora dưới một nhãn tiêu đề chung, lồng nhiều cấp, bằng headerGroup trên từng cột.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-groups-demo"
+import code from "~/demos/column-groups-demo.tsx?raw"
+
+Đặt một nhãn phía trên các cột liên quan. Nhãn có thể lồng nhau.
+
+<ComponentPreview code={code} title="column-groups-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Một cấp
+
+```tsx
+{ id: "department", header: "Phòng ban", accessor: (row) => row.department, headerGroup: "Công việc" }
+{ id: "role", header: "Vai trò", accessor: (row) => row.role, headerGroup: "Công việc" }
+```
+
+Các cột liền nhau có cùng nhãn dùng chung một ô tiêu đề trải dài.
+
+## Nhiều cấp
+
+Truyền mảng, cấp ngoài cùng trước:
+
+```tsx
+{ id: "salary", headerGroup: ["Hợp đồng", "Lương"], ... }
+{ id: "remote", headerGroup: ["Hợp đồng", "Điều khoản"], ... }
+```
+
+Ô chỉ gộp khi **cả đường dẫn** giống nhau, nên `A › x` và `B › x` vẫn tách riêng. Cột không có nhóm sẽ có ô trống ở cấp đó.
+
+## Quy tắc
+
+- Cột ghim và cột cuộn được nhóm riêng (một ô không thể vừa cố định vừa cuộn).
+- Các dòng nhóm cố định cùng tiêu đề.
+- Nhãn nhóm dài vẫn dễ đọc: nhãn bám mép trái khi bạn cuộn qua một nhóm rộng.
+
+## API
+
+| Prop / tuỳ chọn      | Ở đâu                   | Kiểu                                       | Mặc định            | Mô tả                         |
+| -------------------- | ----------------------- | ------------------------------------------ | ------------------- | ----------------------------- |
+| `headerGroup`        | cột                     | `string \| string[]`                       | không               | Nhãn nhóm, cấp ngoài trước.   |
+| `enableHeaderGroups` | `DataGrid`              | `boolean`                                  | `true`              | Hiện các dòng nhóm.           |
+| `headerGroupHeight`  | `DataGrid`              | `number`                                   | `headerHeight` (40) | Chiều cao mỗi dòng nhóm (px). |
+| `headerGroup`        | slot                    | `({ label, level, columns }) => ReactNode` | nhãn                | Nội dung ô nhóm tuỳ biến.     |
+| `headerGroup`        | `classNames` / `styles` |                                            |                     | Đổi kiểu ô nhóm.              |

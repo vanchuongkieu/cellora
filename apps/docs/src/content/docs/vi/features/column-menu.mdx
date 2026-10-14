@@ -1,0 +1,69 @@
+---
+title: Menu cột
+description: Menu trên tiêu đề cột của data grid Cellora với sắp xếp, ghim, nhóm, lọc, ẩn và quản lý cột. Tắt từng nhóm, đổi kích thước, thêm mục hoặc thay hẳn.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-menu-demo"
+import code from "~/demos/column-menu-demo.tsx?raw"
+
+Mỗi tiêu đề có nút **⋮** chứa các thao tác cho cột đó.
+
+<ComponentPreview code={code} title="column-menu-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Bên trong có gì
+
+| Nhóm     | Mục                            | Hiện khi                                  |
+| -------- | ------------------------------ | ----------------------------------------- |
+| `sort`   | Tăng dần, giảm dần, bỏ sắp xếp | cột [sắp xếp được](/vi/features/sorting/) |
+| `pin`    | Ghim trái, ghim phải, bỏ ghim  | độ rộng cố định và `pinnable !== false`   |
+| `group`  | Nhóm theo cột này / Bỏ nhóm    | `groupable !== false`                     |
+| `filter` | Ô nhập chữ                     | `filterable !== false`                    |
+| `hide`   | Ẩn cột                         | `hideable !== false`                      |
+| `manage` | Ẩn / hiện từng cột (checkbox)  | luôn có                                   |
+
+## Tắt từng nhóm
+
+```tsx
+<DataGrid columnMenuItems={{ group: false, pin: false }} />
+```
+
+Theo cột: `menu: false` bỏ nút ⋮, `hideable: false` giữ cột luôn hiện, v.v. Tắt hẳn menu bằng `enableColumnMenu={false}`.
+
+## Kích thước và vị trí
+
+```tsx
+<DataGrid columnMenuWidth={260} columnMenuAlign="start" columnMenuClassName="rounded-xl" />
+```
+
+Menu không khoá trang: trang vẫn cuộn được, menu bám theo nút và tự lật lên / xuống khi cần.
+
+## Thêm mục hoặc thay hẳn
+
+| Slot                | Dùng để                                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `columnMenuExtra`   | Thêm mục của bạn sau các mục có sẵn.                                                                                          |
+| `columnMenuTrigger` | Chỉ thay icon ⋮.                                                                                                              |
+| `columnMenu`        | Thay toàn bộ (nút và nội dung). Nhận đủ mọi thứ: `sorted`, `pinned`, `setSort`, `setPin`, `setFilter`, `hide`, `setHidden`, … |
+
+## Ẩn cột bằng code
+
+```tsx
+grid.setColumnHidden("email", true)
+grid.columnState.hidden // { email: true }
+```
+
+## API
+
+| Prop / tuỳ chọn                                      | Ở đâu      | Kiểu                                                        | Mặc định      | Mô tả                |
+| ---------------------------------------------------- | ---------- | ----------------------------------------------------------- | ------------- | -------------------- |
+| `enableColumnMenu`                                   | `DataGrid` | `boolean`                                                   | `true`        | Hiện menu ⋮.         |
+| `columnMenuItems`                                    | `DataGrid` | `{ sort?, pin?, group?, filter?, hide?, manage?: boolean }` | tất cả `true` | Nhóm được hiện.      |
+| `columnMenuWidth`                                    | `DataGrid` | `number \| string`                                          | `220`         | Độ rộng menu.        |
+| `columnMenuAlign`                                    | `DataGrid` | `"start" \| "center" \| "end"`                              | `"end"`       | Căn theo nút.        |
+| `columnMenuClassName` / `columnMenuTriggerClassName` | `DataGrid` | `string`                                                    |               | Class thêm.          |
+| `menu`                                               | cột        | `boolean`                                                   | `true`        | Hiện menu ở cột này. |
+| `hideable`                                           | cột        | `boolean`                                                   | `true`        | Cho phép ẩn cột này. |
+| `columnMenu`, `hideColumn`, `manageColumns`          | `labels`   | `string`                                                    | tiếng Anh     | Câu chữ.             |

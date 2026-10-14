@@ -1,0 +1,58 @@
+---
+title: Cuộn ảo
+description: Hiển thị một triệu dòng và một trăm cột trong data grid Cellora bằng cuộn ảo. Cuộn native 60 fps, không chớp trắng, chạy cùng nhóm dòng, ghim cột, chọn dòng và sửa ô.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/virtual-scroll-demo"
+import code from "~/demos/virtual-scroll-demo.tsx?raw"
+
+Chỉ những dòng và cột đang nhìn thấy mới có mặt trên trang. Thử một triệu dòng:
+
+<ComponentPreview code={code} title="virtual-scroll-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Bật tính năng
+
+```tsx
+<DataGrid rows={bigRows} columns={columns} getRowId={(row) => row.id} virtualized maxHeight={600} />
+```
+
+Vậy là xong. Dòng được cuộn thay vì phân trang, footer hiện tổng số dòng.
+
+## Vì sao vẫn mượt
+
+- **Cuộn native.** Dòng nằm đúng vị trí thật trong một khối cao, nên trình duyệt tự cuộn mà không cần chạy script mỗi khung hình.
+- **Vẽ trước.** Hai màn hình dòng được chuẩn bị theo hướng đang cuộn, giữ lại một màn phía sau; cột là nửa màn mỗi bên. Khi vuốt thật nhanh, các dòng đang hiện được vẽ trước.
+- **Không chớp trắng.** Vùng chưa kịp vẽ hiện đường kẻ dòng (hoặc thanh skeleton) vẽ bằng CSS.
+- **Cả dòng lẫn cột.** Với 100 cột, chỉ cột đang hiện (cộng phần vẽ trước) nằm trong DOM. Cột ghim luôn được vẽ.
+
+## Chiều cao dòng
+
+Mọi dòng cao 37 px như bảng thường, dù có bao nhiêu dòng: chuyển từ 10.000 sang 1.000.000 dòng không làm giao diện thay đổi. Trong giới hạn chiều cao phần tử của trình duyệt (khoảng 890.000 dòng ở 37 px trên Chrome) trình duyệt cuộn native; vượt quá thì vị trí cuộn được co giãn, vẫn mượt như vậy. Đổi bằng `rowHeight`.
+
+## Chạy cùng
+
+[Sắp xếp](/vi/features/sorting/), [tìm kiếm](/vi/features/search/), [lọc](/vi/features/column-filters/), [ghim cột](/vi/features/pinned-columns/), [nhóm cột](/vi/features/column-groups/), [nhóm dòng](/vi/features/row-grouping/), [tổng hợp](/vi/features/aggregation/), [chọn dòng](/vi/features/row-selection/), [sửa ô](/vi/features/inline-editing/). Độ rộng cột cố định luôn bật.
+
+## Mẹo cho dữ liệu lớn
+
+- Dòng là gì cũng được: trong demo, mỗi dòng chỉ là chỉ số của nó. Dòng càng nhẹ càng tốn ít bộ nhớ.
+- Truyền `getRowId`.
+- Giữ `accessor` thật nhẹ (chúng chạy cho mọi dòng khi sắp xếp hay tìm kiếm).
+- Tìm toàn văn trên hàng triệu ô cần chút thời gian; nó không chặn việc gõ, nhưng lọc theo cột rẻ hơn.
+
+## API
+
+| Prop                 | Kiểu                              | Mặc định            | Mô tả                                             |
+| -------------------- | --------------------------------- | ------------------- | ------------------------------------------------- |
+| `virtualized`        | `boolean`                         | `false`             | Bật cuộn ảo.                                      |
+| `maxHeight`          | `number \| string`                | `400`               | Giới hạn chiều cao bắt buộc (`null` sẽ dùng 400). |
+| `rowHeight`          | `number`                          | `37`                | Chiều cao dòng cố định (px).                      |
+| `headerHeight`       | `number`                          | `40`                | Chiều cao tiêu đề (px).                           |
+| `overscanScreens`    | `number \| { rows?, columns? }`   | dòng `2`, cột `0.5` | Vẽ trước bao nhiêu màn hình.                      |
+| `overscanRows`       | `number`                          | `10`                | Số dòng vẽ thêm tối thiểu mỗi bên.                |
+| `overscanColumns`    | `number`                          | `3`                 | Số cột vẽ thêm tối thiểu mỗi bên.                 |
+| `virtualPlaceholder` | `"skeleton" \| "lines" \| "none"` | `"skeleton"`        | Vùng chưa vẽ trông thế nào khi cuộn nhanh.        |
+| `rowCount`           | slot                              |                     | Thay chữ "N rows".                                |

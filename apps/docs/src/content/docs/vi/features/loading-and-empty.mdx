@@ -1,0 +1,58 @@
+---
+title: Đang tải & không có dữ liệu
+description: Hiện dòng skeleton hoặc lớp phủ spinner khi data grid Cellora đang tải, và thông báo tuỳ chỉnh khi không có dòng nào khớp.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/loading-demo"
+import code from "~/demos/loading-demo.tsx?raw"
+
+Cho người dùng biết dữ liệu đang tới, và nên làm gì khi không có gì.
+
+<ComponentPreview code={code} title="loading-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Đang tải
+
+```tsx
+const { data, isLoading } = useQuery(...)
+<DataGrid rows={data ?? []} loading={isLoading} />
+```
+
+| `loadingVariant`    | Trông như                                                      | Hợp với               |
+| ------------------- | -------------------------------------------------------------- | --------------------- |
+| `"auto"` (mặc định) | Skeleton khi chưa có dòng nào, lớp phủ khi đã có dòng          | Đa số trường hợp      |
+| `"skeleton"`        | Các dòng xám giữ chỗ (số liệu ở footer cũng thành ô giữ chỗ)   | Lần tải đầu           |
+| `"overlay"`         | Spinner phủ lên các dòng hiện tại, vẫn nhìn thấy nhưng bị khoá | Tải lại, chuyển trang |
+
+- `loadingRows` đặt số dòng skeleton (mặc định: số dòng mỗi trang, tối đa 10).
+- Vùng cuộn có `aria-busy` và chữ "Loading..." cho trình đọc màn hình.
+
+## Không có dữ liệu
+
+Khi không dòng nào khớp (chưa có dữ liệu, hoặc không gì qua được tìm kiếm / bộ lọc):
+
+```tsx
+<DataGrid emptyMessage="Chưa có nhân viên nào." />
+```
+
+Muốn hơn một dòng chữ, dùng slot `empty` (nút xoá bộ lọc, hình minh hoạ…):
+
+```tsx
+<DataGrid slots={{ empty: (grid) => <button onClick={() => grid.setFilter("")}>Xoá tìm kiếm</button> }} />
+```
+
+Thông báo luôn nằm giữa vùng đang nhìn thấy, kể cả khi grid đã cuộn ngang.
+
+## API
+
+| Prop / tuỳ chọn                           | Ở đâu                   | Kiểu                                | Mặc định                      | Mô tả                       |
+| ----------------------------------------- | ----------------------- | ----------------------------------- | ----------------------------- | --------------------------- |
+| `loading`                                 | `DataGrid`              | `boolean`                           | `false`                       | Hiện trạng thái đang tải.   |
+| `loadingVariant`                          | `DataGrid`              | `"auto" \| "skeleton" \| "overlay"` | `"auto"`                      | Kiểu hiển thị.              |
+| `loadingRows`                             | `DataGrid`              | `number`                            | số dòng mỗi trang (tối đa 10) | Số dòng skeleton.           |
+| `emptyMessage`                            | `DataGrid`              | `string`                            | `"No results."`               | Chữ khi không có gì khớp.   |
+| `empty`, `loadingOverlay`, `skeletonCell` | slot                    |                                     |                               | Thay các phần.              |
+| `empty`                                   | `classNames` / `styles` |                                     |                               | Đổi kiểu vùng trống.        |
+| `loading`                                 | `labels`                | `string`                            | `"Loading..."`                | Chữ cho trình đọc màn hình. |

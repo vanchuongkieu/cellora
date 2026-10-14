@@ -1,0 +1,19 @@
+---
+/** Landing page: one live demo, the million-row virtual grid. */
+import VirtualScrollDemo from "../demos/virtual-scroll-demo"
+import { localePath } from "../i18n"
+
+const { locale } = Astro.locals.starlightRoute
+const vi = locale === "vi"
+---
+
+<div class="cl-showcase not-content">
+  <section class="cl-card">
+    <h2>{vi ? "Cuộn ảo: 1.000.000 dòng × 50 cột" : "Virtual scroll: 1,000,000 rows × 50 columns"}</h2>
+    <p>
+      {vi ? "Chỉ phần đang nhìn thấy được vẽ. Đổi số dòng, cuộn thật nhanh, sắp xếp, tìm kiếm." : "Only what is on screen is rendered. Switch sizes, fling it, sort it, search it."}{" "}
+      <a href={localePath(locale, "/features/virtual-scroll/")}>{vi ? "Xem hướng dẫn" : "Read the guide"}</a>
+    </p>
+    <VirtualScrollDemo client:only="react" />
+  </section>
+</div>

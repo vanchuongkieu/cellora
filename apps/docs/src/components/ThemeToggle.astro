@@ -1,0 +1,23 @@
+---
+/** One-click light / dark switch (stored the way Starlight's own theme picker stores it). */
+import { ui } from "../i18n"
+
+const t = ui(Astro.locals.starlightRoute.locale)
+---
+
+<button type="button" class="cl-icon-button" data-theme-toggle aria-label={t.toggleTheme} title={t.toggleTheme}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"></circle>
+    <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path>
+  </svg>
+</button>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")) {
+    button.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark"
+      document.documentElement.dataset.theme = next
+      localStorage.setItem("starlight-theme", next)
+    })
+  }
+</script>

@@ -1,0 +1,84 @@
+---
+title: Column filters
+description: Filter Cellora data grid rows per column from the header menu. Filters combine with each other and with search.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-filters-demo"
+import code from "~/demos/column-filters-demo.tsx?raw"
+import CustomDemo from "~/demos/column-filters-custom-demo"
+import customCode from "~/demos/column-filters-custom-demo.tsx?raw"
+
+Each column can have its own text filter, typed in the column menu.
+
+<ComponentPreview code={code} title="column-filters-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## How to use
+
+1. Open **⋮** on a column header.
+2. Choose **Filter** and type. Rows update as you type.
+3. A filter icon appears in the header while the column is filtered. Clear the text to remove the filter.
+
+Column filters are on by default (they live in the [column menu](/features/column-menu/)).
+
+## Rules
+
+- A row must match **every** column filter, plus the [search](/features/search/) if any.
+- Matching is case-insensitive "contains" on the column's `accessor` value, accents ignored (`ignoreAccents`, on by default).
+- Hiding a column also stops its filter until it is shown again.
+- [Display columns](/features/display-columns/) cannot be filtered.
+
+## Your own matching
+
+- `filterValue(row)`: what the filter matches against instead of the accessor's value (a formatted date, a label for a code).
+- `filterMatch(row, text)`: your own rule, called with the row and the typed text. Exact matches, `>60000`, ranges, anything. Wins over `filterValue`.
+
+<ComponentPreview code={customCode} title="column-filters-custom-demo.tsx">
+  <CustomDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+{ id: "startDate", header: "Start date", accessor: (row) => row.startDate, filterValue: (row) => formatDay(row.startDate) }
+{ id: "salary", header: "Salary", accessor: (row) => row.salary, filterMatch: (row, text) => (text.startsWith(">") ? row.salary > Number(text.slice(1)) : String(row.salary).includes(text)) }
+```
+
+## Filter on the server
+
+When the API filters, pass its rows with `manualFiltering` and read `columnFilters` from `onStateChange`. See [Server-side data](/features/server-side/). To start filtered, or control the filters from a URL, use `defaultColumnFilters` / `columnFilters`.
+
+## Turn it off
+
+```tsx
+// for one column
+{ id: "id", header: "ID", accessor: (row) => row.id, filterable: false }
+
+// for the whole grid (keeps the rest of the menu)
+<DataGrid columnMenuItems={{ filter: false }} />
+```
+
+## Filter from code
+
+```tsx
+grid.setColumnFilter("department", "eng")
+grid.setColumnFilter("department", "") // clear
+grid.state.columnFilters // { department: "eng" }
+```
+
+This is how you build your own filter bar: see the toolbar in the [Slots demo](/customization/slots/).
+
+## API
+
+| Prop / option                  | Where      | Type                     | Default                          | Description                                  |
+| ------------------------------ | ---------- | ------------------------ | -------------------------------- | -------------------------------------------- |
+| `filterable`                   | column     | `boolean`                | `true`                           | Offer "Filter" in this column's menu.        |
+| `filterValue`                  | column     | `(row) => unknown`       | accessor                         | What the filter matches against.             |
+| `filterMatch`                  | column     | `(row, text) => boolean` |                                  | Your own matching rule.                      |
+| `columnMenuItems.filter`       | `DataGrid` | `boolean`                | `true`                           | Show "Filter" in every menu.                 |
+| `ignoreAccents`                | `DataGrid` | `boolean`                | `true`                           | Match without accents.                       |
+| `manualFiltering`              | `DataGrid` | `boolean`                | `false`                          | Rows are already filtered (by an API).       |
+| `columnFilters`                | `DataGrid` | `Record<string, string>` |                                  | Controlled filters by column id.             |
+| `defaultColumnFilters`         | `DataGrid` | `Record<string, string>` | `{}`                             | Initial filters.                             |
+| `onStateChange`                | `DataGrid` | `(state) => void`        |                                  | Filters (and the rest of the state) changed. |
+| `filter` / `filterPlaceholder` | `labels`   | `string`                 | `"Filter"` / `"Filter value..."` | Menu texts.                                  |

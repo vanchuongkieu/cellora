@@ -1,0 +1,60 @@
+---
+title: Height & sticky header
+description: Control the Cellora data grid height with maxHeight or fillHeight, keep the header on top while rows scroll, and fill the screen without page scroll.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/height-demo"
+import code from "~/demos/height-demo.tsx?raw"
+
+Rows scroll inside the grid, the header stays on top.
+
+<ComponentPreview code={code} title="height-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## A height cap: `maxHeight`
+
+```tsx
+<DataGrid maxHeight={400} /> // default
+<DataGrid maxHeight="60vh" /> // any CSS length
+<DataGrid maxHeight={null} /> // no cap: the grid grows with its rows
+```
+
+The grid is never taller than the cap; shorter content keeps its natural height.
+
+## Header on top: `stickyHeader`
+
+On by default. Turn it off to let the header scroll away with the rows:
+
+```tsx
+<DataGrid stickyHeader={false} />
+```
+
+Column-group rows and the [total row](/features/aggregation/) stick too (the total row to the bottom).
+
+## Fill the screen: `fillHeight`
+
+Make the grid take exactly the height that is left on the page, so the page itself does not scroll (dashboards, admin screens):
+
+```tsx
+<DataGrid fillHeight fillHeightOffset={16} fillHeightMin={240} />
+```
+
+- The space is **measured from the real layout**: headers, toolbars, margins and footers around the grid all count, and it updates on resize.
+- `fillHeightOffset` leaves extra pixels free below (a fixed bottom bar).
+- `fillHeightMin` keeps a minimum on tiny screens.
+- Inside a scrolling panel instead of the window, pass it: `fillHeightContainer={panelRef}`.
+
+`fillHeight` replaces `maxHeight`.
+
+## API
+
+| Prop                  | Type                                    | Default | Description                                |
+| --------------------- | --------------------------------------- | ------- | ------------------------------------------ |
+| `maxHeight`           | `number \| string \| null`              | `400`   | Height cap of the scroll area.             |
+| `stickyHeader`        | `boolean`                               | `true`  | Keep the header visible while rows scroll. |
+| `fillHeight`          | `boolean`                               | `false` | Fill the remaining screen height.          |
+| `fillHeightOffset`    | `number`                                | `0`     | px to leave free below.                    |
+| `fillHeightMin`       | `number`                                | `200`   | Minimum height in px.                      |
+| `fillHeightContainer` | `RefObject<HTMLElement> \| HTMLElement` | window  | Fill this scrolling element instead.       |

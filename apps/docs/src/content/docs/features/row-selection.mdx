@@ -1,0 +1,86 @@
+---
+title: Row selection
+description: Select Cellora data grid rows with checkboxes. Selection is kept by row id across pages, sorting and filtering; select all, per group, or only some rows.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/row-selection-demo"
+import code from "~/demos/row-selection-demo.tsx?raw"
+
+A checkbox column with a select-all header. The footer shows how many rows are checked.
+
+<ComponentPreview code={code} title="row-selection-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Turn it on
+
+```tsx
+<DataGrid enableRowSelection getRowId={(row) => row.id} onSelectionChange={(change) => console.log(change)} />
+```
+
+**Give `getRowId`.** Selection is stored by id, so a checked row stays checked when you change page, sort, filter or reload the data. Without it the row's position is the id, which breaks as soon as rows move.
+
+## What you receive
+
+`onSelectionChange` is called on every change with:
+
+| Field            | Type       | Meaning                                    |
+| ---------------- | ---------- | ------------------------------------------ |
+| `selectedRowIds` | `string[]` | Every checked id, across all pages         |
+| `selectedRows`   | `TRow[]`   | Checked rows present in the current `rows` |
+| `count`          | `number`   | How many are checked                       |
+
+## Select all: page or everything
+
+| `selectAllScope`   | The header checkbox covers                                                            |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `"page"` (default) | The rows on the current page (all rows when [virtualized](/features/virtual-scroll/)) |
+| `"all"`            | Every row matching the current search and filters                                     |
+
+When [grouped](/features/row-grouping/), each group header has a checkbox for the rows inside it.
+
+## Rows that cannot be checked
+
+```tsx
+<DataGrid isRowSelectable={(row) => row.status !== "Inactive"} />
+```
+
+Their checkbox is disabled, and select-all / group checkboxes skip them.
+
+## Controlled selection
+
+```tsx
+const [ids, setIds] = useState<readonly string[]>([])
+<DataGrid enableRowSelection selectedRowIds={ids} onSelectionChange={(change) => setIds(change.selectedRowIds)} />
+```
+
+Or just set the start with `defaultSelectedRowIds`.
+
+## From code
+
+```tsx
+grid.selection.isSelected(row)
+grid.selection.toggle(row)
+grid.selection.setMany(rows, true)
+grid.selection.clear()
+grid.selection.count
+```
+
+## Scale
+
+Checking a row costs the same with 50 rows or a million: the grid only looks at the rows you checked.
+
+## API
+
+| Prop                                                        | Type                | Default  | Description                       |
+| ----------------------------------------------------------- | ------------------- | -------- | --------------------------------- |
+| `enableRowSelection`                                        | `boolean`           | `false`  | Add the checkbox column.          |
+| `selectAllScope`                                            | `"page" \| "all"`   | `"page"` | What the header checkbox covers.  |
+| `isRowSelectable`                                           | `(row) => boolean`  | all      | Disable some checkboxes.          |
+| `pinSelectionColumn`                                        | `boolean`           | `true`   | Keep the column pinned left.      |
+| `selectedRowIds`                                            | `readonly string[]` |          | Controlled selection.             |
+| `defaultSelectedRowIds`                                     | `readonly string[]` |          | Initial selection.                |
+| `onSelectionChange`                                         | `(change) => void`  |          | Called on every change.           |
+| `selectAll`, `selectRow`, `selectionSummary`, `selectGroup` | slots               |          | Replace the checkboxes / summary. |
+| `selectAll`, `selectRow`, `selected`, `selectGroup`         | `labels`            | English  | Texts.                            |

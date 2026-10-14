@@ -1,0 +1,57 @@
+---
+title: Phân trang
+description: Phân trang data grid Cellora với ô chọn số dòng mỗi trang và nút trang trước / sau. Trang cuối ngắn vẫn giữ chiều cao bảng.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/pagination-demo"
+import code from "~/demos/pagination-demo.tsx?raw"
+
+Phân trang bật sẵn: 10 dòng mỗi trang, có footer để chuyển trang và đổi số dòng.
+
+<ComponentPreview code={code} title="pagination-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Cấu hình
+
+```tsx
+<DataGrid pageSize={25} pageSizeOptions={[25, 50, 100]} />
+```
+
+- `pageSize` là số dòng ban đầu; người dùng đổi bằng **Rows per page**. Đổi prop về sau cũng áp dụng số mới.
+- Sắp xếp, tìm kiếm, lọc hay đổi số dòng đều quay về trang đầu.
+- Trang cuối ngắn vẫn giữ chiều cao của trang đầy, nên nội dung bên dưới không nhảy.
+- Khi [nhóm dòng](/vi/features/row-grouping/), mỗi trang tính theo dòng hiển thị (tiêu đề nhóm + dòng dữ liệu).
+
+## Tắt phân trang
+
+```tsx
+<DataGrid enablePagination={false} maxHeight={400} />
+```
+
+Khi đó mọi dòng cuộn bên trong `maxHeight`. Với hàng nghìn dòng hãy dùng [cuộn ảo](/vi/features/virtual-scroll/) (nó thay cho phân trang).
+
+## Điều khiển bằng code
+
+```tsx
+grid.setPageIndex(2) // trang thứ ba
+grid.setPageSize(50)
+grid.result.pageIndex // trang hiện tại (đếm từ 0)
+grid.result.pageCount
+grid.result.total // số dòng khớp (hoặc số dòng hiển thị khi nhóm)
+```
+
+## Thay từng phần của footer
+
+Mỗi phần footer là một slot: `range` ("1-10 of 57"), `pageSize`, `pageIndicator` ("Page 1 / 6"), `pageNavigation` (các nút), hoặc `footer` cho tất cả. Các câu chữ cũng là [label](/vi/customization/labels/).
+
+## API
+
+| Prop / tuỳ chọn                                                     | Ở đâu      | Kiểu       | Mặc định       | Mô tả                           |
+| ------------------------------------------------------------------- | ---------- | ---------- | -------------- | ------------------------------- |
+| `enablePagination`                                                  | `DataGrid` | `boolean`  | `true`         | Phân trang và hiện footer.      |
+| `pageSize`                                                          | `DataGrid` | `number`   | `10`           | Số dòng mỗi trang.              |
+| `pageSizeOptions`                                                   | `DataGrid` | `number[]` | `[10, 20, 50]` | Lựa chọn trong "Rows per page". |
+| `range`, `pageIndicator`, `rowsPerPage`, `previousPage`, `nextPage` | `labels`   |            | tiếng Anh      | Chữ ở footer.                   |
+| `range`, `pageSize`, `pageIndicator`, `pageNavigation`, `footer`    | slot       |            |                | Thay các phần của footer.       |

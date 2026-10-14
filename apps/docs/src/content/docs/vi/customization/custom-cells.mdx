@@ -1,0 +1,65 @@
+---
+title: Ô tuỳ biến
+description: "Hiển thị bất cứ thứ gì trong ô và tiêu đề của data grid Cellora: badge, avatar, link, component có hook, nhãn tiêu đề và định dạng tổng hợp riêng."
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/custom-cells-demo"
+import code from "~/demos/custom-cells-demo.tsx?raw"
+
+Ô, tiêu đề, giá trị tổng hợp và editor đều có thể là một hàm render hoặc một component.
+
+<ComponentPreview code={code} title="custom-cells-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ô: hàm render
+
+```tsx
+{
+  id: "status",
+  header: "Trạng thái",
+  accessor: (row) => row.status, // vẫn là giá trị để sắp xếp, tìm kiếm, lọc
+  cell: (row, { grid, index }) => <StatusBadge status={row.status} />,
+}
+```
+
+## Ô: component (dùng được hook)
+
+```tsx
+function RevealEmail({ row, value, index, column, grid }: DataGridCellComponentProps<Employee>) {
+  const [shown, setShown] = useState(false)
+  return shown ? <span>{row.email}</span> : <button onClick={() => setShown(true)}>Hiện</button>
+}
+
+{ id: "email", header: "Email", accessor: (row) => row.email, cellComponent: RevealEmail }
+```
+
+## Nhãn tiêu đề
+
+Chỉ thay phần nhãn: sắp xếp, menu và tay nắm đổi độ rộng vẫn giữ nguyên.
+
+```tsx
+headerCell: ({ column, sorted, grid }) => (
+  <span>
+    {column.header} {sorted === "asc" ? "↑" : ""}
+  </span>
+)
+// hoặc headerComponent: MyHeader
+```
+
+## Giá trị tổng hợp và editor
+
+| Tuỳ chọn                                  | Bản component        | Nhận                                                     |
+| ----------------------------------------- | -------------------- | -------------------------------------------------------- |
+| `aggregateCell(value, { scope, column })` | `aggregateComponent` | `{ value, scope, column }`                               |
+| `editCell(ctx)`                           | `editComponent`      | `{ row, column, index, value, pending, commit, cancel }` |
+
+Xem [Tổng hợp](/vi/features/aggregation/) và [Sửa trực tiếp](/vi/features/inline-editing/).
+
+## Quy tắc
+
+- Hàm (`cell`, `headerCell`, …) được ưu tiên hơn component (`cellComponent`, …) khi có cả hai.
+- Chữ thuần từ `cell` có tooltip và dấu "…" sẵn; nội dung phức tạp bị cắt theo ô.
+- Đặt `data-no-row-click` cho phần không nên kích hoạt [`onRowClick`](/vi/features/row-and-cell-click/) (nút và link đã tự loại trừ).
+- `index` là vị trí trong trang hiện tại (hoặc trong mọi dòng khi cuộn ảo).

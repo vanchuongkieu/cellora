@@ -1,0 +1,69 @@
+---
+title: Core (@cellora/core)
+description: The framework-free logic behind Cellora - filtering, sorting, paging, grouping, aggregation, selection and virtual-scroll math - usable from any JavaScript code.
+---
+
+`@cellora/core` is pure TypeScript with no framework dependency. `@cellora/react` is built on it, and a Vue binding will reuse it. Use it directly for server-side processing, workers, tests, or another UI library.
+
+```ts
+import { processRows, createInitialState, buildGroupTree } from "@cellora/core"
+```
+
+## Rows
+
+| Function                                      | Description                                                                             |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `createInitialState(pageSize?)`               | `{ sort: null, filter: "", columnFilters: {}, pageIndex: 0, pageSize }`.                |
+| `processRows(rows, columns, state, options?)` | Filter + sort + paginate. Returns `{ rows, matchedRows, total, pageCount, pageIndex }`. |
+| `setSort(state, columnId, direction \| null)` | New state with that sort (back to page 1).                                              |
+| `toggleSort(state, columnId)`                 | Cycle asc → desc → none.                                                                |
+| `setColumnFilter(state, columnId, value)`     | Set or clear one column filter.                                                         |
+| `foldAccents(text)` / `hasAccents(text)`      | Strip accents (`"Nguyễn"` → `"Nguyen"`, `đ` → `d`); whether a text has any.             |
+
+`processRows` never mutates its input. When nothing is filtered it returns the same array; when the search only grows it filters the previous matches. It honours the column rules `searchable`, `searchValue`, `sortValue`, `compare`, `filterValue` and `filterMatch`.
+
+`options` (`ProcessOptions`):
+
+| Option             | Default | Description                                                   |
+| ------------------ | ------- | ------------------------------------------------------------- |
+| `ignoreAccents`    | `true`  | Search and filters match without accents.                     |
+| `searchFilter`     |         | `(row, term) => boolean` replacing the built-in search.       |
+| `manualFiltering`  | `false` | Skip filtering (rows already match).                          |
+| `manualSorting`    | `false` | Skip sorting (rows already ordered).                          |
+| `manualPagination` | `false` | Skip slicing (rows are one page); `rowCount` gives the total. |
+| `rowCount`         |         | Total matching rows with `manualPagination`.                  |
+
+## Grouping and aggregation
+
+| Function                                                           | Description                                                                      |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `buildGroupTree(rows, columns, groupBy)`                           | Bucket rows into nested groups with aggregates (the expensive step; do it once). |
+| `flattenGroupTree(tree, expanded, defaultExpanded?)`               | Visible lines for the open groups (cheap).                                       |
+| `groupRows(rows, columns, { groupBy, expanded, defaultExpanded })` | Both steps at once.                                                              |
+| `aggregateRows(rows, columns)`                                     | Aggregates for every column with `aggregate`.                                    |
+
+## Columns
+
+| Function                                                                                                     | Description                             |
+| ------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| `getColumnWidth(column, sizes)` / `setColumnWidth(sizes, column, width)` / `clampColumnWidth(column, width)` | Width resolution with min / max.        |
+| `getStickyOffsets(columns, sizes)`                                                                           | Left / right offsets of pinned columns. |
+| `createColumnState()` / `setColumnPin` / `setColumnHidden` / `applyColumnState(columns, state)`              | Runtime pinning and visibility.         |
+| `getHeaderGroupDepth(columns)` / `getHeaderGroupRow(columns, level)`                                         | Column-group header rows.               |
+
+## Selection and editing
+
+| Function                                                                                | Description                                             |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `toggleRowSelection(set, id)` / `setRowsSelected(set, ids, value)`                      | Immutable selection updates.                            |
+| `getSelectionStatus(selected, ids)`                                                     | `"none" \| "some" \| "all"` (fast with a `Set` of ids). |
+| `formatEditValue(type, value)` / `parseEditInput(type, text)` / `isSameEditValue(a, b)` | Editor value conversion.                                |
+
+## Virtual scroll math
+
+| Function                                                                            | Description                                                           |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `getRowMetrics({ count, rowSize, headerSize, viewportSize, maxScrollSize? })`       | Total size, scroll extent, compression.                               |
+| `getRowRange({ virtualOffset, metrics, count, rowSize, overscan, … })`              | Rows to render.                                                       |
+| `createOffsets(sizes)` / `findIndexAtOffset(offsets, offset)` / `getOffsetRange(…)` | Variable-size columns.                                                |
+| `toVirtualOffset` / `toScrollOffset`                                                | Map scroll positions when content exceeds the browser's height limit. |

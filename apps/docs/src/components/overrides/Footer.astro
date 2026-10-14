@@ -1,0 +1,14 @@
+---
+/** Starlight's footer (edit link, last updated, pagination) plus a one-line credit. */
+import Default from "@astrojs/starlight/components/Footer.astro"
+
+import { ui } from "../../i18n"
+import { SITE } from "../../site"
+
+const t = ui(Astro.locals.starlightRoute.locale)
+---
+
+<Default><slot /></Default>
+<p class="cl-credit">
+  {t.builtBy} <a href="https://github.com/vanchuongkieu">vanchuongkieu</a>. {t.sourceOn} <a href={SITE.repo}>GitHub</a>.
+</p>

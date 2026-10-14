@@ -1,0 +1,65 @@
+---
+title: Nhãn & đa ngôn ngữ
+description: Dịch mọi câu chữ của data grid Cellora bằng prop labels. Danh sách đầy đủ các nhãn kèm giá trị tiếng Anh mặc định.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/labels-demo"
+import code from "~/demos/labels-demo.tsx?raw"
+
+Mọi câu chữ grid hiển thị hoặc đọc cho trình đọc màn hình đều lấy từ `labels`. Ghi đè bất kỳ nhãn nào; phần còn lại giữ tiếng Anh mặc định.
+
+<ComponentPreview code={code} title="labels-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Cách dùng
+
+```tsx
+<DataGrid
+  labels={{
+    sortAsc: "Sắp xếp tăng dần",
+    selected: (count) => `Đã chọn ${count.toLocaleString("vi-VN")}`,
+  }}
+  searchPlaceholder="Tìm kiếm..."
+  emptyMessage="Không có kết quả."
+/>
+```
+
+Khai báo object một lần (bên ngoài component) và dùng lại cho mọi grid. `DEFAULT_LABELS` được export nếu bạn muốn bắt đầu từ bộ tiếng Anh đầy đủ.
+
+Hai câu chữ là prop riêng: `searchPlaceholder` và `emptyMessage`.
+
+## Mọi nhãn
+
+| Khoá                                           | Mặc định                                                                          |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| `columnMenu`                                   | `"Column options"`                                                                |
+| `sortAsc` / `sortDesc` / `sortClear`           | `"Sort ascending"` / `"Sort descending"` / `"Unsorted"`                           |
+| `pinLeft` / `pinRight` / `unpin`               | `"Pin left"` / `"Pin right"` / `"Unpin"`                                          |
+| `filter` / `filterPlaceholder`                 | `"Filter"` / `"Filter value..."`                                                  |
+| `hideColumn` / `manageColumns`                 | `"Hide column"` / `"Manage columns"`                                              |
+| `selectAll` / `selectRow` / `selectGroup`      | `"Select all rows"` / `"Select row"` / `"Select group"`                           |
+| `selected(count)`                              | `"1,234 selected"`                                                                |
+| `loading`                                      | `"Loading..."`                                                                    |
+| `rowCount(total)`                              | `"1,000,000 rows"`                                                                |
+| `groupBy` / `ungroup`                          | `"Group by this column"` / `"Ungroup"`                                            |
+| `total`                                        | `"Total"`                                                                         |
+| `expandGroup` / `collapseGroup`                | `"Expand group"` / `"Collapse group"`                                             |
+| `emptyGroup`                                   | `"(Empty)"`                                                                       |
+| `groupPanelHint`                               | `"Drag a column header here to group by it"`                                      |
+| `removeGroup(header)`                          | `"Stop grouping by Department"`                                                   |
+| `invalidNumber` / `invalidDate` / `editFailed` | `"Enter a valid number"` / `"Enter a valid date"` / `"Could not save the change"` |
+| `editCell(header)`                             | `"Edit Name"`                                                                     |
+| `searchRows`                                   | `"Search rows"`                                                                   |
+| `rowsPerPage`                                  | `"Rows per page"`                                                                 |
+| `previousPage` / `nextPage`                    | `"Previous page"` / `"Next page"`                                                 |
+| `pageIndicator(page, pageCount)`               | `"Page 2 / 10"`                                                                   |
+| `range(from, to, total)`                       | `"11-20 of 57"`                                                                   |
+| `resizeColumn(header)`                         | `"Resize Name column"`                                                            |
+
+Nhãn dạng hàm nhận vào con số, nên bạn tự quyết cách định dạng số theo ngôn ngữ của mình.
+
+## Ngôn ngữ của trang tài liệu
+
+Tài liệu này có tiếng Anh và tiếng Việt: chọn ngôn ngữ ở thanh tiêu đề.

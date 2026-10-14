@@ -1,0 +1,62 @@
+---
+title: Slot
+description: Thay bất kỳ phần nào của giao diện data grid Cellora bằng slot, dạng hàm, React component hoặc JSX con. Toolbar, footer, icon, menu, checkbox và nhiều hơn.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/slots-demo"
+import code from "~/demos/slots-demo.tsx?raw"
+
+Mọi phần bao quanh dữ liệu của bạn (toolbar, icon, checkbox, chữ ở footer, menu…) đều là một **slot** có thể thay.
+
+<ComponentPreview code={code} title="slots-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ba cách điền slot
+
+### 1. `slots`: hàm
+
+```tsx
+<DataGrid slots={{ sortIcon: (direction) => (direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕") }} />
+```
+
+### 2. `components`: React component
+
+Dùng được hook bên trong. Các slot nhận grid (`toolbar`, `search`, `empty`, `groupPanel`, `loadingOverlay`, `footer`) nhận props `{ grid }`; `sortIcon` nhận `{ direction }`; các slot khác nhận object ngữ cảnh làm props.
+
+```tsx
+function Toolbar({ grid }: { grid: DataGridApi<Employee> }) {
+  const [open, setOpen] = useState(false)
+  return <div>{grid.result.total} dòng</div>
+}
+
+;<DataGrid components={{ toolbar: Toolbar }} />
+```
+
+### 3. JSX con
+
+```tsx
+<DataGrid rows={rows} columns={columns}>
+  <DataGrid.Empty>Chưa có gì ở đây.</DataGrid.Empty>
+  <DataGrid.Toolbar>{(grid) => <MyToolbar grid={grid} />}</DataGrid.Toolbar>
+  <DataGridSlot name="range">{({ from, to, total }) => `${from}–${to} / ${total}`}</DataGridSlot>
+</DataGrid>
+```
+
+Mỗi slot có một phần cùng tên: `DataGrid.Toolbar`, `DataGrid.Empty`, `DataGrid.SortIcon`, … Phần con có thể là nội dung, hàm render, hoặc `component={MyComponent}`.
+
+## Cái nào được ưu tiên
+
+**JSX con → `components` → `slots`.** Dùng lẫn được; cái mạnh hơn thay cái yếu hơn cho cùng một slot.
+
+## Dòng và dòng nhóm
+
+`row`, `groupRow` và `footerRow` nhận sẵn `cells` mặc định để bạn bọc lại:
+
+- Ở chế độ bảng, trả về một `<tr>`.
+- Khi [cuộn ảo](/vi/features/virtual-scroll/), phần tử dòng đã có sẵn: trả về phần nằm bên trong (ví dụ `<div className="contents">{cells}</div>`).
+
+## Mọi slot
+
+Danh sách đầy đủ kèm tham số ở [Danh sách slot](/vi/api/slots/).

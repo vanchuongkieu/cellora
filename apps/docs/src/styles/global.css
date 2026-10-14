@@ -1,0 +1,886 @@
+@layer base, starlight, theme, components, utilities;
+
+@import "@astrojs/starlight-tailwind";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+/* The demos render the real grid: same one-line setup as any app */
+@import "@cellora/react/styles.css";
+
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* shadcn/ui tokens the grid is styled with (Cellora preset: blue, stone) */
+@theme inline {
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+/* ---------------------------------------------------------------------------
+ * Tokens
+ * ------------------------------------------------------------------------- */
+
+:root,
+:root[data-theme="light"] {
+  /* grid (shadcn/ui theme variables) */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.004 49.25);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.147 0.004 49.25);
+  --primary: oklch(0.488 0.243 264.376);
+  --primary-foreground: oklch(0.97 0.014 254.604);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.97 0.001 106.424);
+  --muted-foreground: oklch(0.553 0.013 58.071);
+  --accent: oklch(0.97 0.001 106.424);
+  --accent-foreground: oklch(0.216 0.006 56.043);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.923 0.003 48.717);
+  --input: oklch(0.923 0.003 48.717);
+  --ring: oklch(0.709 0.01 56.259);
+  --chart-1: oklch(0.809 0.105 251.813);
+  --chart-2: oklch(0.623 0.214 259.815);
+  --chart-3: oklch(0.546 0.245 262.881);
+  --chart-4: oklch(0.488 0.243 264.376);
+  --chart-5: oklch(0.424 0.199 265.638);
+  --radius: 0.45rem;
+
+  /* docs chrome (shadcn/ui neutral) */
+  --cl-bg: #ffffff;
+  --cl-fg: #0a0a0a;
+  --cl-muted: #f5f5f5;
+  --cl-muted-fg: #737373;
+  --cl-border: #e5e5e5;
+  --cl-primary: #171717;
+  --cl-primary-fg: #fafafa;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.985 0.001 106.423);
+  --card: oklch(0.216 0.006 56.043);
+  --card-foreground: oklch(0.985 0.001 106.423);
+  --popover: oklch(0.216 0.006 56.043);
+  --popover-foreground: oklch(0.985 0.001 106.423);
+  --primary: oklch(0.424 0.199 265.638);
+  --primary-foreground: oklch(0.97 0.014 254.604);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.268 0.007 34.298);
+  --muted-foreground: oklch(0.709 0.01 56.259);
+  --accent: oklch(0.268 0.007 34.298);
+  --accent-foreground: oklch(0.985 0.001 106.423);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.553 0.013 58.071);
+
+  --cl-bg: #0a0a0a;
+  --cl-fg: #fafafa;
+  --cl-muted: #1f1f1f;
+  --cl-muted-fg: #a3a3a3;
+  --cl-border: #262626;
+  --cl-primary: #fafafa;
+  --cl-primary-fg: #171717;
+}
+
+/* Starlight's own variables, mapped onto the tokens above */
+:root,
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-color-white: var(--cl-fg);
+  --sl-color-black: var(--cl-bg);
+  --sl-color-gray-1: var(--cl-fg);
+  --sl-color-gray-2: var(--cl-fg);
+  --sl-color-gray-3: var(--cl-muted-fg);
+  --sl-color-gray-4: var(--cl-muted-fg);
+  --sl-color-gray-5: var(--cl-border);
+  --sl-color-gray-6: var(--cl-muted);
+  --sl-color-gray-7: var(--cl-muted);
+  --sl-color-text: var(--cl-fg);
+  --sl-color-text-accent: var(--cl-fg);
+  --sl-color-text-invert: var(--cl-primary-fg);
+  --sl-color-accent: var(--cl-primary);
+  --sl-color-accent-low: var(--cl-muted);
+  --sl-color-accent-high: var(--cl-fg);
+  --sl-color-bg: var(--cl-bg);
+  --sl-color-bg-nav: var(--cl-bg);
+  --sl-color-bg-sidebar: var(--cl-bg);
+  --sl-color-bg-inline-code: var(--cl-muted);
+  --sl-color-hairline: var(--cl-border);
+  --sl-color-hairline-light: var(--cl-border);
+  --sl-color-hairline-shade: var(--cl-border);
+
+  --sl-text-body: 0.9375rem;
+  --sl-text-body-sm: 0.8125rem;
+  --sl-text-code: 0.8125rem;
+  --sl-text-h1: 1.875rem;
+  --sl-text-h2: 1.25rem;
+  --sl-text-h3: 1.0625rem;
+  --sl-text-h4: 1rem;
+  --sl-text-h5: 0.9375rem;
+  --sl-line-height: 1.75;
+  --sl-line-height-headings: 1.3;
+  --sl-nav-height: 3.5rem;
+  --sl-nav-pad-x: 1.5rem;
+  --sl-sidebar-width: 16.5rem;
+  --sl-sidebar-pad-x: 1.25rem;
+  /* Wider than a plain article: the live demos are tables */
+  --sl-content-width: 56rem;
+  --sl-content-pad-x: 1.5rem;
+}
+
+@layer base {
+  /* Borders use the theme color, as `shadcn init` sets up (Tailwind 4 defaults to currentColor) */
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+  /* Form controls inherit the page look (Tailwind Preflight is not loaded under Starlight) */
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+body {
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+ * Shared controls
+ * ------------------------------------------------------------------------- */
+
+.cl-button-primary,
+.cl-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 0.15s,
+    opacity 0.15s;
+}
+.cl-button-primary {
+  background: var(--cl-primary);
+  color: var(--cl-primary-fg);
+}
+.cl-button-primary:hover {
+  opacity: 0.9;
+}
+.cl-button-secondary {
+  background: var(--cl-bg);
+  color: var(--cl-fg);
+  border: 1px solid var(--cl-border);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+.cl-button-secondary:hover {
+  background: var(--cl-muted);
+}
+.cl-button-lg {
+  height: 2.25rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+}
+.cl-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  color: var(--cl-fg);
+  transition: background-color 0.15s;
+}
+.cl-icon-button:hover {
+  background: var(--cl-muted);
+}
+.cl-button-square {
+  border: 1px solid var(--cl-border);
+  background: var(--cl-bg);
+}
+
+/* ---------------------------------------------------------------------------
+ * Header
+ * ------------------------------------------------------------------------- */
+
+.page > .header {
+  border-bottom: 0;
+  background: var(--cl-bg);
+}
+.cl-header {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 1.5rem;
+}
+.cl-site-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--cl-fg);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.cl-site-title img {
+  width: 1.125rem;
+  height: auto;
+}
+.cl-nav {
+  display: none;
+  align-items: center;
+  gap: 1.25rem;
+}
+.cl-nav a {
+  color: var(--cl-fg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  opacity: 0.8;
+}
+.cl-nav a:hover,
+.cl-nav a[aria-current="page"] {
+  opacity: 1;
+}
+.cl-header-end {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cl-header-tools {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+.cl-separator {
+  width: 1px;
+  height: 1rem;
+  margin-inline: 0.25rem;
+  background: var(--cl-border);
+}
+.cl-header-tools .cl-button-primary {
+  margin-inline-start: 0.5rem;
+}
+@media (min-width: 50rem) {
+  .cl-nav,
+  .cl-header-tools {
+    display: flex;
+  }
+}
+
+/* Search box: grey field like "Search documentation..." */
+site-search button[data-open-modal] {
+  height: 2rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--cl-muted);
+  color: var(--cl-muted-fg);
+  font-size: 0.875rem;
+  padding-inline: 0.75rem 0.5rem;
+}
+@media (min-width: 50rem) {
+  site-search button[data-open-modal] {
+    width: 15rem;
+    max-width: none;
+  }
+}
+site-search button[data-open-modal]:hover {
+  color: var(--cl-fg);
+}
+/* "⌘K" as one small pill (the outer kbd), not one box per key */
+site-search button[data-open-modal] > kbd {
+  gap: 0.125rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border: 1px solid var(--cl-border);
+  border-radius: 0.3125rem;
+  background: var(--cl-bg);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--cl-muted-fg);
+}
+site-search button[data-open-modal] > kbd kbd {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+}
+
+/* Language picker: compact, no border, always the whole name ("Tiếng Việt", never "Tiếng …") */
+starlight-lang-select select {
+  width: auto;
+  text-overflow: clip;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cl-fg);
+}
+starlight-lang-select {
+  --sl-icon-size: 0.875rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Sidebar
+ * ------------------------------------------------------------------------- */
+
+.sidebar-pane {
+  border-inline-end: 1px solid var(--cl-border);
+  scrollbar-width: none;
+}
+.sidebar-content {
+  padding: 1.5rem 0.75rem 2rem;
+}
+.sidebar-content ul.top-level > li + li {
+  margin-top: 1.5rem;
+}
+.sidebar-content summary {
+  padding: 0 0.625rem 0.375rem;
+  cursor: default;
+  pointer-events: none;
+}
+.sidebar-content summary .large {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cl-muted-fg);
+}
+.sidebar-content summary .caret {
+  display: none;
+}
+.sidebar-content ul ul li {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.sidebar-content ul ul li + li {
+  margin-top: 0.125rem;
+}
+.sidebar-content a {
+  display: flex;
+  align-items: center;
+  height: 1.875rem;
+  padding: 0 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--cl-fg);
+}
+.sidebar-content a:hover {
+  background: var(--cl-muted);
+  color: var(--cl-fg);
+}
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+  background: var(--cl-muted);
+  color: var(--cl-fg);
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------------
+ * "On this page"
+ * ------------------------------------------------------------------------- */
+
+.right-sidebar {
+  border-inline-start: 0;
+}
+.right-sidebar-panel {
+  padding-top: 3rem;
+}
+.right-sidebar-panel h2 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cl-muted-fg);
+  margin-bottom: 0.75rem;
+}
+.right-sidebar-panel a {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  padding-block: 0.25rem;
+  color: var(--cl-muted-fg);
+}
+.right-sidebar-panel a:hover,
+.right-sidebar-panel a[aria-current="true"] {
+  color: var(--cl-fg);
+}
+.right-sidebar-panel ul ul a {
+  padding-inline-start: 0.75rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Page title + content
+ * ------------------------------------------------------------------------- */
+
+.content-panel {
+  padding-block: 0.75rem;
+}
+.content-panel:first-of-type {
+  padding-top: 2.5rem;
+}
+.content-panel + .content-panel {
+  border-top: 0;
+}
+.cl-page-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.cl-page-head h1 {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--cl-fg);
+}
+.cl-page-actions {
+  display: none;
+  align-items: center;
+  gap: 0.375rem;
+  flex: none;
+  padding-top: 0.125rem;
+}
+@media (min-width: 40rem) {
+  .cl-page-actions {
+    display: flex;
+  }
+}
+.cl-page-actions .cl-button-secondary {
+  height: 2rem;
+  font-size: 0.8125rem;
+  background: var(--cl-muted);
+  border-color: transparent;
+  box-shadow: none;
+}
+.cl-page-actions .cl-button-secondary:hover {
+  background: var(--cl-border);
+}
+.cl-page-actions .cl-button-square {
+  background: var(--cl-muted);
+  border-color: transparent;
+}
+.cl-page-description {
+  margin-top: 0.5rem !important;
+  max-width: 34rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--cl-muted-fg);
+}
+
+.sl-markdown-content {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--cl-fg);
+}
+.sl-markdown-content :is(h2, h3, h4):not(:where(.not-content *)) {
+  color: var(--cl-fg);
+  letter-spacing: -0.015em;
+}
+.sl-markdown-content h2:not(:where(.not-content *)) {
+  margin-top: 3rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.sl-markdown-content h3:not(:where(.not-content *)) {
+  margin-top: 2rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+.sl-markdown-content :is(h2, h3):not(:where(.not-content *)) + * {
+  margin-top: 0.75rem;
+}
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--cl-fg);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in oklab, var(--cl-fg) 30%, transparent);
+}
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  text-decoration-color: var(--cl-fg);
+}
+.sl-markdown-content :not(pre) > code:not(:where(.not-content *)) {
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.375rem;
+  background: var(--cl-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.sl-markdown-content strong:not(:where(.not-content *)) {
+  font-weight: 600;
+  color: var(--cl-fg);
+}
+.sl-markdown-content :is(ul, ol) li:not(:where(.not-content *)) + li {
+  margin-top: 0.375rem;
+}
+
+/* Tables: compact, hairline rows */
+.sl-markdown-content table:not(:where(.not-content *)) {
+  /* Narrow screens: the table scrolls sideways on its own, never the page */
+  display: block;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  border-collapse: collapse;
+}
+@media (min-width: 50rem) {
+  .sl-markdown-content table:not(:where(.not-content *)) {
+    display: table;
+    width: 100%;
+  }
+}
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--cl-border);
+  background: transparent;
+  text-align: start;
+  vertical-align: top;
+}
+.sl-markdown-content th:not(:where(.not-content *)) {
+  font-weight: 500;
+  color: var(--cl-muted-fg);
+}
+.sl-markdown-content tr:nth-child(2n):not(:where(.not-content *)) {
+  background: transparent;
+}
+
+/* Steps: neutral counters */
+.sl-markdown-content .sl-steps > li::before {
+  background: var(--cl-muted);
+  color: var(--cl-fg);
+  border: 0;
+  font-size: 0.8125rem;
+}
+.sl-markdown-content .sl-steps > li::after {
+  background: var(--cl-border);
+}
+
+/* Code blocks */
+.sl-markdown-content .expressive-code {
+  margin-top: 1rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Live demo + collapsible source (ComponentPreview)
+ * ------------------------------------------------------------------------- */
+
+.cl-preview {
+  margin-top: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--cl-border);
+  /* Same radius as the grid inside (its rounded-md) */
+  border-radius: calc(var(--radius) * 0.8);
+}
+.cl-preview-demo {
+  padding: 1rem;
+  /* Room for the grid before its island mounts: the page must not jump when it appears */
+  min-height: 18rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.cl-preview-code {
+  position: relative;
+  border-top: 1px solid var(--cl-border);
+}
+.cl-preview-code .expressive-code {
+  margin: 0;
+}
+.cl-preview-code .expressive-code .frame {
+  border-radius: 0;
+}
+.cl-preview-code[data-collapsed] .expressive-code {
+  max-height: 8.5rem;
+  overflow: hidden;
+}
+.cl-preview-code[data-collapsed] .expressive-code .header,
+.cl-preview-code[data-collapsed] .expressive-code .copy {
+  display: none;
+}
+.cl-preview-code-overlay {
+  display: none;
+}
+.cl-preview-code[data-collapsed] .cl-preview-code-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, color-mix(in oklab, #f7f7f7 10%, transparent), #f7f7f7 85%);
+}
+:root[data-theme="dark"] .cl-preview-code[data-collapsed] .cl-preview-code-overlay {
+  background: linear-gradient(to bottom, color-mix(in oklab, #171717 10%, transparent), #171717 85%);
+}
+.cl-preview-code-overlay .cl-button-secondary {
+  border-radius: 0.625rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Footer: pills + credit
+ * ------------------------------------------------------------------------- */
+
+.cl-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+.cl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--cl-muted);
+  color: var(--cl-fg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+.cl-pill:hover {
+  background: var(--cl-border);
+}
+.cl-credit {
+  margin-top: 4rem;
+  font-size: 0.8125rem;
+  color: var(--cl-muted-fg);
+  text-align: center;
+}
+.cl-credit a {
+  color: var(--cl-fg);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Landing page
+ * ------------------------------------------------------------------------- */
+
+/* The splash page content is wider than an article */
+[data-has-hero] .sl-container,
+.cl-wide {
+  max-width: 76rem;
+}
+.cl-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 0 3rem;
+}
+.cl-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.625rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  background: var(--cl-muted);
+  color: var(--cl-fg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+.cl-hero h1 {
+  margin-top: 1.25rem;
+  max-width: 60rem;
+  font-size: clamp(2rem, 1.25rem + 2.6vw, 3rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--cl-fg);
+}
+.cl-hero-tagline {
+  margin-top: 1.25rem;
+  max-width: 44rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--cl-fg);
+  opacity: 0.85;
+}
+.cl-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+.cl-hero-actions .cl-button-secondary {
+  background: var(--cl-muted);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.cl-card {
+  border: 1px solid var(--cl-border);
+  border-radius: calc(var(--radius) * 0.8);
+  padding: 1.25rem;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.cl-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--cl-fg);
+}
+.cl-card > p {
+  margin: 0.25rem 0 1rem;
+  color: var(--cl-muted-fg);
+}
+.cl-card > p a {
+  color: var(--cl-fg);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Install command block (InstallTabs)
+ * ------------------------------------------------------------------------- */
+
+.cl-install {
+  display: block;
+  margin-top: 1rem;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #f7f7f7;
+}
+:root[data-theme="dark"] .cl-install {
+  background: #171717;
+}
+.cl-install-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--cl-border);
+}
+.cl-install-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
+  background: var(--cl-fg);
+  color: var(--cl-bg);
+}
+.cl-install-tabs {
+  display: flex;
+  gap: 0.125rem;
+}
+.cl-install-tabs button {
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  border-radius: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--cl-muted-fg);
+}
+.cl-install-tabs button:hover {
+  color: var(--cl-fg);
+}
+.cl-install-tabs button[aria-selected="true"] {
+  background: var(--cl-bg);
+  color: var(--cl-fg);
+  box-shadow:
+    0 0 0 1px var(--cl-border),
+    0 1px 2px rgb(0 0 0 / 0.04);
+}
+.cl-install-copy {
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.375rem;
+  color: var(--cl-muted-fg);
+}
+.cl-install-copy:hover,
+.cl-install-copy[data-copied] {
+  color: var(--cl-fg);
+  background: var(--cl-bg);
+}
+.cl-install pre {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  background: transparent;
+  border: 0;
+  overflow-x: auto;
+}
+.cl-install pre code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--cl-fg);
+  background: none;
+  padding: 0;
+}

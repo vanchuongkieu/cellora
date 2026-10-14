@@ -1,0 +1,70 @@
+---
+title: Styling
+description: Style the Cellora data grid with your shadcn/ui theme, per-part classNames and styles, bordered mode and dark mode.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/styling-demo"
+import code from "~/demos/styling-demo.tsx?raw"
+
+Cellora uses your shadcn/ui theme variables, so it already matches your app. On top of that, every part can take extra classes and inline styles.
+
+<ComponentPreview code={code} title="styling-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## 1. Theme (global)
+
+Change the CSS variables and every grid follows: `--background`, `--foreground`, `--muted`, `--border`, `--primary`, `--ring`, `--radius`. Dark mode works through your `.dark` variables.
+
+## 2. `classNames` (per part)
+
+```tsx
+<DataGrid
+  classNames={{
+    headerCell: "bg-primary/5 text-primary",
+    row: "odd:bg-muted/40",
+  }}
+/>
+```
+
+Your classes are merged **after** the defaults with tailwind-merge, so `bg-primary/5` replaces the default background instead of fighting it.
+
+## 3. `styles` (per part)
+
+For values a class cannot express:
+
+```tsx
+<DataGrid styles={{ cell: { fontVariantNumeric: "tabular-nums" } }} />
+```
+
+## Parts
+
+| Part                                  | What it is                                           |
+| ------------------------------------- | ---------------------------------------------------- |
+| `root`                                | Outer wrapper (same as `className`)                  |
+| `toolbar`                             | Toolbar above the grid                               |
+| `search`                              | The default search input                             |
+| `groupPanel` / `groupChip`            | The "group by" bar and its chips                     |
+| `scroll`                              | The scrolling area with the border                   |
+| `table`                               | The `<table>` (or the grid element when virtualized) |
+| `header` / `headerRow` / `headerCell` | Header block, row, cells                             |
+| `headerGroup`                         | Cells of column-group rows                           |
+| `row` / `cell`                        | Body rows and every cell                             |
+| `groupRow` / `footerRow`              | Row-group headers and the total row                  |
+| `empty`                               | The "No results" area                                |
+| `footer`                              | Pagination, selection summary, row count             |
+| `columnMenu`                          | The column menu panel                                |
+
+## 4. Look switches
+
+| Prop            | Default    | Effect                                                        |
+| --------------- | ---------- | ------------------------------------------------------------- |
+| `bordered`      | `false`    | Lines between columns too                                     |
+| `stickyDivider` | `false`    | Line beside pinned columns                                    |
+| `stickyShadow`  | `true`     | Shadow beside pinned columns while content scrolls under them |
+| `resizeHandle`  | `"always"` | Resize handle always faintly visible, or only on hover        |
+
+## 5. Replace a part entirely
+
+When classes are not enough, swap the part's markup with a [slot](/customization/slots/).

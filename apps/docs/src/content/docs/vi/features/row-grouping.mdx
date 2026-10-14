@@ -1,0 +1,73 @@
+---
+title: Nhóm dòng
+description: Nhóm các dòng của data grid Cellora theo một hoặc nhiều cột, mở / đóng nhóm, và cho người dùng kéo tiêu đề cột vào thanh nhóm.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/row-grouping-demo"
+import code from "~/demos/row-grouping-demo.tsx?raw"
+
+Gom các dòng cùng giá trị dưới một tiêu đề nhóm như **Engineering (12)**. Lồng bao nhiêu cấp cũng được.
+
+<ComponentPreview code={code} title="row-grouping-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Nhóm dòng
+
+Không kiểm soát (grid tự giữ trạng thái):
+
+```tsx
+<DataGrid defaultGroupBy={["department"]} />
+```
+
+Có kiểm soát (bạn giữ trạng thái, ví dụ để lưu vào URL):
+
+```tsx
+const [groupBy, setGroupBy] = useState<readonly string[]>(["department", "role"])
+<DataGrid groupBy={groupBy} onGroupByChange={setGroupBy} />
+```
+
+Danh sách id cột, cấp ngoài cùng trước. Id không tồn tại bị bỏ qua.
+
+## Ba cách người dùng nhóm
+
+1. **Menu cột**: ⋮ → _Group by this column_ / _Ungroup_.
+2. **Thanh nhóm**: `enableGroupPanel` thêm một thanh phía trên grid. Kéo tiêu đề cột vào để thêm cấp, kéo chip để đổi thứ tự, bấm × để bỏ.
+3. **Giao diện của bạn**: gọi `grid.setGroupBy([...])`.
+
+## Mở và đóng nhóm
+
+Bấm vào dòng nhóm (hoặc mũi tên) để mở / đóng. Nhóm ban đầu đóng; `groupDefaultExpanded` mở tất cả. Bằng code: `grid.toggleGroup(group.key)`.
+
+## Thứ tự các nhóm
+
+Giống sắp xếp theo cột đó: số và ngày theo giá trị, chữ theo thứ tự tự nhiên, giá trị trống ở cuối với nhãn **(Empty)**. Dòng trong mỗi nhóm giữ nguyên [thứ tự sắp xếp](/vi/features/sorting/) hiện tại.
+
+## Hiển thị
+
+| Prop               | Mặc định | Tác dụng                                                      |
+| ------------------ | -------- | ------------------------------------------------------------- |
+| `hideGroupedCells` | `true`   | Để trống cột đang nhóm ở dòng dữ liệu (dòng nhóm đã ghi rồi). |
+| `groupIndent`      | `16`     | Số px thụt lề mỗi cấp.                                        |
+
+Dòng nhóm hiển thị được [giá trị tổng hợp](/vi/features/aggregation/) (tổng, trung bình…) theo cột. Khi bật [chọn dòng](/vi/features/row-selection/), checkbox của nhóm chọn mọi dòng bên trong.
+
+## Phân trang và quy mô
+
+Khi phân trang, mỗi trang tính theo dòng hiển thị (tiêu đề nhóm + dòng dữ liệu). Nhóm một triệu dòng chỉ tốn một lượt duyệt mỗi cấp; mở / đóng nhóm không đụng lại dữ liệu. Hoạt động cùng [cuộn ảo](/vi/features/virtual-scroll/).
+
+## API
+
+| Prop / tuỳ chọn                                                                                     | Ở đâu      | Kiểu                | Mặc định  | Mô tả                                    |
+| --------------------------------------------------------------------------------------------------- | ---------- | ------------------- | --------- | ---------------------------------------- |
+| `groupBy`                                                                                           | `DataGrid` | `readonly string[]` |           | Nhóm có kiểm soát.                       |
+| `defaultGroupBy`                                                                                    | `DataGrid` | `readonly string[]` | `[]`      | Nhóm ban đầu (không kiểm soát).          |
+| `onGroupByChange`                                                                                   | `DataGrid` | `(groupBy) => void` |           | Gọi mỗi lần thay đổi.                    |
+| `groupDefaultExpanded`                                                                              | `DataGrid` | `boolean`           | `false`   | Nhóm mở sẵn.                             |
+| `groupIndent`                                                                                       | `DataGrid` | `number`            | `16`      | Thụt lề mỗi cấp.                         |
+| `hideGroupedCells`                                                                                  | `DataGrid` | `boolean`           | `true`    | Ẩn giá trị cột đang nhóm ở dòng dữ liệu. |
+| `enableGroupPanel`                                                                                  | `DataGrid` | `boolean`           | `false`   | Thanh kéo-thả để nhóm.                   |
+| `groupable`                                                                                         | cột        | `boolean`           | `true`    | Cho nhóm theo cột này.                   |
+| `groupRow`, `groupLabel`, `groupIcon`, `groupPanel`, `groupChip`, `selectGroup`                     | slot       |                     |           | Thay các phần của nhóm.                  |
+| `groupBy`, `ungroup`, `expandGroup`, `collapseGroup`, `emptyGroup`, `groupPanelHint`, `removeGroup` | `labels`   |                     | tiếng Anh | Câu chữ.                                 |

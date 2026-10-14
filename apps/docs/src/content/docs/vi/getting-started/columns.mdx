@@ -1,0 +1,78 @@
+---
+title: Định nghĩa cột
+description: "Định nghĩa cột cho data grid Cellora bằng mảng: id, header, accessor, độ rộng, căn lề và ô tuỳ biến. accessor là giá trị gốc, cell là cách hiển thị."
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/columns-demo"
+import code from "~/demos/columns-demo.tsx?raw"
+
+Một cột cho biết **đọc gì** từ dòng (`accessor`) và **hiển thị thế nào** (`cell`).
+
+<ComponentPreview code={code} title="columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Tối thiểu
+
+```tsx
+{ id: "name", header: "Tên", accessor: (row) => row.name }
+```
+
+| Khoá       | Tác dụng                                                                             |
+| ---------- | ------------------------------------------------------------------------------------ |
+| `id`       | Khoá duy nhất. Dùng cho trạng thái sắp xếp, bộ lọc, ghim, độ rộng và trong callback. |
+| `header`   | Chữ trên tiêu đề cột (cũng dùng trong menu và nhãn).                                 |
+| `accessor` | Đọc giá trị gốc. Sắp xếp, tìm kiếm, lọc, nhóm và tính tổng đều dùng nó.              |
+
+## Giá trị và hiển thị
+
+`accessor` nên trả về **giá trị gốc** (số, `Date`, chuỗi). Định dạng đặt trong `cell`, để sắp xếp so sánh số thay vì so chữ như `"$9,000"` với `"$10,000"`:
+
+```tsx
+{
+  id: "salary",
+  header: "Lương",
+  accessor: (row) => row.salary,
+  cell: (row) => formatMoney(row.salary),
+}
+```
+
+`cell` trả về được mọi React node: badge, link, nút bấm, thanh tiến độ. Xem [Ô tuỳ biến](/vi/customization/custom-cells/).
+
+## Độ rộng và căn lề
+
+Mặc định cột có **độ rộng cố định**: nội dung không đẩy cột rộng ra, chữ dài bị cắt bằng dấu "…", và không có gì nhảy khi chuyển trang hay cuộn.
+
+```tsx
+{ id: "email", header: "Email", accessor: (row) => row.email, width: 260, minWidth: 120, maxWidth: 480, align: "left" }
+```
+
+| Khoá       | Mặc định | Ghi chú                                                     |
+| ---------- | -------- | ----------------------------------------------------------- |
+| `width`    | `160`    | px                                                          |
+| `minWidth` | `60`     | Giới hạn dưới khi kéo đổi độ rộng                           |
+| `maxWidth` | không có | Giới hạn trên khi kéo đổi độ rộng                           |
+| `align`    | `"left"` | `"left"`, `"center"` hoặc `"right"`; cột số thường căn phải |
+
+Đặt `fixedColumnWidths={false}` trên grid để dùng bố cục bảng tự động của trình duyệt (khi đó không kéo độ rộng hay ghim cột được).
+
+## Kiểu TypeScript
+
+Khai báo kiểu dòng một lần, mọi `accessor` / `cell` đều có kiểu:
+
+```tsx
+import type { DataGridColumnInput } from "@cellora/react"
+
+const columns: DataGridColumnInput<Employee>[] = [
+  { id: "name", header: "Tên", accessor: (row) => row.name }, // row: Employee
+]
+```
+
+## Giữ cột ổn định
+
+Khai báo mảng bên ngoài component, hoặc bọc trong `useMemo`. Grid chỉ đọc lại dữ liệu khi thứ ảnh hưởng tới dữ liệu (một `accessor`, `aggregate`, …) đổi, nên cell renderer inline vẫn ổn, nhưng mảng ổn định luôn là rẻ nhất.
+
+## Mọi tuỳ chọn của cột
+
+Sắp xếp, lọc, ghim, nhóm, sửa và nhiều thứ khác cũng được cấu hình theo từng cột. Danh sách đầy đủ ở [Tham chiếu cột](/vi/api/column/).

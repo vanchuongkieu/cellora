@@ -1,0 +1,43 @@
+---
+title: Click dòng & ô
+description: Xử lý click vào dòng và ô của data grid Cellora bằng onRowClick và onCellClick. Nút, link và ô nhập bên trong ô vẫn giữ hành vi riêng.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/row-click-demo"
+import code from "~/demos/row-click-demo.tsx?raw"
+
+Mở trang chi tiết, ngăn kéo hay bản xem trước khi người dùng bấm vào một dòng hoặc một ô.
+
+<ComponentPreview code={code} title="row-click-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Các hàm xử lý
+
+```tsx
+<DataGrid onRowClick={({ row, rowId, index, event }) => navigate(`/employees/${rowId}`)} onCellClick={({ row, column, value, event }) => console.log(column.id, value)} />
+```
+
+- Đặt cả hai thì hàm của ô chạy trước, rồi đến hàm của dòng.
+- Dòng (và ô) có con trỏ dạng bàn tay khi đã đặt hàm xử lý.
+- `index` là vị trí trong danh sách đang hiển thị (trang hiện tại, hoặc mọi dòng khi cuộn ảo). `rowId` lấy từ `getRowId`.
+
+## Cái gì không tính là click
+
+Các phần tử tương tác trong ô giữ hành vi riêng và **không** kích hoạt các hàm trên: nút, link, ô nhập, select, textarea, label, checkbox, switch, mục menu, combobox, và mọi thứ bạn đánh dấu bằng `data-no-row-click`. Cột checkbox chọn dòng và dòng nhóm cũng không kích hoạt.
+
+```tsx
+cell: (row) => <div data-no-row-click>Bấm vào đây không ảnh hưởng tới dòng</div>
+```
+
+## Hiệu năng
+
+Cả grid chỉ có một listener, không phải mỗi dòng một cái: hàng nghìn dòng cũng không tốn thêm.
+
+## API
+
+| Prop          | Kiểu                                                    | Mô tả                                                |
+| ------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| `onRowClick`  | `({ row, index, rowId, event }) => void`                | Một dòng được bấm.                                   |
+| `onCellClick` | `({ row, index, rowId, event, column, value }) => void` | Một ô được bấm. `value` là giá trị accessor của cột. |

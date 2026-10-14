@@ -1,0 +1,63 @@
+---
+title: Slots reference
+description: Every slot of the Cellora data grid with the arguments it receives - toolbar, rows, groups, totals, editors, menus, checkboxes and footer parts.
+---
+
+How to use slots (functions, components, JSX children) is explained in [Slots](/customization/slots/). This page lists them all.
+
+## Toolbar and body
+
+| Slot             | Receives                          | Replaces                             |
+| ---------------- | --------------------------------- | ------------------------------------ |
+| `toolbar`        | `grid`                            | The whole toolbar (search included). |
+| `search`         | `grid`                            | Only the search input.               |
+| `row`            | `{ row, index, selected, cells }` | A body row (wrap `cells`).           |
+| `empty`          | `grid`                            | The "no results" content.            |
+| `skeletonCell`   | `{ column, rowIndex }`            | One loading placeholder cell.        |
+| `loadingOverlay` | `grid`                            | The spinner over existing rows.      |
+
+## Headers and columns
+
+| Slot                | Receives                                | Replaces                                   |
+| ------------------- | --------------------------------------- | ------------------------------------------ |
+| `headerGroup`       | `{ label, level, columns }`             | A column-group cell's content.             |
+| `sortIcon`          | `direction` (`"asc" \| "desc" \| null`) | The sort indicator.                        |
+| `resizeHandle`      | `{ column, width }`                     | The resize handle visual.                  |
+| `columnMenu`        | menu context                            | The whole column menu (trigger + content). |
+| `columnMenuTrigger` | menu context                            | The ⋮ icon.                                |
+| `columnMenuExtra`   | menu context                            | Extra items at the end of the menu.        |
+
+The menu context: `{ column, grid, columns, sorted, pinned, filterValue, canSort, canPin, grouped, canGroup, setGrouped, setSort, setPin, setFilter, hide, isHidden, setHidden }`.
+
+## Grouping and totals
+
+| Slot            | Receives                      | Replaces                           |
+| --------------- | ----------------------------- | ---------------------------------- |
+| `groupRow`      | `{ group, cells, toggle }`    | A row-group header (wrap `cells`). |
+| `groupLabel`    | `{ group, column, label }`    | The group text ("Corn (8)").       |
+| `groupIcon`     | `{ expanded }`                | The chevron.                       |
+| `selectGroup`   | `{ group, status, onChange }` | The group's checkbox.              |
+| `groupPanel`    | `grid`                        | The whole group-by bar.            |
+| `groupChip`     | `{ column, remove }`          | One chip in the bar.               |
+| `footerRow`     | `{ totals, cells }`           | The total row (wrap `cells`).      |
+| `aggregateCell` | `{ column, value, scope }`    | Every aggregate value.             |
+
+## Editing
+
+| Slot       | Receives                                                 | Replaces                                                  |
+| ---------- | -------------------------------------------------------- | --------------------------------------------------------- |
+| `editCell` | `{ row, column, index, value, pending, commit, cancel }` | Any cell editor (return `null` to keep the built-in one). |
+
+## Selection and footer
+
+| Slot               | Receives                                         | Replaces                        |
+| ------------------ | ------------------------------------------------ | ------------------------------- |
+| `selectAll`        | `{ status, disabled, onChange }`                 | The header checkbox.            |
+| `selectRow`        | `{ row, checked, disabled, onChange }`           | A row's checkbox.               |
+| `selectionSummary` | `{ selectedRowIds, selectedRows, count, total }` | "3 selected".                   |
+| `footer`           | `grid`                                           | The whole footer.               |
+| `rowCount`         | `{ total }`                                      | "1,000,000 rows" (virtualized). |
+| `range`            | `{ from, to, total }`                            | "1-10 of 57".                   |
+| `pageSize`         | `{ pageSize, options, onChange }`                | "Rows per page" + select.       |
+| `pageIndicator`    | `{ pageIndex, pageCount }`                       | "Page 1 / 6".                   |
+| `pageNavigation`   | `{ pageIndex, pageCount, onPageChange }`         | Previous / next buttons.        |

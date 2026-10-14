@@ -1,0 +1,106 @@
+---
+title: Sắp xếp
+description: Sắp xếp dòng trong data grid Cellora bằng cách bấm vào tiêu đề cột. Số và ngày sắp theo giá trị, chữ theo thứ tự tự nhiên, ô trống luôn ở cuối.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/sorting-demo"
+import code from "~/demos/sorting-demo.tsx?raw"
+import CustomDemo from "~/demos/sorting-custom-demo"
+import customCode from "~/demos/sorting-custom-demo.tsx?raw"
+
+Bấm vào tiêu đề cột để sắp xếp theo cột đó. Mỗi lần bấm chuyển sang bước tiếp: **tăng dần → giảm dần → không sắp xếp**.
+
+<ComponentPreview code={code} title="sorting-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Bật tính năng
+
+Cần bật ở hai chỗ, để không cột nào bị sắp xếp ngoài ý muốn:
+
+1. `enableSorting` trên grid (mặc định tắt).
+2. `sortable: true` trên từng cột được phép sắp xếp.
+
+```tsx
+<DataGrid rows={rows} columns={columns} enableSorting />
+```
+
+```tsx
+{ id: "salary", header: "Lương", accessor: (row) => row.salary, sortable: true }
+```
+
+## Giá trị được so sánh thế nào
+
+Sắp xếp đọc giá trị từ `accessor` của cột, không phải nội dung `cell` hiển thị. Hãy để giá trị gốc trong `accessor` và định dạng trong `cell`:
+
+```tsx
+{
+  id: "salary",
+  header: "Lương",
+  accessor: (row) => row.salary, // 52000: sắp xếp như số
+  cell: (row) => formatMoney(row.salary), // "$52,000": chỉ để hiển thị
+  sortable: true,
+}
+```
+
+| Kiểu giá trị         | Thứ tự                                                        |
+| -------------------- | ------------------------------------------------------------- |
+| `number`             | Theo số (`2` trước `10`)                                      |
+| `Date`               | Theo thời gian                                                |
+| `string`             | Tự nhiên, không phân biệt hoa thường (`file2` trước `file10`) |
+| `null` / `undefined` | Luôn ở cuối, cả hai chiều                                     |
+
+Các dòng có giá trị bằng nhau giữ nguyên thứ tự ban đầu (sắp xếp ổn định).
+
+## Thứ tự theo ý bạn
+
+Hai tuỳ chọn của cột thay đổi cách sắp xếp, không ảnh hưởng tới hiển thị hay tìm kiếm:
+
+- `sortValue(row)`: sắp xếp theo giá trị này thay cho giá trị `accessor`. Một thứ hạng cho trạng thái (`Junior < Senior < Lead`), họ của tên, một số đã parse. Quy tắc như trên (số theo giá trị, chuỗi theo thứ tự tự nhiên).
+- `compare(a, b)`: hàm so sánh hai **dòng** của riêng bạn cho chiều tăng dần (âm khi `a` đứng trước). Grid tự đảo cho chiều giảm dần và giữ nguyên vị trí các dòng bằng nhau. Ưu tiên hơn `sortValue`.
+
+<ComponentPreview code={customCode} title="sorting-custom-demo.tsx">
+  <CustomDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+{ id: "role", header: "Vai trò", accessor: (row) => row.role, sortable: true, sortValue: (row) => RANK[row.role] }
+{ id: "status", header: "Trạng thái", accessor: (row) => row.status, sortable: true, compare: (a, b) => a.priority - b.priority }
+```
+
+## Sắp xếp trên server
+
+Khi API sắp xếp, truyền dòng của nó kèm `manualSorting`: tiêu đề vẫn hiện trạng thái sắp xếp và `onStateChange` cho bạn biết cần hỏi gì. Xem [Dữ liệu phía server](/vi/features/server-side/). Muốn sắp xếp sẵn, hoặc điều khiển từ URL, dùng `defaultSort` / `sort`.
+
+## Sắp xếp bằng code
+
+Menu cột có sẵn _Sắp xếp tăng dần_, _giảm dần_ và _Bỏ sắp xếp_. Từ một slot hay toolbar tự làm, dùng [grid API](/vi/api/grid-api/):
+
+```tsx
+grid.setSort("salary", "desc") // hoặc "asc", hoặc null để bỏ
+grid.toggleSort("salary") // giống bấm vào tiêu đề
+grid.state.sort // { columnId: "salary", direction: "desc" } | null
+```
+
+## Bàn phím
+
+Khi cột không có nút menu, tiêu đề cột nhận được focus: nhấn <kbd>Enter</kbd> hoặc <kbd>Space</kbd> để sắp xếp.
+
+## API
+
+| Prop / tuỳ chọn | Ở đâu      | Kiểu                              | Mặc định | Mô tả                                                          |
+| --------------- | ---------- | --------------------------------- | -------- | -------------------------------------------------------------- |
+| `enableSorting` | `DataGrid` | `boolean`                         | `false`  | Công tắc chung cho sắp xếp theo tiêu đề.                       |
+| `manualSorting` | `DataGrid` | `boolean`                         | `false`  | Dòng đã được sắp xếp sẵn (bởi API).                            |
+| `sort`          | `DataGrid` | `{ columnId, direction } \| null` |          | Sắp xếp có kiểm soát.                                          |
+| `defaultSort`   | `DataGrid` | `{ columnId, direction } \| null` | `null`   | Sắp xếp ban đầu.                                               |
+| `onStateChange` | `DataGrid` | `(state) => void`                 |          | Sắp xếp (và phần còn lại của state) thay đổi.                  |
+| `sortable`      | cột        | `boolean`                         | `false`  | Cho phép sắp xếp cột này.                                      |
+| `sortValue`     | cột        | `(row) => unknown`                | accessor | Giá trị dùng để sắp xếp.                                       |
+| `compare`       | cột        | `(a, b) => number`                |          | Hàm so sánh hai dòng của riêng bạn (chiều tăng dần).           |
+| `sortIcon`      | slot       | `(direction) => ReactNode`        | mũi tên  | Thay biểu tượng sắp xếp. Xem [Slot](/vi/customization/slots/). |
+
+## Hiệu năng
+
+Một triệu dòng được sắp xếp trong chưa tới một giây: mỗi giá trị chỉ đọc một lần, chuỗi được xếp hạng một lần, sau đó chỉ sắp xếp các con số.

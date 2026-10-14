@@ -1,0 +1,53 @@
+---
+title: Columns as JSX
+description: Declare Cellora columns as JSX children with DataGrid.Column, field, render-function children and the Cell, Header, Aggregate and Edit parts.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/jsx-columns-demo"
+import code from "~/demos/jsx-columns-demo.tsx?raw"
+
+Prefer markup to arrays? Write columns as `<DataGrid.Column>` children. They take the same options as a [`columns`](/getting-started/columns/) entry.
+
+<ComponentPreview code={code} title="jsx-columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## `field` instead of `id` + `accessor`
+
+```tsx
+<DataGrid.Column<Employee> field="name" header="Name" />
+// same as
+{ id: "name", header: "Name", accessor: (row) => row.name }
+```
+
+You can still pass `id` and `accessor` yourself (e.g. for computed values).
+
+## The cell
+
+A function child renders the cell:
+
+```tsx
+<DataGrid.Column<Employee> field="status" header="Status">
+  {(row) => <StatusBadge status={row.status} />}
+</DataGrid.Column>
+```
+
+Or use named parts when you need more than the cell:
+
+| Part                          | Same as         |
+| ----------------------------- | --------------- |
+| `<DataGrid.Column.Cell>`      | `cell`          |
+| `<DataGrid.Column.Header>`    | `headerCell`    |
+| `<DataGrid.Column.Aggregate>` | `aggregateCell` |
+| `<DataGrid.Column.Edit>`      | `editCell`      |
+
+## Mixing with `columns`
+
+Both can be used at once: the `columns` array comes first, then the JSX columns.
+
+## Notes
+
+- `<DataGrid.Column>` renders nothing by itself; the grid reads it.
+- Columns without `field` or `accessor` are [display columns](/features/display-columns/) (actions, icons).
+- The generic `<DataGrid.Column<Employee>>` gives typed `field` names and rows; it is optional.

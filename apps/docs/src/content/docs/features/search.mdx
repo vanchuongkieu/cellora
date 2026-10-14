@@ -1,0 +1,101 @@
+---
+title: Search
+description: Add a search box to the Cellora data grid. Accent-insensitive, matches every data column, customizable per column or with your own search function, responsive on large data.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/search-demo"
+import code from "~/demos/search-demo.tsx?raw"
+import ColumnsDemo from "~/demos/search-columns-demo"
+import columnsCode from "~/demos/search-columns-demo.tsx?raw"
+import CustomDemo from "~/demos/search-custom-demo"
+import customCode from "~/demos/search-custom-demo.tsx?raw"
+
+One box that filters rows by any column.
+
+<ComponentPreview code={code} title="search-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Turn it on
+
+```tsx
+<DataGrid rows={rows} columns={columns} enableSearch searchPlaceholder="Search employees..." />
+```
+
+## How matching works
+
+- A row matches when **any visible data column** contains the text. Hidden and [display columns](/features/display-columns/) are not searched.
+- Matching is a case-insensitive "contains" on the column's `accessor` value (so `52000` matches `"520"`, not `"$52"`).
+- **Accents are ignored**: `nguyen` finds `Nguyễn`, `creme` finds `Crème`, and `Nguyễn` finds `nguyen` too. Turn this off with `ignoreAccents={false}` for exact matching.
+- Search and [column filters](/features/column-filters/) combine: a row must pass both.
+- Typing resets to the first page.
+
+## Choose what each column offers to the search
+
+Two column options change what is matched, without touching sorting or filters:
+
+- `searchValue(row)`: the text to search instead of the accessor's value. Use it for formatted dates (`"5 Mar 2024"`), money (`"$52,000"`), labels of codes, or several fields joined.
+- `searchable: false`: leave the column out (internal ids, hashes).
+
+<ComponentPreview code={columnsCode} title="search-columns-demo.tsx">
+  <ColumnsDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+{ id: "startDate", header: "Start date", accessor: (row) => row.startDate, searchValue: (row) => formatDay(row.startDate) }
+{ id: "id", header: "ID", accessor: (row) => row.id, searchable: false }
+```
+
+## Your own search
+
+`searchFilter(row, term)` replaces the built-in matching entirely: it is called for every row with the trimmed search text and returns whether the row matches. Column filters still apply on top. Use it for multi-word search, `field:value` syntax, fuzzy matching or a search index.
+
+<ComponentPreview code={customCode} title="search-custom-demo.tsx">
+  <CustomDemo client:only="react" />
+</ComponentPreview>
+
+```tsx
+<DataGrid enableSearch searchFilter={(row, term) => term.split(/\s+/).every((word) => row.name.toLowerCase().includes(word))} />
+```
+
+Define the function outside the component (or `useCallback` it): a new function on every render makes the grid filter again.
+
+## Search on the server
+
+When the API does the searching, pass the rows it returns with `manualFiltering` and read the text from `onStateChange`. See [Server-side data](/features/server-side/).
+
+## Large data
+
+Typing never blocks: the box shows each key at once and filtering runs in a background render. When you keep typing (`"ali"` → `"alic"`), only the previous matches are searched again. Accent folding costs nothing on plain ASCII data; on a million accented rows the first keystroke takes well under a second.
+
+## Search from code or your own input
+
+Hide the default box (`enableSearch={false}`) and drive the same filter from anywhere with the [grid API](/api/grid-api/):
+
+```tsx
+grid.setFilter("design")
+grid.state.filter // "design"
+```
+
+To keep the toolbar but swap the input, use the `search` slot; to replace the whole toolbar, the `toolbar` slot. See [Slots](/customization/slots/). To start with a search text, or control it from a URL, use `defaultFilter` / `filter` (see [DataGrid props](/api/data-grid/#state-controlled-or-initial)).
+
+## API
+
+| Prop / option       | Where                   | Type                       | Default         | Description                                        |
+| ------------------- | ----------------------- | -------------------------- | --------------- | -------------------------------------------------- |
+| `enableSearch`      | `DataGrid`              | `boolean`                  | `false`         | Show the search box.                               |
+| `searchPlaceholder` | `DataGrid`              | `string`                   | `"Search..."`   | Placeholder text.                                  |
+| `ignoreAccents`     | `DataGrid`              | `boolean`                  | `true`          | Match without accents (search and column filters). |
+| `searchFilter`      | `DataGrid`              | `(row, term) => boolean`   | built-in        | Your own search; replaces the built-in matching.   |
+| `manualFiltering`   | `DataGrid`              | `boolean`                  | `false`         | Rows are already filtered (by an API).             |
+| `filter`            | `DataGrid`              | `string`                   |                 | Controlled search text.                            |
+| `defaultFilter`     | `DataGrid`              | `string`                   | `""`            | Initial search text.                               |
+| `onStateChange`     | `DataGrid`              | `(state) => void`          |                 | Search text (and the rest of the state) changed.   |
+| `searchable`        | column                  | `boolean`                  | `true`          | Let the search look at this column.                |
+| `searchValue`       | column                  | `(row) => unknown`         | accessor        | What the search matches for this column.           |
+| `searchRows`        | `labels`                | `string`                   | `"Search rows"` | Accessible name of the input.                      |
+| `search`            | slot                    | `(grid) => ReactNode`      | input           | Replace the input only.                            |
+| `toolbar`           | slot                    | `(grid) => ReactNode`      | toolbar         | Replace the whole toolbar.                         |
+| `search`            | `classNames` / `styles` | `string` / `CSSProperties` |                 | Style the input.                                   |
+| `foldAccents(text)` | `@cellora/core`         | `(text: string) => string` |                 | The accent stripping, for your own matching code.  |

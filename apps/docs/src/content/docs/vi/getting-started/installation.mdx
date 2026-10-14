@@ -1,0 +1,81 @@
+---
+title: Cài đặt
+description: Cài data grid React Cellora bằng pnpm, npm, yarn hoặc bun, và khai báo cho Tailwind CSS v4. Dùng được với Vite, Next.js và Astro.
+---
+
+import { Steps } from "@astrojs/starlight/components"
+import InstallTabs from "~/components/InstallTabs.astro"
+
+## Yêu cầu
+
+|                 | Phiên bản                                                                             |
+| --------------- | ------------------------------------------------------------------------------------- |
+| React           | 18 hoặc 19                                                                            |
+| Tailwind CSS    | v4                                                                                    |
+| Theme shadcn/ui | các biến CSS do `npx shadcn init` thêm vào (`--background`, `--border`, `--muted`, …) |
+
+Cellora vẽ bằng chính theme token shadcn/ui của bạn, nên tự nhận màu, bo góc và chế độ tối.
+
+## Cài đặt
+
+<Steps>
+
+1. **Cài Tailwind CSS và shadcn/ui** (bỏ qua nếu dự án đã có):
+
+   ```sh
+   npx shadcn@latest init
+   ```
+
+   Lệnh này thêm Tailwind CSS v4, các biến theme và `tw-animate-css` (menu của grid dùng nó để có hiệu ứng).
+
+2. **Thêm package**:
+
+   <InstallTabs packages="@cellora/react" />
+
+   `@cellora/core` được cài kèm. `react` và `react-dom` là peer dependency (dự án bạn đã có sẵn).
+
+3. **Import style của grid** vào file CSS đang import Tailwind, đặt sau nó:
+
+   ```css title="src/index.css"
+   @import "tailwindcss";
+   @import "tw-animate-css";
+   @import "@cellora/react/styles.css";
+   ```
+
+   Không cần tự viết đường dẫn: file này báo cho Tailwind quét code của grid (Tailwind v4 chỉ sinh những class nó tìm thấy, và tự bỏ qua `node_modules`).
+
+4. **Hiển thị bảng**:
+
+   ```tsx title="src/app.tsx"
+   import { DataGrid } from "@cellora/react"
+
+   const rows = [
+     { id: "1", name: "Ava Nguyen", role: "Engineer" },
+     { id: "2", name: "Liam Smith", role: "Designer" },
+   ]
+
+   const columns = [
+     { id: "name", header: "Tên", accessor: (row: (typeof rows)[number]) => row.name },
+     { id: "role", header: "Vai trò", accessor: (row: (typeof rows)[number]) => row.role },
+   ]
+
+   export default function App() {
+     return <DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} />
+   }
+   ```
+
+</Steps>
+
+## Theo framework
+
+- **Vite / Create React App**: không cần làm gì thêm.
+- **Next.js (App Router)**: import `DataGrid` ở bất kỳ component nào. Package đã có sẵn `"use client"`, nên Server Component render trực tiếp được; truyền dữ liệu qua props.
+- **Astro**: dùng như một React island, ví dụ `<MyGrid client:load />`.
+
+## Xử lý sự cố
+
+| Hiện tượng                                                         | Cách sửa                                                                                           |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Bảng không có viền, không đổi màu khi rê chuột, menu không có kiểu | Thiếu `@import "@cellora/react/styles.css";` trong file CSS.                                       |
+| Màu sai / trong suốt                                               | Thiếu biến theme shadcn/ui: chạy `npx shadcn init`, hoặc chép các biến `:root` và `.dark` vào CSS. |
+| Menu mở ra không có hiệu ứng                                       | Thêm `@import "tw-animate-css";`.                                                                  |

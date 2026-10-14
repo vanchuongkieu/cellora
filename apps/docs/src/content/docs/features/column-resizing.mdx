@@ -1,0 +1,69 @@
+---
+title: Column resizing
+description: Resize Cellora data grid columns by dragging, double-click to fit the content, or with the keyboard. Bounds per column with minWidth and maxWidth.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/column-resizing-demo"
+import code from "~/demos/column-resizing-demo.tsx?raw"
+
+Every column can be resized, three ways.
+
+<ComponentPreview code={code} title="column-resizing-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Three ways to resize
+
+| How                                                                          | What happens                                         |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **Drag** the handle at a header's right edge                                 | Width follows the pointer (also outside the header). |
+| **Double-click** the handle                                                  | Fits the column to its content (see below).          |
+| **Keyboard**: <kbd>Tab</kbd> to the handle, then <kbd>←</kbd> / <kbd>→</kbd> | 10 px per press.                                     |
+
+Resizing never sorts the column, even though the handle sits inside the header.
+
+## Double-click to fit
+
+`autoFitOnDoubleClick` decides what "content" means:
+
+| Value                        | Fits to                            |
+| ---------------------------- | ---------------------------------- |
+| `true` / `"cells"` (default) | The widest cell currently rendered |
+| `"header"`                   | The header label                   |
+| `"both"`                     | Whichever is wider                 |
+| `false`                      | Double-click does nothing          |
+
+## Limits per column
+
+```tsx
+{ id: "name", header: "Name", accessor: (row) => row.name, width: 160, minWidth: 120, maxWidth: 320 }
+{ id: "id", header: "ID", accessor: (row) => row.id, resizable: false }
+```
+
+## Look of the handle
+
+```tsx
+<DataGrid resizeHandle="hover" resizeHandleClassName="h-8 w-1 bg-primary" />
+```
+
+`"always"` (default) shows a faint divider that lights up on hover; `"hover"` shows it only on hover. For full control use the `resizeHandle` slot.
+
+## Notes
+
+- Resizing needs fixed widths (`fixedColumnWidths`, on by default).
+- Widths live in the grid's state; they reset when the grid unmounts.
+
+## API
+
+| Prop / option                                 | Where      | Type                                       | Default             | Description                 |
+| --------------------------------------------- | ---------- | ------------------------------------------ | ------------------- | --------------------------- |
+| `enableColumnResizing`                        | `DataGrid` | `boolean`                                  | `true`              | Master switch.              |
+| `resizeHandle`                                | `DataGrid` | `"always" \| "hover"`                      | `"always"`          | When the handle is visible. |
+| `resizeHandleClassName` / `resizeHandleStyle` | `DataGrid` | `string` / `CSSProperties`                 |                     | Style the bar.              |
+| `autoFitOnDoubleClick`                        | `DataGrid` | `boolean \| "cells" \| "header" \| "both"` | `true`              | Double-click fit.           |
+| `fixedColumnWidths`                           | `DataGrid` | `boolean`                                  | `true`              | Fixed widths (required).    |
+| `resizable`                                   | column     | `boolean`                                  | `true`              | Allow resizing this column. |
+| `width` / `minWidth` / `maxWidth`             | column     | `number`                                   | `160` / `60` / none | px.                         |
+| `resizeColumn`                                | `labels`   | `(header) => string`                       | `"Resize X column"` | Handle's accessible name.   |
+| `resizeHandle`                                | slot       | `({ column, width }) => ReactNode`         | bar                 | Custom handle visual.       |

@@ -1,0 +1,67 @@
+---
+title: Bắt đầu nhanh
+description: "Từng bước tạo bảng Cellora đầu tiên: dòng, cột, id ổn định cho mỗi dòng, rồi bật các tính năng bằng props."
+---
+
+import { Code, Steps } from "@astrojs/starlight/components"
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/quick-start-demo"
+import code from "~/demos/quick-start-demo.tsx?raw"
+import dataCode from "~/demos/data.ts?raw"
+
+<ComponentPreview code={code} title="quick-start-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ba thứ một bảng cần
+
+<Steps>
+
+1. **`rows`**: một mảng bất kỳ. Thường là object; số hay chuỗi cũng được.
+
+2. **`columns`**: hiển thị gì. Mỗi cột có `id`, `header` và `accessor` để đọc giá trị từ một dòng:
+
+   ```tsx
+   const columns = [
+     { id: "name", header: "Tên", accessor: (row: Employee) => row.name },
+     { id: "salary", header: "Lương", accessor: (row: Employee) => row.salary },
+   ]
+   ```
+
+3. **`getRowId`** (rất nên có): id ổn định cho mỗi dòng. Chọn dòng và sửa ô dựa vào nó, nên giữ đúng khi sắp xếp, chuyển trang hay tải lại. Không có thì grid dùng vị trí dòng.
+
+</Steps>
+
+```tsx
+<DataGrid rows={employees} columns={columns} getRowId={(row) => row.id} />
+```
+
+## Bật tính năng
+
+Mỗi tính năng là một prop. Mặc định bạn có bảng phân trang, cuộn được, đổi được độ rộng cột và có menu cột:
+
+```tsx
+<DataGrid
+  rows={employees}
+  columns={columns}
+  getRowId={(row) => row.id}
+  enableSorting // bấm tiêu đề để sắp xếp (cột bật bằng sortable: true)
+  enableSearch // ô tìm kiếm phía trên bảng
+  enableRowSelection // cột checkbox
+  pageSize={20}
+/>
+```
+
+Mỗi tính năng có trang riêng kèm demo: bắt đầu với [Sắp xếp](/vi/features/sorting/) hoặc xem mục **Tính năng** ở thanh bên.
+
+## Mẹo để luôn nhanh
+
+- Khai báo `columns` **bên ngoài component** (hoặc trong `useMemo`). Viết inline cũng được: grid chỉ đọc lại dữ liệu khi `accessor` thật sự đổi, nhưng mảng ổn định là rẻ nhất.
+- Để giá trị gốc trong `accessor`, định dạng trong `cell`, để sắp xếp và lọc so sánh đúng số và ngày.
+- Đừng sửa trực tiếp `rows`; khi dữ liệu đổi hãy truyền mảng mới (`[...rows]`, `rows.map(...)`).
+
+## Dữ liệu mẫu
+
+Mọi demo đều import từ file này:
+
+<Code code={dataCode} lang="ts" title="data.ts" />

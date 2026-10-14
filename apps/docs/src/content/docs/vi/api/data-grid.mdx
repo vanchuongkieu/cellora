@@ -1,0 +1,176 @@
+---
+title: Props của DataGrid
+description: Tham chiếu đầy đủ mọi prop của DataGrid trong Cellora, kèm kiểu, giá trị mặc định và liên kết tới tính năng tương ứng.
+---
+
+```tsx
+import { DataGrid } from "@cellora/react"
+```
+
+`TRow` là kiểu của một dòng; được suy ra từ `rows`.
+
+## Dữ liệu
+
+| Prop       | Kiểu                                   | Mặc định    | Mô tả                                                                                                                 |
+| ---------- | -------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| `rows`     | `readonly TRow[]`                      | bắt buộc    | Dữ liệu. Không bao giờ bị sửa; truyền mảng mới để thay đổi.                                                           |
+| `columns`  | `readonly DataGridColumnInput<TRow>[]` |             | Các cột ([tham chiếu](/vi/api/column/)). Không bắt buộc khi dùng cột JSX.                                             |
+| `children` | `ReactNode`                            |             | `<DataGrid.Column>` và các phần slot ([cột JSX](/vi/getting-started/jsx-columns/), [slot](/vi/customization/slots/)). |
+| `getRowId` | `(row, index) => string`               | chỉ số dòng | Id ổn định cho mỗi dòng: chọn dòng và sửa ô dựa vào nó.                                                               |
+
+## Giao diện
+
+| Prop                | Kiểu                                           | Mặc định        | Mô tả                                                                  |
+| ------------------- | ---------------------------------------------- | --------------- | ---------------------------------------------------------------------- |
+| `className`         | `string`                                       |                 | Class cho khung ngoài.                                                 |
+| `classNames`        | `Partial<Record<DataGridPart, string>>`        |                 | Class thêm theo từng phần ([giao diện](/vi/getting-started/styling/)). |
+| `styles`            | `Partial<Record<DataGridPart, CSSProperties>>` |                 | Style inline theo từng phần.                                           |
+| `bordered`          | `boolean`                                      | `false`         | Có đường kẻ giữa các cột.                                              |
+| `rowClassName`      | `(row, index) => string \| undefined`          |                 | Class thêm cho từng dòng.                                              |
+| `slots`             | `DataGridSlots<TRow>`                          |                 | Thay các phần ([danh sách slot](/vi/api/slots/)).                      |
+| `components`        | `DataGridSlotComponents<TRow>`                 |                 | Các slot dạng component.                                               |
+| `labels`            | `Partial<DataGridLabels>`                      | tiếng Anh       | Mọi câu chữ ([nhãn](/vi/customization/labels/)).                       |
+| `searchPlaceholder` | `string`                                       | `"Search..."`   | Chữ gợi ý ô tìm kiếm.                                                  |
+| `emptyMessage`      | `string`                                       | `"No results."` | Chữ khi không có gì khớp.                                              |
+
+## Kích thước và bố cục
+
+| Prop                  | Kiểu                                                    | Mặc định | Mô tả                                                                               |
+| --------------------- | ------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `maxHeight`           | `number \| string \| null`                              | `400`    | Giới hạn chiều cao vùng cuộn ([chiều cao](/vi/features/height-and-sticky-header/)). |
+| `fillHeight`          | `boolean`                                               | `false`  | Lấp đầy chiều cao còn lại của màn hình.                                             |
+| `fillHeightOffset`    | `number`                                                | `0`      | Số px chừa lại bên dưới.                                                            |
+| `fillHeightMin`       | `number`                                                | `200`    | Chiều cao tối thiểu khi lấp đầy.                                                    |
+| `fillHeightContainer` | `RefObject<HTMLElement \| null> \| HTMLElement \| null` | cửa sổ   | Phần tử cuộn cần lấp đầy thay vì cửa sổ.                                            |
+| `stickyHeader`        | `boolean`                                               | `true`   | Giữ tiêu đề khi cuộn dòng.                                                          |
+| `fixedColumnWidths`   | `boolean`                                               | `true`   | Độ rộng cố định (cần cho đổi độ rộng và ghim).                                      |
+| `stickyDivider`       | `boolean`                                               | `false`  | Đường kẻ cạnh cột ghim ([ghim cột](/vi/features/pinned-columns/)).                  |
+| `stickyShadow`        | `boolean`                                               | `true`   | Bóng cạnh cột ghim khi có nội dung cuộn bên dưới.                                   |
+
+## Sắp xếp, tìm kiếm, lọc
+
+| Prop            | Kiểu                     | Mặc định | Mô tả                                                                              |
+| --------------- | ------------------------ | -------- | ---------------------------------------------------------------------------------- |
+| `enableSorting` | `boolean`                | `false`  | Sắp xếp theo tiêu đề; cột bật bằng `sortable` ([sắp xếp](/vi/features/sorting/)).  |
+| `enableSearch`  | `boolean`                | `false`  | Ô tìm kiếm ([tìm kiếm](/vi/features/search/)).                                     |
+| `ignoreAccents` | `boolean`                | `true`   | Tìm kiếm và lọc không phân biệt dấu (`nguyen` tìm được `Nguyễn`).                  |
+| `searchFilter`  | `(row, term) => boolean` | mặc định | Hàm tìm kiếm riêng, thay cho "có cột chứa chữ" ([tìm kiếm](/vi/features/search/)). |
+
+Bộ lọc theo cột nằm trong menu cột ([lọc theo cột](/vi/features/column-filters/)). Cách khớp và thứ tự theo từng cột là tuỳ chọn của cột: `searchValue`, `searchable`, `sortValue`, `compare`, `filterValue`, `filterMatch` ([cột](/vi/api/column/#quy-tắc-tìm-kiếm-sắp-xếp-và-lọc)).
+
+## State (điều khiển hoặc ban đầu)
+
+Sắp xếp, tìm kiếm, bộ lọc và trang do grid giữ. Mỗi thứ có thể có giá trị ban đầu hoặc được kiểm soát; `onStateChange` báo mọi thay đổi ([dữ liệu phía server](/vi/features/server-side/)).
+
+| Prop                   | Kiểu                              | Mặc định | Mô tả                                          |
+| ---------------------- | --------------------------------- | -------- | ---------------------------------------------- |
+| `sort`                 | `{ columnId, direction } \| null` |          | Sắp xếp có kiểm soát.                          |
+| `defaultSort`          | `{ columnId, direction } \| null` | `null`   | Sắp xếp ban đầu.                               |
+| `filter`               | `string`                          |          | Chữ tìm kiếm có kiểm soát.                     |
+| `defaultFilter`        | `string`                          | `""`     | Chữ tìm kiếm ban đầu.                          |
+| `columnFilters`        | `Record<string, string>`          |          | Bộ lọc cột có kiểm soát (theo id cột).         |
+| `defaultColumnFilters` | `Record<string, string>`          | `{}`     | Bộ lọc cột ban đầu.                            |
+| `pageIndex`            | `number`                          |          | Trang có kiểm soát (đếm từ 0).                 |
+| `defaultPageIndex`     | `number`                          | `0`      | Trang ban đầu.                                 |
+| `onStateChange`        | `(state: DataGridState) => void`  |          | Toàn bộ state sau mỗi thao tác của người dùng. |
+
+## Xử lý phía server
+
+| Prop               | Kiểu      | Mặc định      | Mô tả                                                                                    |
+| ------------------ | --------- | ------------- | ---------------------------------------------------------------------------------------- |
+| `manualSorting`    | `boolean` | `false`       | `rows` đã sắp xếp sẵn: hiển thị nguyên trạng ([phía server](/vi/features/server-side/)). |
+| `manualFiltering`  | `boolean` | `false`       | `rows` đã khớp tìm kiếm và bộ lọc.                                                       |
+| `manualPagination` | `boolean` | `false`       | `rows` là một trang; không bao giờ bị cắt.                                               |
+| `rowCount`         | `number`  | `rows.length` | Số dòng khớp trên mọi trang (với `manualPagination`).                                    |
+
+## Phân trang
+
+| Prop               | Kiểu                | Mặc định       | Mô tả                                                               |
+| ------------------ | ------------------- | -------------- | ------------------------------------------------------------------- |
+| `enablePagination` | `boolean`           | `true`         | Phân trang và hiện footer ([phân trang](/vi/features/pagination/)). |
+| `pageSize`         | `number`            | `10`           | Số dòng mỗi trang.                                                  |
+| `pageSizeOptions`  | `readonly number[]` | `[10, 20, 50]` | Lựa chọn "Rows per page".                                           |
+
+## Cột
+
+| Prop                         | Kiểu                                                        | Mặc định       | Mô tả                                                                      |
+| ---------------------------- | ----------------------------------------------------------- | -------------- | -------------------------------------------------------------------------- |
+| `enableColumnResizing`       | `boolean`                                                   | `true`         | Kéo / bàn phím đổi độ rộng ([đổi độ rộng](/vi/features/column-resizing/)). |
+| `resizeHandle`               | `"always" \| "hover"`                                       | `"always"`     | Khi nào tay nắm hiện.                                                      |
+| `resizeHandleClassName`      | `string`                                                    |                | Class thêm cho vạch tay nắm.                                               |
+| `resizeHandleStyle`          | `CSSProperties`                                             |                | Style cho vạch tay nắm.                                                    |
+| `autoFitOnDoubleClick`       | `boolean \| "cells" \| "header" \| "both"`                  | `true`         | Nhấp đúp để vừa nội dung.                                                  |
+| `enableColumnMenu`           | `boolean`                                                   | `true`         | Menu ⋮ trên mỗi tiêu đề ([menu cột](/vi/features/column-menu/)).           |
+| `columnMenuItems`            | `{ sort?, pin?, group?, filter?, hide?, manage?: boolean }` | bật hết        | Nhóm trong menu.                                                           |
+| `columnMenuWidth`            | `number \| string`                                          | `220`          | Độ rộng menu.                                                              |
+| `columnMenuClassName`        | `string`                                                    |                | Class thêm cho menu.                                                       |
+| `columnMenuTriggerClassName` | `string`                                                    |                | Class thêm cho nút ⋮.                                                      |
+| `columnMenuAlign`            | `"start" \| "center" \| "end"`                              | `"end"`        | Căn menu.                                                                  |
+| `enableHeaderGroups`         | `boolean`                                                   | `true`         | Dòng nhóm cột ([nhóm cột](/vi/features/column-groups/)).                   |
+| `headerGroupHeight`          | `number`                                                    | `headerHeight` | Chiều cao mỗi dòng nhóm.                                                   |
+
+## Nhóm dòng và dòng tổng
+
+| Prop                   | Kiểu                | Mặc định | Mô tả                                                        |
+| ---------------------- | ------------------- | -------- | ------------------------------------------------------------ |
+| `groupBy`              | `readonly string[]` |          | Nhóm có kiểm soát ([nhóm dòng](/vi/features/row-grouping/)). |
+| `defaultGroupBy`       | `readonly string[]` | `[]`     | Nhóm ban đầu.                                                |
+| `onGroupByChange`      | `(groupBy) => void` |          | Nhóm thay đổi.                                               |
+| `groupDefaultExpanded` | `boolean`           | `false`  | Nhóm mở sẵn.                                                 |
+| `groupIndent`          | `number`            | `16`     | Thụt lề mỗi cấp (px).                                        |
+| `hideGroupedCells`     | `boolean`           | `true`   | Ẩn giá trị cột đang nhóm ở dòng dữ liệu.                     |
+| `enableGroupPanel`     | `boolean`           | `false`  | Thanh kéo-thả để nhóm.                                       |
+| `enableFooterRow`      | `boolean`           | `false`  | Dòng tổng ([tổng hợp](/vi/features/aggregation/)).           |
+
+## Chọn dòng
+
+| Prop                    | Kiểu                                                | Mặc định | Mô tả                                                    |
+| ----------------------- | --------------------------------------------------- | -------- | -------------------------------------------------------- |
+| `enableRowSelection`    | `boolean`                                           | `false`  | Cột checkbox ([chọn dòng](/vi/features/row-selection/)). |
+| `selectAllScope`        | `"page" \| "all"`                                   | `"page"` | Phạm vi chọn tất cả.                                     |
+| `isRowSelectable`       | `(row) => boolean`                                  |          | Vô hiệu một số dòng.                                     |
+| `pinSelectionColumn`    | `boolean`                                           | `true`   | Ghim cột checkbox bên trái.                              |
+| `selectedRowIds`        | `readonly string[]`                                 |          | Lựa chọn có kiểm soát.                                   |
+| `defaultSelectedRowIds` | `readonly string[]`                                 |          | Lựa chọn ban đầu.                                        |
+| `onSelectionChange`     | `({ selectedRowIds, selectedRows, count }) => void` |          | Lựa chọn thay đổi.                                       |
+
+## Sửa ô
+
+| Prop              | Kiểu                                 | Mặc định        | Mô tả                                                  |
+| ----------------- | ------------------------------------ | --------------- | ------------------------------------------------------ |
+| `enableEditing`   | `boolean`                            | `false`         | Sửa trực tiếp ([sửa ô](/vi/features/inline-editing/)). |
+| `editTrigger`     | `"doubleClick" \| "click" \| "none"` | `"doubleClick"` | Thao tác bắt đầu sửa.                                  |
+| `onCellEdit`      | `(edit) => unknown`                  |                 | Lưu thay đổi; `false` hoặc ném lỗi là từ chối.         |
+| `isCellEditable`  | `({ row, column }) => boolean`       |                 | Điều kiện thêm cho từng ô.                             |
+| `onEditingChange` | `(cell \| null) => void`             |                 | Ô đang sửa thay đổi.                                   |
+
+## Sự kiện
+
+| Prop          | Kiểu                                                    | Mô tả                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------- |
+| `onRowClick`  | `({ row, index, rowId, event }) => void`                | Một dòng được bấm ([click](/vi/features/row-and-cell-click/)). |
+| `onCellClick` | `({ row, index, rowId, event, column, value }) => void` | Một ô được bấm.                                                |
+
+## Đang tải
+
+| Prop             | Kiểu                                | Mặc định                      | Mô tả                                                              |
+| ---------------- | ----------------------------------- | ----------------------------- | ------------------------------------------------------------------ |
+| `loading`        | `boolean`                           | `false`                       | Trạng thái đang tải ([đang tải](/vi/features/loading-and-empty/)). |
+| `loadingVariant` | `"auto" \| "skeleton" \| "overlay"` | `"auto"`                      | Kiểu hiển thị.                                                     |
+| `loadingRows`    | `number`                            | số dòng mỗi trang (tối đa 10) | Số dòng skeleton.                                                  |
+
+## Cuộn ảo
+
+| Prop                 | Kiểu                              | Mặc định            | Mô tả                                                                 |
+| -------------------- | --------------------------------- | ------------------- | --------------------------------------------------------------------- |
+| `virtualized`        | `boolean`                         | `false`             | Chỉ vẽ phần đang nhìn thấy ([cuộn ảo](/vi/features/virtual-scroll/)). |
+| `rowHeight`          | `number`                          | `37`                | Chiều cao dòng (px).                                                  |
+| `headerHeight`       | `number`                          | `40`                | Chiều cao tiêu đề (px).                                               |
+| `overscanScreens`    | `number \| { rows?, columns? }`   | dòng `2`, cột `0.5` | Vẽ trước bao nhiêu màn hình.                                          |
+| `overscanRows`       | `number`                          | `10`                | Số dòng vẽ thêm tối thiểu mỗi bên.                                    |
+| `overscanColumns`    | `number`                          | `3`                 | Số cột vẽ thêm tối thiểu mỗi bên.                                     |
+| `virtualPlaceholder` | `"skeleton" \| "lines" \| "none"` | `"skeleton"`        | Vùng chưa vẽ trông thế nào.                                           |
+
+## Phần tĩnh
+
+`DataGrid.Column` (cùng `.Cell`, `.Header`, `.Aggregate`, `.Edit`) và mỗi slot một phần: `DataGrid.Toolbar`, `DataGrid.Empty`, `DataGrid.SortIcon`, …

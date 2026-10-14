@@ -1,0 +1,89 @@
+---
+title: Server-side data
+description: Let an API sort, search, filter and page the Cellora data grid - the grid keeps the state, reports every change with onStateChange, and shows the page the server returns.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/server-side-demo"
+import code from "~/demos/server-side-demo.tsx?raw"
+
+By default the grid sorts, searches, filters and pages the rows you give it. When the data lives behind an API (too big to download, or already indexed on the server), the grid can hand that work over: it keeps the state, tells you every time it changes, and shows whatever page you give back.
+
+<ComponentPreview code={code} title="server-side-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Three steps
+
+1. **Listen**: `onStateChange` is called with the whole state `{ sort, filter, columnFilters, pageIndex, pageSize }` after every change the user makes. Fetch for it (debounce the search text if your API is slow).
+2. **Hand the rows over**: pass what the API returned as `rows`, with `manualSorting`, `manualFiltering` and `manualPagination` so the grid does not process them again. Any of the three can stay client-side (a server that pages but does not sort, for instance).
+3. **Tell the total**: with `manualPagination`, `rowCount` is the number of matching rows across all pages. It drives the page count and the "1-10 of 250" text.
+
+```tsx
+const [state, setState] = useState<DataGridState>({ sort: null, filter: "", columnFilters: {}, pageIndex: 0, pageSize: 20 })
+const { data, isLoading } = useQuery(["employees", state], () => fetchEmployees(state))
+
+<DataGrid
+  rows={data?.rows ?? []}
+  columns={columns}
+  manualSorting
+  manualFiltering
+  manualPagination
+  rowCount={data?.total}
+  onStateChange={setState}
+  pageSize={state.pageSize}
+  loading={isLoading}
+  loadingVariant="overlay"
+  enableSorting
+  enableSearch
+/>
+```
+
+## What the server receives
+
+| Field           | Type                              | Meaning                                               |
+| --------------- | --------------------------------- | ----------------------------------------------------- |
+| `sort`          | `{ columnId, direction } \| null` | Column id and `"asc"` / `"desc"`, or no sort.         |
+| `filter`        | `string`                          | The search box text (trim it yourself).               |
+| `columnFilters` | `Record<string, string>`          | Typed text per column id (empty filters are removed). |
+| `pageIndex`     | `number`                          | 0-based page.                                         |
+| `pageSize`      | `number`                          | Rows per page.                                        |
+
+Changing the sort, search, a filter or the page size goes back to page 0 before `onStateChange` fires, so one request is enough.
+
+## Controlled state (URL, saved views)
+
+Each part of the state can also be given to the grid: `sort`, `filter`, `columnFilters`, `pageIndex` (and `pageSize`, which always comes from the prop). The grid then shows that value and still reports changes through `onStateChange`; store them where you like (search params, local storage). For a starting value without controlling it later, use `defaultSort`, `defaultFilter`, `defaultColumnFilters`, `defaultPageIndex`.
+
+```tsx
+<DataGrid sort={sortFromUrl} pageIndex={pageFromUrl} onStateChange={(state) => router.replace(toUrl(state))} />
+```
+
+## What stays client-side
+
+- **Row grouping** groups the rows you pass (the current page). Group an API's result when it returns everything that belongs together.
+- **Totals** (`enableFooterRow`) sum the rows you pass. Ask the API for grand totals and show them with the `footerRow` slot.
+- **Select all = "all"** covers the rows you pass. Server-wide selection needs your own id list.
+- **Virtual scroll** replaces paging; with `manualSorting` / `manualFiltering` it shows the rows as they come.
+
+## Loading
+
+While a request runs, `loading` with `loadingVariant="overlay"` dims the old rows instead of replacing them with a skeleton, so the table does not jump. See [Loading & empty state](/features/loading-and-empty/).
+
+## API
+
+| Prop                                                                          | Type                              | Default       | Description                                               |
+| ----------------------------------------------------------------------------- | --------------------------------- | ------------- | --------------------------------------------------------- |
+| `manualSorting`                                                               | `boolean`                         | `false`       | `rows` are already sorted.                                |
+| `manualFiltering`                                                             | `boolean`                         | `false`       | `rows` already match the search and the column filters.   |
+| `manualPagination`                                                            | `boolean`                         | `false`       | `rows` are one page; the grid never slices them.          |
+| `rowCount`                                                                    | `number`                          | `rows.length` | Matching rows across all pages (with `manualPagination`). |
+| `onStateChange`                                                               | `(state: DataGridState) => void`  |               | Any of sort, search, filters, page, page size changed.    |
+| `sort`                                                                        | `{ columnId, direction } \| null` |               | Controlled sort.                                          |
+| `filter`                                                                      | `string`                          |               | Controlled search text.                                   |
+| `columnFilters`                                                               | `Record<string, string>`          |               | Controlled column filters.                                |
+| `pageIndex`                                                                   | `number`                          |               | Controlled page.                                          |
+| `pageSize`                                                                    | `number`                          | `10`          | Rows per page (prop changes apply).                       |
+| `defaultSort` / `defaultFilter` / `defaultColumnFilters` / `defaultPageIndex` |                                   |               | Initial values, uncontrolled.                             |
+
+In `@cellora/core`, the same switches are the fourth argument of `processRows(rows, columns, state, { manualSorting, manualFiltering, manualPagination, rowCount })`.

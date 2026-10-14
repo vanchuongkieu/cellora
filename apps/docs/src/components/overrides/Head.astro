@@ -1,0 +1,32 @@
+---
+/**
+ * Starlight's head, plus two things that stop the page from flashing:
+ *
+ * - The theme is applied before any stylesheet loads. Starlight ships the page
+ *   as `data-theme="dark"` and only switches to the saved theme in a script
+ *   that runs after the CSS, so a light-mode visitor saw a dark frame first.
+ * - The fonts are preloaded, so text is not drawn in a fallback font and then
+ *   redrawn in Geist on every page load.
+ */
+import Default from "@astrojs/starlight/components/Head.astro"
+
+import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url"
+import geistVietnamese from "@fontsource-variable/geist/files/geist-vietnamese-wght-normal.woff2?url"
+import geistMonoLatin from "@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url"
+
+const fonts = Astro.locals.starlightRoute.locale === "vi" ? [geistLatin, geistVietnamese, geistMonoLatin] : [geistLatin, geistMonoLatin]
+---
+
+<script is:inline>
+  ;(() => {
+    try {
+      const stored = localStorage.getItem("starlight-theme")
+      const theme = stored === "light" || stored === "dark" ? stored : matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
+      document.documentElement.dataset.theme = theme
+    } catch {
+      /* no storage access: Starlight's own script decides */
+    }
+  })()
+</script>
+{fonts.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
+<Default />

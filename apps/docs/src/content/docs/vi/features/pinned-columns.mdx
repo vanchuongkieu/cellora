@@ -1,0 +1,59 @@
+---
+title: Ghim cột
+description: Ghim cột của data grid Cellora sang trái hoặc phải để luôn nhìn thấy khi cuộn ngang, bằng code hoặc từ menu cột.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/pinned-columns-demo"
+import code from "~/demos/pinned-columns-demo.tsx?raw"
+
+Cột được ghim đứng yên trong khi phần còn lại cuộn ngang.
+
+<ComponentPreview code={code} title="pinned-columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## Ghim bằng code
+
+```tsx
+{ id: "name", header: "Tên", accessor: (row) => row.name, sticky: "left" }
+{ id: "total", header: "Tổng", accessor: (row) => row.total, sticky: "right" }
+```
+
+Mỗi bên ghim được nhiều cột; chúng xếp chồng theo thứ tự cột. Cột ghim tự được đưa về mép của nó.
+
+## Ghim từ menu
+
+Người dùng ghim / bỏ ghim bất kỳ cột nào qua **⋮ → Pin left / Pin right / Unpin**. Tắt cho một cột bằng `pinnable: false`, hoặc cho tất cả bằng `columnMenuItems={{ pin: false }}`.
+
+## Hình thức ở mép
+
+| Prop            | Mặc định | Tác dụng                                                                      |
+| --------------- | -------- | ----------------------------------------------------------------------------- |
+| `stickyShadow`  | `true`   | Bóng mờ cạnh cột ghim trong cùng, **chỉ hiện khi** có nội dung cuộn bên dưới. |
+| `stickyDivider` | `false`  | Đường kẻ 1 px cố định cạnh cột ghim trong cùng.                               |
+
+## Nên biết
+
+- Ghim cột cần độ rộng cố định (`fixedColumnWidths`, bật sẵn).
+- Cột checkbox chọn dòng mặc định được ghim trái (`pinSelectionColumn`).
+- Ô được ghim giữ màu hover và màu đã chọn của dòng.
+- Hoạt động y hệt ở chế độ [cuộn ảo](/vi/features/virtual-scroll/).
+
+## Đổi khi đang chạy
+
+```tsx
+grid.setColumnPin("email", "left") // "left" | "right" | false
+grid.columnState.pinned // { email: "left" }
+```
+
+## API
+
+| Prop / tuỳ chọn                  | Ở đâu      | Kiểu                | Mặc định  | Mô tả                               |
+| -------------------------------- | ---------- | ------------------- | --------- | ----------------------------------- |
+| `sticky`                         | cột        | `"left" \| "right"` | không     | Bên ghim ban đầu.                   |
+| `pinnable`                       | cột        | `boolean`           | `true`    | Có mục ghim trong menu.             |
+| `stickyShadow`                   | `DataGrid` | `boolean`           | `true`    | Bóng khi có nội dung cuộn bên dưới. |
+| `stickyDivider`                  | `DataGrid` | `boolean`           | `false`   | Đường kẻ cố định.                   |
+| `pinSelectionColumn`             | `DataGrid` | `boolean`           | `true`    | Giữ cột checkbox bên trái.          |
+| `pinLeft` / `pinRight` / `unpin` | `labels`   | `string`            | tiếng Anh | Chữ trong menu.                     |

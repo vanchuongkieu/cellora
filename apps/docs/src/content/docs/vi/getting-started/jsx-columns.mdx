@@ -1,0 +1,53 @@
+---
+title: Cột dạng JSX
+description: Khai báo cột Cellora bằng JSX với DataGrid.Column, field, hàm render làm con và các phần Cell, Header, Aggregate, Edit.
+---
+
+import ComponentPreview from "~/components/ComponentPreview.astro"
+import Demo from "~/demos/jsx-columns-demo"
+import code from "~/demos/jsx-columns-demo.tsx?raw"
+
+Thích viết markup hơn mảng? Khai báo cột bằng `<DataGrid.Column>` làm con của grid. Nhận đúng các tuỳ chọn như một phần tử trong [`columns`](/vi/getting-started/columns/).
+
+<ComponentPreview code={code} title="jsx-columns-demo.tsx">
+  <Demo client:only="react" />
+</ComponentPreview>
+
+## `field` thay cho `id` + `accessor`
+
+```tsx
+<DataGrid.Column<Employee> field="name" header="Tên" />
+// tương đương
+{ id: "name", header: "Tên", accessor: (row) => row.name }
+```
+
+Bạn vẫn có thể tự truyền `id` và `accessor` (ví dụ cho giá trị tính toán).
+
+## Ô (cell)
+
+Một hàm làm con sẽ render ô:
+
+```tsx
+<DataGrid.Column<Employee> field="status" header="Trạng thái">
+  {(row) => <StatusBadge status={row.status} />}
+</DataGrid.Column>
+```
+
+Hoặc dùng các phần có tên khi cần nhiều hơn ô:
+
+| Phần                          | Tương đương     |
+| ----------------------------- | --------------- |
+| `<DataGrid.Column.Cell>`      | `cell`          |
+| `<DataGrid.Column.Header>`    | `headerCell`    |
+| `<DataGrid.Column.Aggregate>` | `aggregateCell` |
+| `<DataGrid.Column.Edit>`      | `editCell`      |
+
+## Dùng chung với `columns`
+
+Dùng cả hai cùng lúc được: mảng `columns` đứng trước, sau đó là các cột JSX.
+
+## Ghi chú
+
+- `<DataGrid.Column>` tự nó không hiển thị gì; grid đọc nó.
+- Cột không có `field` hay `accessor` là [cột thao tác](/vi/features/display-columns/) (nút bấm, icon).
+- Generic `<DataGrid.Column<Employee>>` cho `field` và dòng có kiểu; không bắt buộc.

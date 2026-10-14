@@ -1,0 +1,81 @@
+---
+/**
+ * The install command for every package manager, in one block like
+ * ui.shadcn.com: terminal icon + manager tabs + copy button over the command.
+ * The chosen manager is remembered across pages.
+ */
+interface Props {
+  /** Space-separated package names */
+  packages: string
+  /** Install as a dev dependency */
+  dev?: boolean
+}
+
+const { packages, dev = false } = Astro.props
+
+const commands = [
+  { manager: "pnpm", command: `pnpm add ${dev ? "-D " : ""}${packages}` },
+  { manager: "npm", command: `npm install ${dev ? "-D " : ""}${packages}` },
+  { manager: "yarn", command: `yarn add ${dev ? "-D " : ""}${packages}` },
+  { manager: "bun", command: `bun add ${dev ? "-d " : ""}${packages}` },
+]
+---
+
+<cl-install class="cl-install not-content">
+  <div class="cl-install-bar">
+    <span class="cl-install-icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m4 17 6-6-6-6" />
+        <path d="M12 19h8" />
+      </svg>
+    </span>
+    <div class="cl-install-tabs" role="tablist">
+      {
+        commands.map(({ manager }, index) => (
+          <button type="button" role="tab" data-manager={manager} aria-selected={index === 0 ? "true" : "false"}>
+            {manager}
+          </button>
+        ))
+      }
+    </div>
+    <button type="button" class="cl-install-copy" aria-label="Copy command" title="Copy">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect width="14" height="14" x="8" y="8" rx="2" />
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      </svg>
+    </button>
+  </div>
+  {/* One line on purpose: <pre> keeps every space and line break */}
+  {commands.map(({ manager, command }, index) => <pre data-manager={manager} hidden={index !== 0}><code>{command}</code></pre>)}
+</cl-install>
+
+<script>
+  const STORAGE_KEY = "cellora-package-manager"
+
+  class ClInstall extends HTMLElement {
+    connectedCallback() {
+      this.show(localStorage.getItem(STORAGE_KEY) ?? "pnpm")
+      for (const tab of this.querySelectorAll<HTMLButtonElement>("[role=tab]")) {
+        tab.addEventListener("click", () => {
+          const manager = tab.dataset.manager ?? "pnpm"
+          localStorage.setItem(STORAGE_KEY, manager)
+          // Keep every install block on the page in step
+          for (const block of document.querySelectorAll<ClInstall>("cl-install")) block.show(manager)
+        })
+      }
+      const copy = this.querySelector<HTMLButtonElement>(".cl-install-copy")
+      copy?.addEventListener("click", async () => {
+        const visible = this.querySelector<HTMLElement>("pre:not([hidden])")
+        await navigator.clipboard.writeText(visible?.textContent?.trim() ?? "")
+        copy.dataset.copied = ""
+        setTimeout(() => delete copy.dataset.copied, 1500)
+      })
+    }
+
+    show(manager: string) {
+      for (const tab of this.querySelectorAll<HTMLElement>("[role=tab]")) tab.setAttribute("aria-selected", String(tab.dataset.manager === manager))
+      for (const panel of this.querySelectorAll<HTMLElement>("pre[data-manager]")) panel.hidden = panel.dataset.manager !== manager
+    }
+  }
+  customElements.define("cl-install", ClInstall)
+</script>
