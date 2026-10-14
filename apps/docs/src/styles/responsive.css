@@ -86,25 +86,28 @@
  * Motion
  * ------------------------------------------------------------------------- */
 
-/* Starlight's mobile menu is a popover: slide it in from the top */
-#starlight__sidebar {
-  transition:
-    opacity 0.18s ease-out,
-    translate 0.18s ease-out,
-    display 0.18s allow-discrete,
-    overlay 0.18s allow-discrete;
-}
-#starlight__sidebar:popover-open {
-  opacity: 1;
-  translate: 0 0;
-  @starting-style {
+/* Starlight's mobile menu is a popover: slide it in from the top. Phones
+   only: on desktop the same element is the always-visible sidebar. */
+@media (max-width: 50rem) {
+  #starlight__sidebar {
+    transition:
+      opacity 0.18s ease-out,
+      translate 0.18s ease-out,
+      display 0.18s allow-discrete,
+      overlay 0.18s allow-discrete;
+  }
+  #starlight__sidebar:popover-open {
+    opacity: 1;
+    translate: 0 0;
+    @starting-style {
+      opacity: 0;
+      translate: 0 -0.5rem;
+    }
+  }
+  #starlight__sidebar:not(:popover-open) {
     opacity: 0;
     translate: 0 -0.5rem;
   }
-}
-#starlight__sidebar:not(:popover-open) {
-  opacity: 0;
-  translate: 0 -0.5rem;
 }
 
 /* "View Code": the source unfolds instead of snapping open */

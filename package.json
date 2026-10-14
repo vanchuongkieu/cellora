@@ -14,6 +14,8 @@
     "build": "bun --filter './packages/*' build",
     "build:docs": "bun run build && bun --filter docs build",
     "deploy:docs": "bun run build:docs && wrangler deploy",
+    "release": "bun run build && cd packages/core && bun publish && cd ../react && bun publish",
+    "release:dry": "bun run build && cd packages/core && bun publish --dry-run && cd ../react && bun publish --dry-run",
     "typecheck": "bun --filter '*' typecheck",
     "lint": "bun --filter '*' lint",
     "format": "prettier --write \"packages/*/src/**/*.{ts,tsx,css}\" \"apps/docs/src/**/*.{ts,tsx,mdx,css}\" \"apps/docs/*.mjs\" \"*.{json,mjs,md}\" && bun --filter playground-react format"

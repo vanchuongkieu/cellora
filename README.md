@@ -165,4 +165,4 @@ Current Chrome, Edge, Firefox and Safari, desktop and mobile.
 
 ## License
 
-Not chosen yet.
+[MIT](LICENSE)

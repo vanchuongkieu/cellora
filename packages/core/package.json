@@ -1,7 +1,11 @@
 {
   "name": "@cellora/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cellora core: framework-agnostic data grid logic (sorting, filtering, grouping, virtual scrolling)",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "data-grid",
     "datagrid",
