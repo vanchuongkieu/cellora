@@ -38,7 +38,7 @@ export default defineConfig({
         vi: { label: "Tiếng Việt", lang: "vi" },
       },
       social: [{ icon: "github", label: "GitHub", href: SITE.repo }],
-      customCss: ["./src/styles/global.css"],
+      customCss: ["./src/styles/global.css", "./src/styles/search.css", "./src/styles/responsive.css"],
       // shadcn/ui-style chrome; everything else stays Starlight's
       components: {
         Head: "./src/components/overrides/Head.astro",

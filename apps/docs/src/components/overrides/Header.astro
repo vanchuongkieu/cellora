@@ -14,6 +14,11 @@ import SiteTitle from "./SiteTitle.astro"
 const { locale } = Astro.locals.starlightRoute
 const t = ui(locale)
 const path = Astro.url.pathname
+// Pages offered in the search dialog before anything is typed
+const suggested = [
+  { title: t.searchStart, pages: t.searchPages.slice(0, 3) },
+  { title: t.searchPopular, pages: t.searchPages.slice(3) },
+]
 const links = [
   { label: t.docs, href: localePath(locale, "/getting-started/introduction/"), section: "/getting-started/" },
   { label: t.features, href: localePath(locale, "/features/sorting/"), section: "/features/" },
@@ -49,3 +54,33 @@ const links = [
     </div>
   </div>
 </div>
+
+{/* Moved into the search dialog by the script below (Starlight owns that markup) */}
+<template data-search-suggest>
+  <nav class="cl-search-suggest" aria-label={t.searchPopular}>
+    {
+      suggested.map((group) => (
+        <>
+          <h3>{group.title}</h3>
+          {group.pages.map(([href, label]) => (
+            <a href={localePath(locale, href)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+              </svg>
+              {label}
+            </a>
+          ))}
+        </>
+      ))
+    }
+  </nav>
+</template>
+
+<script>
+  // Suggested pages live inside Starlight's search dialog, under the input.
+  // CSS hides them as soon as something is typed (`:placeholder-shown`).
+  const template = document.querySelector<HTMLTemplateElement>("template[data-search-suggest]")
+  const container = document.querySelector("site-search .search-container")
+  if (template && container) container.append(template.content)
+</script>

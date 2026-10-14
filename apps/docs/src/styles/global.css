@@ -598,6 +598,23 @@ starlight-lang-select {
   text-align: start;
   vertical-align: top;
 }
+/* Types and signatures in API tables wrap instead of forcing a wide table;
+   the first column (the prop / option name) stays on one line */
+.sl-markdown-content :is(th, td) code:not(:where(.not-content *)) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.sl-markdown-content :is(th, td):first-child code:not(:where(.not-content *)) {
+  white-space: nowrap;
+}
+@media (max-width: 50rem) {
+  .sl-markdown-content table:not(:where(.not-content *)) {
+    font-size: 0.75rem;
+  }
+  .sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+    padding: 0.375rem 0.5rem;
+  }
+}
 .sl-markdown-content th:not(:where(.not-content *)) {
   font-weight: 500;
   color: var(--cl-muted-fg);
@@ -621,6 +638,16 @@ starlight-lang-select {
 .sl-markdown-content .expressive-code {
   margin-top: 1rem;
 }
+/* Touch screens show the copy button all the time: keep it light and leave
+   room at the end of the lines so it does not sit on the code */
+@media (hover: none) {
+  .expressive-code .copy button {
+    opacity: 0.6;
+  }
+  .expressive-code pre {
+    padding-inline-end: 3rem;
+  }
+}
 
 /* ---------------------------------------------------------------------------
  * Live demo + collapsible source (ComponentPreview)
@@ -637,6 +664,9 @@ starlight-lang-select {
   padding: 1rem;
   /* Room for the grid before its island mounts: the page must not jump when it appears */
   min-height: 18rem;
+  @media (max-width: 50rem) {
+    padding: 0.75rem;
+  }
   background: var(--background);
   color: var(--foreground);
   font-size: 0.875rem;

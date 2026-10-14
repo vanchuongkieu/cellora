@@ -23,7 +23,8 @@ const { code, title = "demo.tsx" } = Astro.props
 const t = ui(Astro.locals.starlightRoute.locale)
 ---
 
-<div class="cl-preview not-content">
+{/* data-pagefind-ignore: demo source must not show up as search results */}
+<div class="cl-preview not-content" data-pagefind-ignore>
   <div class="cl-preview-demo">
     <slot />
   </div>

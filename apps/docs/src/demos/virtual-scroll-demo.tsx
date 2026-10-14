@@ -9,7 +9,7 @@ const WORDS = ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", 
 const hash = (row: number, column: number) => (Math.imul(row + 1, 2654435761) ^ Math.imul(column + 1, 40503)) >>> 0
 
 const columns: DataGridColumnInput<number>[] = [
-  { id: "n", header: "#", accessor: (row) => row + 1, align: "right", width: 100, sticky: "left", sortable: true },
+  { id: "n", header: "#", accessor: (row) => row + 1, align: "right", width: 84, sticky: "left", sortable: true },
   ...Array.from({ length: 49 }, (_, i): DataGridColumnInput<number> => {
     const c = i + 1
     return i % 2 === 0

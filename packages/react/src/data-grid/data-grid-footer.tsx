@@ -48,82 +48,91 @@ export function DataGridFooter<TRow>({ grid, pageSizeOptions, labels, showSelect
   ) : null
 
   return (
-    <div data-slot="data-grid-footer" className={cn("flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground", classNames.footer)} style={styles.footer}>
-      <div className="flex items-center gap-3">
-        {loading && (showPagination || showRowCount) ? (
-          // Counts are unknown until the rows arrive; "0-0 of 0" would be a lie
-          <Skeleton className="h-4 w-24" />
-        ) : (
-          <>
-            {showPagination && <span>{slots?.range ? slots.range({ from, to, total: result.total }) : labels.range(from, to, result.total)}</span>}
-            {!showPagination && showRowCount && <span>{slots?.rowCount ? slots.rowCount({ total: result.total }) : labels.rowCount(result.total)}</span>}
-          </>
-        )}
-        {selectionSummary}
-      </div>
-      {showPagination && (
-        <div className="flex items-center gap-2">
-          {slots?.pageSize ? (
-            slots.pageSize({
-              pageSize: state.pageSize,
-              options: sizeOptions,
-              onChange: grid.setPageSize,
-            })
+    // A container query root: in a narrow grid (phones) the paging controls take
+    // their own full-width line and spread out, and the "Rows per page" label
+    // steps aside for the select, so nothing wraps mid-phrase
+    <div data-slot="data-grid-footer" className={cn("@container text-sm text-muted-foreground", classNames.footer)} style={styles.footer}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 whitespace-nowrap">
+          {loading && (showPagination || showRowCount) ? (
+            // Counts are unknown until the rows arrive; "0-0 of 0" would be a lie
+            <Skeleton className="h-4 w-24" />
           ) : (
             <>
-              <span>{labels.rowsPerPage}</span>
-              <Select value={String(state.pageSize)} onValueChange={(value) => grid.setPageSize(Number(value))}>
-                <SelectTrigger size="sm" aria-label={labels.rowsPerPage}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {sizeOptions.map((option) => (
-                    <SelectItem key={option} value={String(option)}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {showPagination && <span>{slots?.range ? slots.range({ from, to, total: result.total }) : labels.range(from, to, result.total)}</span>}
+              {!showPagination && showRowCount && <span>{slots?.rowCount ? slots.rowCount({ total: result.total }) : labels.rowCount(result.total)}</span>}
             </>
           )}
-          <span>
-            {slots?.pageIndicator
-              ? slots.pageIndicator({
+          {selectionSummary}
+        </div>
+        {showPagination && (
+          <div className="flex items-center gap-3 whitespace-nowrap @max-md:w-full @max-md:justify-between">
+            <div className="flex items-center gap-2">
+              {slots?.pageSize ? (
+                slots.pageSize({
+                  pageSize: state.pageSize,
+                  options: sizeOptions,
+                  onChange: grid.setPageSize,
+                })
+              ) : (
+                <>
+                  <span className="@max-sm:sr-only">{labels.rowsPerPage}</span>
+                  <Select value={String(state.pageSize)} onValueChange={(value) => grid.setPageSize(Number(value))}>
+                    <SelectTrigger size="sm" aria-label={labels.rowsPerPage}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sizeOptions.map((option) => (
+                        <SelectItem key={option} value={String(option)}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
+            </div>
+            <span>
+              {slots?.pageIndicator
+                ? slots.pageIndicator({
+                    pageIndex: result.pageIndex,
+                    pageCount: result.pageCount,
+                  })
+                : labels.pageIndicator(result.pageIndex + 1, result.pageCount)}
+            </span>
+            <div className="flex items-center gap-2">
+              {slots?.pageNavigation ? (
+                slots.pageNavigation({
                   pageIndex: result.pageIndex,
                   pageCount: result.pageCount,
+                  onPageChange: grid.setPageIndex,
                 })
-              : labels.pageIndicator(result.pageIndex + 1, result.pageCount)}
-          </span>
-          {slots?.pageNavigation ? (
-            slots.pageNavigation({
-              pageIndex: result.pageIndex,
-              pageCount: result.pageCount,
-              onPageChange: grid.setPageIndex,
-            })
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                size="icon-sm"
-                aria-label={labels.previousPage}
-                disabled={loading || result.pageIndex === 0}
-                onClick={() => grid.setPageIndex(result.pageIndex - 1)}
-              >
-                <ChevronLeftIcon />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon-sm"
-                aria-label={labels.nextPage}
-                disabled={loading || result.pageIndex >= result.pageCount - 1}
-                onClick={() => grid.setPageIndex(result.pageIndex + 1)}
-              >
-                <ChevronRightIcon />
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label={labels.previousPage}
+                    disabled={loading || result.pageIndex === 0}
+                    onClick={() => grid.setPageIndex(result.pageIndex - 1)}
+                  >
+                    <ChevronLeftIcon />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label={labels.nextPage}
+                    disabled={loading || result.pageIndex >= result.pageCount - 1}
+                    onClick={() => grid.setPageIndex(result.pageIndex + 1)}
+                  >
+                    <ChevronRightIcon />
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

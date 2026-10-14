@@ -1,0 +1,135 @@
+/* ---------------------------------------------------------------------------
+ * Phones and small tablets (< 50rem): tighter rhythm, plus the motion that
+ * Starlight's mobile menu and the "View Code" reveal lack by default.
+ * ------------------------------------------------------------------------- */
+
+@media (max-width: 50rem) {
+  :root {
+    --sl-nav-pad-x: 1rem;
+    --sl-content-pad-x: 1rem;
+    --sl-text-h1: 1.75rem;
+  }
+
+  /* Page head */
+  .content-panel:first-of-type {
+    padding-top: 1.5rem;
+  }
+  .cl-page-head h1 {
+    font-size: 1.75rem;
+  }
+  .cl-page-description {
+    margin-top: 0.375rem !important;
+    font-size: 0.9375rem;
+  }
+
+  /* Article rhythm */
+  .sl-markdown-content {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+  .sl-markdown-content h2:not(:where(.not-content *)) {
+    margin-top: 2rem;
+    font-size: 1.1875rem;
+  }
+  .sl-markdown-content h3:not(:where(.not-content *)) {
+    margin-top: 1.5rem;
+  }
+  .sl-markdown-content :is(h2, h3):not(:where(.not-content *)) + * {
+    margin-top: 0.5rem;
+  }
+  .sl-markdown-content .expressive-code {
+    margin-top: 0.75rem;
+  }
+  .cl-preview {
+    margin-top: 1rem;
+  }
+  .cl-preview-demo {
+    min-height: 14rem;
+  }
+  .cl-pagination {
+    margin-top: 2rem;
+    gap: 0.5rem;
+  }
+  .cl-credit {
+    margin-top: 2.5rem;
+  }
+
+  /* Landing page */
+  .cl-hero {
+    padding: 2.25rem 0 1.75rem;
+  }
+  .cl-hero h1 {
+    margin-top: 1rem;
+  }
+  .cl-hero-tagline {
+    margin-top: 0.875rem;
+    font-size: 1rem;
+  }
+  .cl-hero-actions {
+    margin-top: 1.25rem;
+  }
+  .cl-card {
+    padding: 1rem;
+  }
+  .cl-card > p {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Install block tabs fit on one row */
+  .cl-install-tabs button {
+    padding: 0 0.375rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion
+ * ------------------------------------------------------------------------- */
+
+/* Starlight's mobile menu is a popover: slide it in from the top */
+#starlight__sidebar {
+  transition:
+    opacity 0.18s ease-out,
+    translate 0.18s ease-out,
+    display 0.18s allow-discrete,
+    overlay 0.18s allow-discrete;
+}
+#starlight__sidebar:popover-open {
+  opacity: 1;
+  translate: 0 0;
+  @starting-style {
+    opacity: 0;
+    translate: 0 -0.5rem;
+  }
+}
+#starlight__sidebar:not(:popover-open) {
+  opacity: 0;
+  translate: 0 -0.5rem;
+}
+
+/* "View Code": the source unfolds instead of snapping open */
+.cl-preview-code .expressive-code {
+  interpolate-size: allow-keywords;
+  transition: max-height 0.3s ease-out;
+}
+.cl-preview-code-overlay {
+  transition: opacity 0.2s;
+}
+
+/* Dropdowns and menus come from Radix + tw-animate (already animated); the
+   docs' own buttons just need a soft hover */
+.cl-pill,
+.cl-search-suggest a,
+.sidebar-content a {
+  transition: background-color 0.12s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #starlight__sidebar,
+  .cl-preview-code .expressive-code,
+  site-search dialog[open],
+  site-search dialog[open]::backdrop {
+    transition: none;
+    animation: none;
+  }
+}

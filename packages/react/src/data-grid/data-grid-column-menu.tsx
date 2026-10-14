@@ -77,7 +77,8 @@ export function DataGridColumnMenu<TRow>({ ctx, visible, labels, width, classNam
         <Button
           variant="ghost"
           size="icon-xs"
-          className={triggerClassName}
+          // A finger needs a bigger target than a mouse pointer
+          className={cn("pointer-coarse:size-8", triggerClassName)}
           aria-label={labels.columnMenu}
           // Header click sorts; the menu button must not
           onClick={stop}

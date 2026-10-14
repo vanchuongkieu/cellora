@@ -16,6 +16,18 @@ const STRINGS = {
     badge: "1,000,000 rows, still 60 fps",
     builtBy: "Built by",
     sourceOn: "The source code is available on",
+    searchStart: "Getting started",
+    searchPopular: "Popular",
+    searchPages: [
+      ["/getting-started/introduction/", "Introduction"],
+      ["/getting-started/installation/", "Installation"],
+      ["/getting-started/quick-start/", "Quick start"],
+      ["/features/sorting/", "Sorting"],
+      ["/features/virtual-scroll/", "Virtual scroll"],
+      ["/features/server-side/", "Server-side data"],
+      ["/features/inline-editing/", "Inline editing"],
+      ["/api/data-grid/", "DataGrid props"],
+    ] as [path: string, label: string][],
   },
   vi: {
     docs: "Tài liệu",
@@ -31,6 +43,18 @@ const STRINGS = {
     badge: "1.000.000 dòng, vẫn 60 fps",
     builtBy: "Phát triển bởi",
     sourceOn: "Mã nguồn có trên",
+    searchStart: "Bắt đầu",
+    searchPopular: "Hay xem",
+    searchPages: [
+      ["/getting-started/introduction/", "Giới thiệu"],
+      ["/getting-started/installation/", "Cài đặt"],
+      ["/getting-started/quick-start/", "Bắt đầu nhanh"],
+      ["/features/sorting/", "Sắp xếp"],
+      ["/features/virtual-scroll/", "Cuộn ảo"],
+      ["/features/server-side/", "Dữ liệu phía server"],
+      ["/features/inline-editing/", "Sửa trực tiếp"],
+      ["/api/data-grid/", "Props của DataGrid"],
+    ] as [path: string, label: string][],
   },
 }
 
